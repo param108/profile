@@ -1,9 +1,8 @@
-.PHONY: server clean
-server:
-	make -C server build
+.PHONY: build clean
+build:
+	- rm -rf build
 	mkdir -p build
-	mv server/build/server build/
+	go build -o build ./...
 
 clean:
-	make -C server clean
 	rm -rf build
