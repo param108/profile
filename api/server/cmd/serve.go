@@ -33,9 +33,10 @@ func serveCmd(c *cli.Context) error {
 		log.Fatalf("Failed to start server:%s", err.Error)
 	}
 
+	// never returns
 	s.Serve()
 
-	return err
+	return nil
 }
 
 func init() {
