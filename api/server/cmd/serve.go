@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"log"
+
+	srv "github.com/param108/profile/api/server/instance"
 	"github.com/urfave/cli/v2"
-	srv "github.com/param108/profile/api/server/serve"
 )
 
 var (
@@ -26,8 +28,14 @@ var (
 )
 
 func serveCmd(c *cli.Context) error {
-	srv.Serve(servePort)
-	return nil
+	s, err := srv.NewServer(servePort)
+	if err != nil {
+		log.Fatalf("Failed to start server:%s", err.Error)
+	}
+
+	s.Serve()
+
+	return err
 }
 
 func init() {
