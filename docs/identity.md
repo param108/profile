@@ -80,16 +80,12 @@ CREATE TABLE invalid_tokens (
         
     triggers the login flow for the source mentioned by redirecting somewhere.
 
-*POST /users/authorize*
+*GET /users/authorize/twitter*
 
-    body:
-        {
-            "source": [twitter|facebook|google]
-            "attributes": {
-                // source specific attributes
-            }
-        }
-    
+    query:
+        `oauth_token`
+        `oauth-verifier`
+        
     returns:
         {
             "access_token": <access-token>,
