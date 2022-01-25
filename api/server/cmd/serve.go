@@ -30,7 +30,7 @@ var (
 func serveCmd(c *cli.Context) error {
 	s, err := srv.NewServer(servePort)
 	if err != nil {
-		log.Fatalf("Failed to start server:%s", err.Error)
+		log.Fatalf("Failed to start server:%s", err.Error())
 	}
 
 	// never returns

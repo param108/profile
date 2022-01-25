@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 	"time"
-
+	_ "embed"
 	"github.com/gorilla/mux"
 )
 
@@ -14,6 +14,10 @@ type Server struct {
 	r *mux.Router
 	s *http.Server
 }
+
+
+//go:embed version.txt
+var version []byte
 
 func NewServer(port int) (*Server,error) {
 	server := &Server{}
@@ -37,5 +41,8 @@ func (s *Server) Serve() {
 }
 
 func (s *Server) RegisterHandlers() {
-
+	s.r.HandleFunc("/version", func(rw http.ResponseWriter, r *http.Request) {
+		rw.WriteHeader(http.StatusOK)
+		rw.Write(version)
+	})
 }
