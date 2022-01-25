@@ -9,6 +9,7 @@ build:	version
 	go build -o build ./...
 
 test:	version
+	[ goimports -l . ]
 	go test -v ./...
 
 clean:

@@ -12,18 +12,18 @@ var (
 
 	// The Actual command
 	serve = &cli.Command{
-	Name: "serve",
-	Usage: "run the server",
-	Action: serveCmd,
-	Flags: []cli.Flag{
-		&cli.IntFlag{
-			Name: "port",
-			Usage: "port to listen on for http requests",
-			Required: true,
-			Value: 8080,
-			EnvVars: []string{"PORT"},
-			Destination: &servePort,
-		}},
+		Name:   "serve",
+		Usage:  "run the server",
+		Action: serveCmd,
+		Flags: []cli.Flag{
+			&cli.IntFlag{
+				Name:        "port",
+				Usage:       "port to listen on for http requests",
+				Required:    true,
+				Value:       8080,
+				EnvVars:     []string{"PORT"},
+				Destination: &servePort,
+			}},
 	}
 )
 
