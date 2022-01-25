@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/gorilla/mux v1.8.0
 	github.com/joho/godotenv v1.4.0
+	github.com/soellman/pidfile v0.0.0-20160225184504-d482c905736b
 	github.com/urfave/cli/v2 v2.3.0
 )
 

@@ -6,13 +6,18 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/param108/profile/api/server/cmd"
+	"github.com/soellman/pidfile"
 	"github.com/urfave/cli/v2"
 )
 
 func main() {
+	if err := pidfile.Write("PID"); err != nil {
+		log.Fatal("failed PID file:" + err.Error())
+	}
+
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Fatal("Error loading .env file:" + err.Error())
 	}
 
 	app := &cli.App{
