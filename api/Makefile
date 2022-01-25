@@ -1,4 +1,7 @@
 .PHONY: build clean version
+
+SHELL=/bin/bash
+
 version:
 	git branch --show-current > server/instance/version.txt
 	git for-each-ref --points-at `git branch --show-current` | head -1 | cut -d' ' -f 1 >> server/instance/version.txt
@@ -9,7 +12,7 @@ build:	version
 	go build -o build ./...
 
 test:	version
-	[ goimports -l . ]
+	if [ -n "`goimports -l .`" ]; then echo "lint failure"; exit 1; fi
 	go test -v ./...
 
 clean:
