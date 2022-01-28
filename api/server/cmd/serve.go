@@ -3,6 +3,8 @@ package cmd
 import (
 	"log"
 
+	"os"
+
 	srv "github.com/param108/profile/api/server/instance"
 	"github.com/soellman/pidfile"
 	"github.com/urfave/cli/v2"
@@ -31,7 +33,11 @@ var (
 func serveCmd(c *cli.Context) error {
 
 	if err := pidfile.Write("PID"); err != nil {
-		log.Fatal("failed PID file:" + err.Error())
+		// lets remove and try again
+		os.Remove("PID")
+		if err = pidfile.Write("PID"); err != nil {
+			log.Fatal("failed PID file:" + err.Error())
+		}
 	}
 
 	s, err := srv.NewServer(servePort)
