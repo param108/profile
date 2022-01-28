@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"log"
-
+	"github.com/soellman/pidfile"
 	srv "github.com/param108/profile/api/server/instance"
 	"github.com/urfave/cli/v2"
 )
@@ -28,6 +28,12 @@ var (
 )
 
 func serveCmd(c *cli.Context) error {
+
+	if err := pidfile.Write("PID"); err != nil {
+		log.Fatal("failed PID file:" + err.Error())
+	}
+
+
 	s, err := srv.NewServer(servePort)
 	if err != nil {
 		log.Fatalf("Failed to start server:%s", err.Error())

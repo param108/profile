@@ -1,12 +1,8 @@
-name: api_test
+name: api_deploy
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
-    paths: 'api/**'
-
 jobs:
 
   build:
@@ -27,3 +23,9 @@ jobs:
 
     - name: Build
       run: make -C api build
+
+    - name: upload server artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: server
+          path: ${{ github.workspace }}/build/server

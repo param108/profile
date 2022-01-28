@@ -5,7 +5,7 @@ We will use systemd to keep the executable running if it crashes.
 
 # Prerequisites
 
-1. 
+1. github cli installed on server
 1. The server binary must listen for SIG_TERM and gracefully shutdown.
 
 # Overview
@@ -14,13 +14,13 @@ We will use systemd to keep the executable running if it crashes.
 
 1. ssh into server and copy the `systemd` unit file to `/etc/systemd/system/tribist.service`
    (Not `user` as we want this service to always run.)
-2. place the server in the appropriate directory with appropriate permissions
-   `/home/tribist/api/server`
-3. when run, the executable must create a file `PID` in the current directory
-   with the process' current PID. 
-   This will be used to send the process `SIG_TERM` when we wish to restart.
-4. a shell script `server.sh` will be placed at `/home/tribist/bin/server.sh` which will
-   be used to start and stop the server.
+2. copy `server.sh`  `/usr/bin/server.sh` with required arguments.
+   - this will be triggered by the unit file to start|stop|restart the server
+3. copy the github access token to `/usr/share/github-token.txt`
+   - this should be readable only by root.
+5. a shell script `restart_server.sh` will be placed at `/usr/bin/restart_server.sh`
+   This will be called by the user `tribist` via sudo to trigger `systemctl restart tribist`.
+   This is needed to avoid the user `tribist` to get more access than necessary via sudo.
 5. check for successful start will use the script `wait_for_it.sh` and will fail in 30 seconds.
    We will hit `http://localhost:8383/health` which will also check the DB connection.
    
@@ -29,37 +29,53 @@ We will use systemd to keep the executable running if it crashes.
 7. `sudo systemctl start tribist`
 
 ## Upgrade
-1. scp `server` binary to `/home/tribist/api/server_new`
+1. get the artifact id from github
 1. ssh into the server
-2. execute `sudo systemctl restart tribist`
-   
-   `server.sh` is responsible to check for `server_new` existing and moving it to `server`
+2. execute `/usr/bin/restart_server.sh`
+   This script is a wrapper for the command `systemctl restart tribist`
+   The unit file will then run `server.sh` with appropriate configurations
+   `server.sh` is responsible to download the new server image if any.
 3. wait for `wait_for_it.sh` to return.
    
    if `wait_for_it.sh` fails print appropriate message and exit.
    
 # Details 
-
+## tribist user
+    The user must have only the ability to restart the server.
+    ```
+        Cmnd_Alias TRIBIST_CMDS = /usr/bin/restart_server.sh
+        
+        tribist ALL=(root) NOPASSWD: TRIBIST_CMDS
+    ```
+    
+    This allows `tribist` on `ALL` hosts to run `TRIBIST_CMDS`` without PASSWORD as `root`
+    
 ## server.sh
     `$1` is one of `[stop|start|restart]`
     
     *start*
     
-    1. check if `home/tribist/api/server_new` exists.
+    1. download the latest release artifact from github.
+    
+    2. if it does exist `mv` it to `/usr/bin/server_new`
+    
+    3. check for `/usr/bin/server_new` and if it exists `mv` it to `/usr/bin/server`
        
-       if it does `mv` it to `/home/tribist/api/server`
-       
-    2. `sudo systemctl start tribist`
+    4. run `/usr/bin/server`
     
     *restart*
 
-    1. check if `home/tribist/api/server_new` exists.
+    1. download the latest release artifact from github.
+    
+    2. if it does exist `mv` it to `/usr/bin/server`
+    
+    3. stop the server by sending SIG_TERM signal to server using the PID file.
+
+    3. check for `/usr/bin/server_new` and if it exists `mv` it to `/usr/bin/server`
        
-       if it does `mv` it to `/home/tribist/api/server`
-       
-    2. `sudo systemctl restart tribist`
+    4. run `/usr/bin/server`
 
     *stop*
     
-    1. `sudo systemctl stop tribist`
+    1. stop the server by sending SIG_TERM signal to server using PID file.
     
