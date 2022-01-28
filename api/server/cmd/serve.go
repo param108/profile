@@ -20,7 +20,7 @@ var (
 			&cli.IntFlag{
 				Name:        "port",
 				Usage:       "port to listen on for http requests",
-				Required:    true,
+				Required:    false,
 				Value:       8080,
 				EnvVars:     []string{"PORT"},
 				Destination: &servePort,

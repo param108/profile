@@ -9,16 +9,38 @@ exit_abnormal() {                         # Function: Exit with error.
   exit 1
 }
 
-while getopts "e:p:c:" options; do
+download_latest_image() {
+	/usr/bin/gh auth login --with-token < ${GH_CONFIG_PATH}
+
+	if [ $? -ne 0 ]
+	then
+		echo "failed login"
+		exit 1
+	fi
+
+	IMAGE_ID=`/usr/bin/gh run -R param108/profile list -w api_deploy --json conclusion,databaseId,workflowDatabaseId -L 1 -q 'select(.[].conclusion = "success")' | jq .[0].databaseId`
+
+	rm /tmp/server
+
+	/usr/bin/gh run -R param108/profile download ${IMAGE_ID} -n server -D /tmp/
+
+	if [ $? -ne 0 ]
+	then
+		echo "failed download"
+		exit 1
+	fi
+
+	mv /tmp/server  server_new
+
+}
+
+while getopts "c:g:" options; do
     case "${options}" in
-        e)
-            ENV=${OPTARG}
-            ;;
-        p)
-            EXECPATH=${OPTARG}
-            ;;
         c)
             COMMAND=${OPTARG}
+            ;;
+        g)
+            GH_CONFIG_PATH=${OPTARG}
             ;;
         :)
             echo "Error: -${OPTARG} requires an argument."
@@ -27,13 +49,13 @@ while getopts "e:p:c:" options; do
     esac
 done
 
-source ${ENV}
+source .env
 
 case "${COMMAND}" in
-    restart)
-        if [ -e "${EXECPATH}/PID" ]
+    reload)
+        if [ -e "PID" ]
         then
-            kill -15 `cat "${EXECPATH}/PID"`
+            kill -15 `cat "PID"`
             sleep 5
         fi
 
@@ -44,18 +66,20 @@ case "${COMMAND}" in
             exit_abnormal
         fi
 
-        if [ -e "${EXECPATH}/server_new" ]
+        download_latest_image
+
+        if [ -e "server_new" ]
         then
-            mv "${EXECPATH}/server_new" "${EXECPATH}/server"
+            mv "server_new" "server"
+           chmod 500 server
         fi
 
-        cd ${EXECPATH}
         ./server
     ;;
     start)
-        if [ -e "${EXECPATH}/PID" ]
+        if [ -e "PID" ]
         then
-            kill -15 `cat "${EXECPATH}/PID"`
+            kill -15 `cat "PID"`
             sleep 5
         fi
 
@@ -66,18 +90,20 @@ case "${COMMAND}" in
             exit_abnormal
         fi
 
-        if [ -e "${EXECPATH}/server_new" ]
+        download_latest_image
+
+        if [ -e "server_new" ]
         then
-            mv "${EXECPATH}/server_new" "${EXECPATH}/server"
+            mv "server_new" "server"
+            chmod 500 server
         fi
 
-        cd ${EXECPATH}
         ./server
     ;;
     stop)
-        if [ -e "${EXECPATH}/PID" ]
+        if [ -e "PID" ]
         then
-            kill -15 `cat "${EXECPATH}/PID"`
+            kill -15 `cat "PID"`
             sleep 5
         fi
 

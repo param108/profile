@@ -6,21 +6,21 @@ We will use systemd to keep the executable running if it crashes.
 # Prerequisites
 
 1. github cli installed on server
-1. The server binary must listen for SIG_TERM and gracefully shutdown.
-
+2. The server binary must listen for SIG_TERM and gracefully shutdown.
+`
 # Overview
 
 ## Installation
 
 1. ssh into server and copy the `systemd` unit file to `/etc/systemd/system/tribist.service`
    (Not `user` as we want this service to always run.)
-2. copy `server.sh`  `/usr/bin/server.sh` with required arguments.
+2. copy `server.sh`  `/usr/bin/server.sh`
    - this will be triggered by the unit file to start|stop|restart the server
-3. copy the github access token to `/usr/share/github-token.txt`
+3. copy the github access token to `/home/tribist/api/gh.txt`
    - this should be readable only by root.
 5. a shell script `restart_server.sh` will be placed at `/usr/bin/restart_server.sh`
-   This will be called by the user `tribist` via sudo to trigger `systemctl restart tribist`.
-   This is needed to avoid the user `tribist` to get more access than necessary via sudo.
+   This will be called by the user `cicd` via sudo to trigger `systemctl restart tribist`.
+   This is needed to avoid the user `cicd` to get more access than necessary via sudo.
 5. check for successful start will use the script `wait_for_it.sh` and will fail in 30 seconds.
    We will hit `http://localhost:8383/health` which will also check the DB connection.
    
@@ -29,28 +29,31 @@ We will use systemd to keep the executable running if it crashes.
 7. `sudo systemctl start tribist`
 
 ## Upgrade
-1. ssh into the server
-2. execute `/usr/bin/restart_server.sh`
+1. The production env file is in a cicd variable. scp it to `/home/tribist/api/.env`
+2. ssh into the server
+3. execute `/usr/bin/restart_server.sh`
    This script is a wrapper for the command `systemctl restart tribist`
-   The unit file will then run `server.sh` with appropriate configurations
+   The unit file will then run `/usr/bin/server.sh` with appropriate configurations
    `server.sh` is responsible to download the new server image if any.
-3. wait for `wait_for_it.sh` to return.
+4. wait for `wait_for_it.sh` to return.
    
    if `wait_for_it.sh` fails print appropriate message and exit.
    
 # Details 
-## tribist user
+## cicd user
     The user must have only the ability to restart the server.
     ```
         Cmnd_Alias TRIBIST_CMDS = /usr/bin/restart_server.sh
         
-        tribist ALL=(root) NOPASSWD: TRIBIST_CMDS
+        cicd ALL=(root) NOPASSWD: TRIBIST_CMDS
     ```
     
-    This allows `tribist` on `ALL` hosts to run `TRIBIST_CMDS`` without PASSWORD as `root`
+    This allows `cicd` on `ALL` hosts to run `TRIBIST_CMDS`` without PASSWORD as `root`
     
 ## server.sh
     `$1` is one of `[stop|start|restart]`
+    
+    Working directory is `/home/tribist/api/`
     
     *start*
     
@@ -63,28 +66,28 @@ We will use systemd to keep the executable running if it crashes.
         use the `databaseId` to download artifact.
 
         ```
-        gh run -R param108/profile download <databaseId from previous command> -n server
+        gh run -R param108/profile download <databaseId from previous command> -n server -D /tmp/
         ```
 
-    use the run id obtained above to extract the `server` artifact
+    use the run id obtained above to extract the `server` artifact to `/tmp/server`
     
-    2. if it does exist `mv` it to `/usr/bin/server_new`
+    2. `mv` it to `/home/tribist/api/server_new`
     
-    3. check for `/usr/bin/server_new` and if it exists `mv` it to `/usr/bin/server`
+    3. check for `/home/tribist/api/server_new` and if it exists `mv` it to `/home/tribist/api/server`
        
-    4. run `/usr/bin/server`
+    4. run `/home/tribist/api/server`
     
     *restart*
 
     1. download the latest release artifact from github.
     
-    2. if it does exist `mv` it to `/usr/bin/server`
+    2. if it does exist `mv` it to `/home/tribist/api/server_new`
     
     3. stop the server by sending SIG_TERM signal to server using the PID file.
 
-    3. check for `/usr/bin/server_new` and if it exists `mv` it to `/usr/bin/server`
+    3. check for `/home/tribist/api/server_new` and if it exists `mv` it to `/home/tribist/api/server`
        
-    4. run `/usr/bin/server`
+    4. run `/home/tribist/api/server`
 
     *stop*
     
