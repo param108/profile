@@ -29,7 +29,6 @@ We will use systemd to keep the executable running if it crashes.
 7. `sudo systemctl start tribist`
 
 ## Upgrade
-1. get the artifact id from github
 1. ssh into the server
 2. execute `/usr/bin/restart_server.sh`
    This script is a wrapper for the command `systemctl restart tribist`
@@ -56,6 +55,18 @@ We will use systemd to keep the executable running if it crashes.
     *start*
     
     1. download the latest release artifact from github.
+
+        ```
+        gh run -R param108/profile list -w api_deploy --json conclusion,databaseId,workflowDatabaseId -L 1 -q 'select(.[].conclusion = "success")' | jq .[0].databaseId
+        ```
+
+        use the `databaseId` to download artifact.
+
+        ```
+        gh run -R param108/profile download <databaseId from previous command> -n server
+        ```
+
+    use the run id obtained above to extract the `server` artifact
     
     2. if it does exist `mv` it to `/usr/bin/server_new`
     
