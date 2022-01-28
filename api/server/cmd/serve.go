@@ -33,9 +33,13 @@ var (
 func serveCmd(c *cli.Context) error {
 
 	if err := pidfile.Write("PID"); err != nil {
-		// lets remove and try again
-		os.Remove("PID")
-		if err = pidfile.Write("PID"); err != nil {
+		if err != pidfile.ErrProcessRunning {
+			// lets remove and try again
+			os.Remove("PID")
+			if err = pidfile.Write("PID"); err != nil {
+				log.Fatal("failed PID file:" + err.Error())
+			}
+		} else {
 			log.Fatal("failed PID file:" + err.Error())
 		}
 	}
