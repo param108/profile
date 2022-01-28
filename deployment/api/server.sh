@@ -71,10 +71,10 @@ case "${COMMAND}" in
         if [ -e "server_new" ]
         then
             mv "server_new" "server"
-           chmod 500 server
+            chmod 500 server
         fi
 
-        ./server
+        ./server serve
     ;;
     start)
         if [ -e "PID" ]
@@ -98,7 +98,7 @@ case "${COMMAND}" in
             chmod 500 server
         fi
 
-        ./server
+        ./server serve
     ;;
     stop)
         if [ -e "PID" ]
