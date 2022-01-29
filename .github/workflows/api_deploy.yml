@@ -29,3 +29,11 @@ jobs:
       with:
         name: server
         path: ${{ github.workspace }}/api/build/server
+
+    - name: trigger new image
+      uses: fifsky/ssh-action@master
+      with:
+        command: sudo /usr/bin/restart_server.sh
+        host: ${{ secrets.API_HOST }}
+        user: cicd
+        key: ${{ secrets.API_PRIVATE_KEY}}
