@@ -1,0 +1,11 @@
+[Unit]
+Description=Tribist
+
+[Service]
+WorkingDirectory=/home/tribist/api
+Type=simple
+Restart=always
+RestartSec=30s
+ExecStart=/usr/bin/server.sh -c start -g gh.txt
+ExecStop=/usr/bin/server.sh -c stop -g gh.txt
+ExecReload=/usr/bin/server.sh -c reload -g gh.txt
