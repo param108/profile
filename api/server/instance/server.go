@@ -40,6 +40,10 @@ func (s *Server) Serve() {
 	log.Fatal(s.s.ListenAndServe())
 }
 
+func (s *Server) Quit() {
+	s.s.Close()
+}
+
 func (s *Server) RegisterHandlers() {
 	s.r.HandleFunc("/version", func(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusOK)
