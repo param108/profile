@@ -6,8 +6,8 @@ We will use systemd to keep the executable running if it crashes.
 # Prerequisites
 
 1. github cli installed on server
-2. The server binary must listen for SIG_TERM and gracefully shutdown.
-`
+2. The server binary must listen for `SIG_TERM` and gracefully shutdown.
+
 # Overview
 
 ## Installation
@@ -29,15 +29,11 @@ We will use systemd to keep the executable running if it crashes.
 7. `sudo systemctl start tribist`
 
 ## Upgrade
-1. The production env file is in a cicd variable. scp it to `/home/tribist/api/.env`
-2. ssh into the server
-3. execute `/usr/bin/restart_server.sh`
-   This script is a wrapper for the command `systemctl restart tribist`
+1. ssh into the server
+2. execute `/usr/bin/restart_server.sh`
+   This script is a wrapper for the command `systemctl stop tribist` and then `systemctl start tribist`
    The unit file will then run `/usr/bin/server.sh` with appropriate configurations
    `server.sh` is responsible to download the new server image if any.
-4. wait for `wait_for_it.sh` to return.
-   
-   if `wait_for_it.sh` fails print appropriate message and exit.
    
 # Details 
 
@@ -91,7 +87,7 @@ We will use systemd to keep the executable running if it crashes.
     
     2. if it does exist `mv` it to `/home/tribist/api/server_new`
     
-    3. stop the server by sending SIG_TERM signal to server using the PID file.
+    3. stop the server by sending `SIG_TERM` signal to server using the PID file.
 
     3. check for `/home/tribist/api/server_new` and if it exists `mv` it to `/home/tribist/api/server`
        
@@ -99,5 +95,5 @@ We will use systemd to keep the executable running if it crashes.
 
     *stop*
     
-    1. stop the server by sending SIG_TERM signal to server using PID file.
+    1. stop the server by sending `SIG_TERM` signal to server using PID file.
     
