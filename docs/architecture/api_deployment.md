@@ -40,6 +40,14 @@ We will use systemd to keep the executable running if it crashes.
    if `wait_for_it.sh` fails print appropriate message and exit.
    
 # Details 
+
+## apache config for proxying
+```
+    ProxyPreserveHost On
+    ProxyRequests Off
+    ProxyPass / http://localhost:8383/
+```
+
 ## cicd user
     The user must have only the ability to restart the server.
     ```
