@@ -27,7 +27,7 @@ jobs:
     - name: Bundle
       run : |
           echo "${{ secrets.API_ENV_CONFIG }}" > ${{ github.workspace }}/api/build/env
-          tar -zcvf ${{ github.workspace }}/api/server.tgz ${{ github.workspace }}/api/build
+          cd ${{ github.workspace }}/api; tar -zcvf server.tgz build
 
     - name: upload server artifact
       uses: actions/upload-artifact@v2
