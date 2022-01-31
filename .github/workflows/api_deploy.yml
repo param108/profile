@@ -35,6 +35,12 @@ jobs:
         name: server
         path: ${{ github.workspace }}/api/build/server
 
+    - name: upload server.tgz artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: server
+        path: ${{ github.workspace }}/api/server.tgz
+
     - name: trigger new image
       uses: fifsky/ssh-action@master
       with:
