@@ -46,6 +46,7 @@ We will use systemd to keep the executable running if it crashes.
 
 ## artifact contents
     The artifact will be created by the `api_deploy` action on github.
+    It will be called `server.tgz`
     It will consist of
     1. server <-- the api server
     2. env    <-- the environment file
@@ -83,10 +84,13 @@ We will use systemd to keep the executable running if it crashes.
         use the `databaseId` to download artifact.
 
         ```
-        gh run -R param108/profile download <databaseId from previous command> -n server -D /tmp/
+        gh run -R param108/profile download <databaseId from previous command> -n server.tgz -D /tmp/
         ```
 
-    `server` is now present in `/tmp/server`. It is the bundled `{ server, env }` package from github.
+	```
+	cd /tmp/; rm -rf build; tar -zxvf /tmp/server.tgz
+	```
+    `server` is now present in `/tmp/build/server`.
     Unzip it and extract the `server` and `env` files.
     
     2. `mv` the `server` binary from the package to `/home/tribist/api/server_new`

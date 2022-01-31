@@ -10,6 +10,10 @@ exit_abnormal() {                         # Function: Exit with error.
 }
 
 download_latest_image() {
+	# clean up
+	rm -rf /tmp/build
+	rm  -f /tmp/server.tgz
+
 	/usr/bin/gh auth login --with-token < ${GH_CONFIG_PATH}
 
 	if [ $? -ne 0 ]
@@ -18,11 +22,12 @@ download_latest_image() {
 		exit 1
 	fi
 
+	# download artifact
 	IMAGE_ID=`/usr/bin/gh run -R param108/profile list -w api_deploy --json conclusion,databaseId,workflowDatabaseId -L 1 -q 'select(.[].conclusion = "success")' | jq .[0].databaseId`
 
 	rm /tmp/server
 
-	/usr/bin/gh run -R param108/profile download ${IMAGE_ID} -n server -D /tmp/
+	/usr/bin/gh run -R param108/profile download ${IMAGE_ID} -n server.tgz -D /tmp/
 
 	if [ $? -ne 0 ]
 	then
@@ -30,7 +35,13 @@ download_latest_image() {
 		exit 1
 	fi
 
-	mv /tmp/server  server_new
+	# extract package
+	pushd /tmp/
+	tar -zxvf /tmp/server.tgz
+	popd
+
+	mv /tmp/build/server  server_new
+	mv /tmp/build/env .env
 
 }
 
