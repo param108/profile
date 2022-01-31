@@ -38,7 +38,7 @@ jobs:
     - name: upload server.tgz artifact
       uses: actions/upload-artifact@v2
       with:
-        name: server
+        name: server.tgz
         path: ${{ github.workspace }}/api/server.tgz
 
     - name: trigger new image
