@@ -85,6 +85,8 @@ We will use systemd to keep the executable running if it crashes.
     
     *start*
     
+    Assumes the server has stopped running.
+ 
     1. download the latest release artifact from github.
 
         ```
@@ -107,9 +109,12 @@ We will use systemd to keep the executable running if it crashes.
 
     3. `mv` the `env` file from the package to `/home/tribist/api/.env`
     
-    3. check for `/home/tribist/api/server_new` and if it exists `mv` it to `/home/tribist/api/server`
-       
-    4. run `/home/tribist/api/server`
+    4. check for `/home/tribist/api/server_new` and if it exists `mv` it to `/home/tribist/api/server`
+    5. migrate (ONLY if `MIGRATE` is NOT `false`) using the command
+
+       `/home/tribist/api/server migrate`  
+
+    6. run `/home/tribist/api/server`
     
     *restart*
 
@@ -119,9 +124,12 @@ We will use systemd to keep the executable running if it crashes.
     
     3. stop the server by sending `SIG_TERM` signal to server using the PID file.
 
-    3. check for `/home/tribist/api/server_new` and if it exists `mv` it to `/home/tribist/api/server`
-       
-    4. run `/home/tribist/api/server`
+    4. check for `/home/tribist/api/server_new` and if it exists `mv` it to `/home/tribist/api/server`
+    5. migrate (ONLY if `MIGRATE` is NOT `false`) using the command
+
+       `/home/tribist/api/server migrate`  
+
+    6. run `/home/tribist/api/server`
 
     *stop*
     
