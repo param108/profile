@@ -50,7 +50,6 @@ The decision to update the server binary will be based on the environment variab
 Default behaviour (if `UPDATE` is not set) is to update the server binary whenever `server.sh start` runs and we will update to the latest image. If `UPDATE=false` then we let the current image run.
 
 To do this, we will modify `server.sh` to do the necessary work.
-# TODO modify `server.sh` documentation in `api_deployment.md`
 
 ## Reversing migrations or irregular migrations
 
