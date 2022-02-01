@@ -66,10 +66,20 @@ We will use systemd to keep the executable running if it crashes.
         cicd ALL=(root) NOPASSWD: TRIBIST_CMDS
     ```
     
-    This allows `cicd` on `ALL` hosts to run `TRIBIST_CMDS`` without PASSWORD as `root`
+    This allows `cicd` on `ALL` hosts to run `TRIBIST_CMDS` without PASSWORD as `root`
     
+    Also `.ssh/authorized_keys` limits the cicd user to only run the `sudo /usr/bin/restart_server.sh` command
+    like below -
+    
+    ```
+    command="sudo /usr/bin/restart_server.sh" ssh-rsa AAAA...
+    ```
 ## server.sh
     `$1` is one of `[stop|start|restart]`
+    
+    Download of new server and server restart will only happen if environment variable `UPDATE` is not `false`.
+    
+    Migrations will only run if `MIGRATE` is NOT `false`.
     
     Working directory is `/home/tribist/api/`
     
