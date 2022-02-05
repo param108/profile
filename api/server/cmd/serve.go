@@ -16,7 +16,7 @@ var (
 	servePort int
 
 	// The Actual command
-	serve = &cli.Command{
+	serveCommand = &cli.Command{
 		Name:   "serve",
 		Usage:  "run the server",
 		Action: serveCmd,
@@ -86,5 +86,5 @@ func serveCmd(c *cli.Context) error {
 }
 
 func init() {
-	register(serve)
+	register(serveCommand)
 }
