@@ -75,11 +75,17 @@ We will use systemd to keep the executable running if it crashes.
     command="sudo /usr/bin/restart_server.sh" ssh-rsa AAAA...
     ```
 ## server.sh
-    `$1` is one of `[stop|start|restart]`
+    `$1` is one of `[stop|start]`
     
-    Download of new server and server restart will only happen if environment variable `UPDATE` is not `false`.
+    First load the environment variables from `.env`. This will give us important variables needed
+    by `server.sh`
+    - `PORT`
+    - `MIGRATE`
+    - `UPDATE`
     
-    Migrations will only run if `MIGRATE` is NOT `false`.
+    Download of new server and server restart will only happen if environment variable `UPDATE` is not set or if it is equal to `true`.
+    
+    Migrations will only run if `MIGRATE` is NOT SET or if it is equal to `true`.
     
     Working directory is `/home/tribist/api/`
     
@@ -87,6 +93,8 @@ We will use systemd to keep the executable running if it crashes.
     
     Assumes the server has stopped running.
  
+    Do steps 1 through 4 only if `UPDATE` is NOT set or `UPDATE` is `true`
+    
     1. download the latest release artifact from github.
 
         ```
@@ -110,27 +118,12 @@ We will use systemd to keep the executable running if it crashes.
     3. `mv` the `env` file from the package to `/home/tribist/api/.env`
     
     4. check for `/home/tribist/api/server_new` and if it exists `mv` it to `/home/tribist/api/server`
-    5. migrate (ONLY if `MIGRATE` is NOT `false`) using the command
+    5. migrate (ONLY if `MIGRATE` is NOT set or `MIGRATE` is `true`) using the command
 
-       `/home/tribist/api/server migrate`  
-
-    6. run `/home/tribist/api/server`
-    
-    *restart*
-
-    1. download the latest release artifact from github.
-    
-    2. if it does exist `mv` it to `/home/tribist/api/server_new`
-    
-    3. stop the server by sending `SIG_TERM` signal to server using the PID file.
-
-    4. check for `/home/tribist/api/server_new` and if it exists `mv` it to `/home/tribist/api/server`
-    5. migrate (ONLY if `MIGRATE` is NOT `false`) using the command
-
-       `/home/tribist/api/server migrate`  
+       `/home/tribist/api/server migrate`
 
     6. run `/home/tribist/api/server`
-
+    
     *stop*
     
     1. stop the server by sending `SIG_TERM` signal to server using PID file.

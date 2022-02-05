@@ -1,7 +1,7 @@
 #!/bin/bash
 
 usage() {                                 # Function: Print a help message.
-  echo "Usage: $0 [ -e ENV ] [ -p PATH ] -c [restart|start|stop]" 1>&2
+  echo "Usage: $0 [ -e ENV ] [ -p PATH ] -c [start|stop]" 1>&2
 }
 
 exit_abnormal() {                         # Function: Exit with error.
@@ -63,30 +63,6 @@ done
 source .env
 
 case "${COMMAND}" in
-    reload)
-        if [ -e "PID" ]
-        then
-            kill -15 `cat "PID"`
-            sleep 5
-        fi
-
-        curl "localhost:${PORT}"
-        if [ $? -eq 0 ]
-        then
-            echo "Failed to shutdown server"
-            exit_abnormal
-        fi
-
-        download_latest_image
-
-        if [ -e "server_new" ]
-        then
-            mv "server_new" "server"
-            chmod 500 server
-        fi
-
-        ./server serve
-    ;;
     start)
         if [ -e "PID" ]
         then
@@ -101,12 +77,25 @@ case "${COMMAND}" in
             exit_abnormal
         fi
 
-        download_latest_image
-
-        if [ -e "server_new" ]
+        # update to the latest image only if UPDATE is not set
+        # or it is "true"
+        if [ "${UPDATE}x" = "x"  -o "${UPDATE}x" = "truex" ]
         then
-            mv "server_new" "server"
-            chmod 500 server
+            download_latest_image
+
+            if [ -e "server_new" ]
+            then
+                mv "server_new" "server"
+                chmod 500 server
+            fi
+        fi
+
+        # run all migrations if MIGRATE is not set OR
+        # it is set to true
+        if [ "${MIGRATE}x" = "x"  -o "${MIGRATE}x" = "truex" ]
+        then
+            # run all the migrations
+            ./server migrate
         fi
 
         ./server serve
