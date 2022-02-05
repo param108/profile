@@ -20,6 +20,11 @@ will be `xxx_<name of migration>.[up|down].sql`.
 
 Each `up` migration must have its counterpart `down` migration.
 
+## Schema file
+
+Make sure you update the file `api/db/schema.sql` with the final schema **BEFORE** raising your
+pull request.
+
 ## Migrate command
 
 To trigger migrations, we will add a command `migrate` in the `cmd` directory.
