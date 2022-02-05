@@ -4,10 +4,20 @@
 The database is a local postgres instance on the production server. This instance will only serve
 localhost.
 
-The password is injected via the environment variable `DB_PASSWORD`.
-The host will be injected via the environment variable `DB_HOST`.
-The port will be injected via the environment variable `DB_PORT`
+The following variables are injected via environment variables.
+1. username - `DB_USER`
+2. password - `DB_PASS`
+3. host     - `DB_HOST`
+4. port     - `DB_PORT`
+5. db name  - `DB_NAME`
 
+## Setup
+
+Run the following on the DB
+
+```
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+```
 
 ## Migrations
 

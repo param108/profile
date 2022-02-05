@@ -134,3 +134,4 @@ We will use systemd to keep the executable running if it crashes.
     
     1. stop the server by sending `SIG_TERM` signal to server using PID file.
     
+    Note: If any error occurs we simply stop there.

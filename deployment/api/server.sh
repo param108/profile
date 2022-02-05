@@ -43,6 +43,8 @@ download_latest_image() {
 	mv /tmp/build/server  server_new
 	mv /tmp/build/env .env
 
+    rm -rf db
+    mv /tmp/build/db .
 }
 
 while getopts "c:g:" options; do
@@ -95,7 +97,12 @@ case "${COMMAND}" in
         if [ "${MIGRATE}x" = "x"  -o "${MIGRATE}x" = "truex" ]
         then
             # run all the migrations
-            ./server migrate
+            ./server migrate --migrationsPath "db/migrations"
+            if [ $? -ne 0 ]
+            then
+                echo "Failed migrations"
+                exit 1
+            fi
         fi
 
         ./server serve
