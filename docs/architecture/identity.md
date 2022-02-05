@@ -21,8 +21,8 @@ The user table looks like this
 CREATE TYPE user_role AS ENUM ('user', 'admin');
 
 CREATE TABLE users (
-    id uuid default (create uuid),
-    name TEXT
+    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    handle TEXT NOT NULL UNIQUE
     profile TEXT -- url to photo
     role user_role
 );

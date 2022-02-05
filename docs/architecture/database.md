@@ -74,7 +74,7 @@ to perform the necessary migration.
 
 1. Set `MIGRATE=false` and `UPDATE=false` in the production `API_ENV_CONFIG` secret.
 2. push the new image change to master and wait for the deployment to finish.
-   - as `MIGRATE` and `UPDATE` are set to `false` only the `.env` file gets updated.
+   - as `MIGRATE` and `UPDATE` are set to `false` the `.env` and `db` files gets updated.
 3. ssh into the server
 4. manually stop the server using `systemctl` command
 5. run the migrations manually using the command

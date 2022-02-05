@@ -79,11 +79,15 @@ case "${COMMAND}" in
             exit_abnormal
         fi
 
+        download_latest_image
+
+        # read the new downloaded env file
+        source .env
+
         # update to the latest image only if UPDATE is not set
         # or it is "true"
         if [ "${UPDATE}x" = "x"  -o "${UPDATE}x" = "truex" ]
         then
-            download_latest_image
 
             if [ -e "server_new" ]
             then
