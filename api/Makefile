@@ -18,3 +18,6 @@ test:	version
 clean:
 	rm server/instance/version.txt
 	rm -rf build
+
+schema:
+	pg_dump -s -d profile -h localhost -U profile > db/schema.sql

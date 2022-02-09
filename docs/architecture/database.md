@@ -35,6 +35,11 @@ Each `up` migration must have its counterpart `down` migration.
 Make sure you update the file `api/db/schema.sql` with the final schema **BEFORE** raising your
 pull request.
 
+```
+make schema
+```
+should create it for you, using `pg_dump`.
+
 ## Migrate command
 
 To trigger migrations, we will add a command `migrate` in the `cmd` directory.
@@ -82,3 +87,12 @@ to perform the necessary migration.
    - you will need admin ssh credentials to do this.
 6. manually start the server using `systemctl` command
    - you will need admin ssh credentials to do this.
+
+## owner column
+
+Every table will have an `owner` column which will be a `uuid`. This will be used primarily
+by the tests to avoid clashes between store tests and end-to-end flow tests.
+
+All teardown functions will only delete entries in the db based on the `owner` column, similarly
+the asserts should be based on queries using the `owner` column. This way, even if two tests that 
+modify tables run in parallel there will be no clash.
