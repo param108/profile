@@ -24,14 +24,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
---
-
-COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
-
-
---
--- Name: user_role; Type: TYPE; Schema: public; Owner: profile
+-- Name: user_role; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.user_role AS ENUM (
@@ -40,14 +33,10 @@ CREATE TYPE public.user_role AS ENUM (
 );
 
 
-ALTER TYPE public.user_role OWNER TO profile;
-
-SET default_tablespace = '';
-
 SET default_table_access_method = heap;
 
 --
--- Name: schema_migrations; Type: TABLE; Schema: public; Owner: profile
+-- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.schema_migrations (
@@ -56,10 +45,8 @@ CREATE TABLE public.schema_migrations (
 );
 
 
-ALTER TABLE public.schema_migrations OWNER TO profile;
-
 --
--- Name: users; Type: TABLE; Schema: public; Owner: profile
+-- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.users (
@@ -71,10 +58,8 @@ CREATE TABLE public.users (
 );
 
 
-ALTER TABLE public.users OWNER TO profile;
-
 --
--- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: profile
+-- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.schema_migrations
@@ -82,7 +67,7 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
--- Name: users users_handle_key; Type: CONSTRAINT; Schema: public; Owner: profile
+-- Name: users users_handle_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
@@ -90,7 +75,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: profile
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
@@ -98,7 +83,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: users_on_handle; Type: INDEX; Schema: public; Owner: profile
+-- Name: users_on_handle; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX users_on_handle ON public.users USING btree (handle);

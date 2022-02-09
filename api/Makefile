@@ -20,4 +20,4 @@ clean:
 	rm -rf build
 
 schema:
-	pg_dump -s -d profile -h localhost -U profile > db/schema.sql
+	pg_dump -s -x -O -d profile -h localhost -U profile --no-tablespace --no-comments  --no-publications --no-security-labels --no-subscriptions > db/schema.sql
