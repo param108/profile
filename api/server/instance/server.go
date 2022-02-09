@@ -8,12 +8,14 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
 type Server struct {
 	port int
 	r    *mux.Router
 	s    *http.Server
+	db   *gorm.DB
 }
 
 //go:embed version.txt
