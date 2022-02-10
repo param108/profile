@@ -14,6 +14,8 @@ The following variables are injected via environment variables.
 ## Setup
 
 On Ubuntu:
+
+From the `api` directory run below command
 ```
 make db
 ```
