@@ -8,7 +8,7 @@ const (
 )
 
 type User struct {
-	ID      string
+	ID      string `gorm:"default:uuid_generate_v4()"`
 	Handle  string
 	Profile string
 	Role    UserRole

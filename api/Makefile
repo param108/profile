@@ -21,3 +21,17 @@ clean:
 
 schema:
 	pg_dump -s -x -O -d profile -h localhost -U profile --no-tablespace --no-comments  --no-publications --no-security-labels --no-subscriptions > db/schema.sql
+
+
+db: 	build
+	sudo su postgres /bin/bash -c psql < db/scripts/createdb.sql
+	build/server migrate --migrationsPath db/migrations
+
+db-destroy:
+	sudo su postgres /bin/bash -c psql < db/scripts/destroydb.sql
+
+db-ci:	build
+	cp ci.env test.env
+	cp ci.env .env
+	PGPASSWORD=${PGPASSWORD} psql -h ${PGHOST} -U ${PGUSER} < db/scripts/createdb.sql
+	build/server migrate --migrationsPath db/migrations

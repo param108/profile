@@ -1,17 +1,17 @@
 package store
 
 import (
-	"gorm.io/gorm"
+	"github.com/param108/profile/api/store/postgres"
 )
 
 type StoreImpl struct {
-	db *gorm.DB
+	db *postgres.PostgresDB
 }
 
 // NewStore Creates a new Store by initializing
 // A StoreImpl object.
 func NewStore() (Store, error) {
-	db, err := NewPostgresDB()
+	db, err := postgres.NewPostgresDB()
 	if err != nil {
 		return nil, err
 	}
