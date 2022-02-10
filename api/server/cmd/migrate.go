@@ -68,7 +68,9 @@ func migrateCmd(c *cli.Context) error {
 		path,
 		"postgres",
 		driver)
-	m.Up() // or m.Step(2) if you want to explicitly set the number of migrations to run
+	if err != nil {
+		log.Fatalf("failed db connect: %s", err.Error())
+	}
 
 	if migrationsNum == 0 {
 		if err := m.Up(); err != nil {

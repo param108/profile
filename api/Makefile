@@ -18,3 +18,6 @@ test:	version
 clean:
 	rm server/instance/version.txt
 	rm -rf build
+
+schema:
+	pg_dump -s -x -O -d profile -h localhost -U profile --no-tablespace --no-comments  --no-publications --no-security-labels --no-subscriptions > db/schema.sql
