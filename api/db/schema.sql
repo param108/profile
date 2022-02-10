@@ -54,7 +54,7 @@ CREATE TABLE public.users (
     handle text NOT NULL,
     profile text,
     role public.user_role,
-    owner uuid NOT NULL
+    writer uuid NOT NULL
 );
 
 

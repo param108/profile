@@ -1,1 +1,1 @@
-ALTER TABLE users ADD COLUMN owner uuid NOT NULL;
+ALTER TABLE users ADD COLUMN writer uuid NOT NULL;

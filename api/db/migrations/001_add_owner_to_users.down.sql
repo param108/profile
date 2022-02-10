@@ -1,1 +1,1 @@
-ALTER TABLE users drop column owner;
+ALTER TABLE users drop column writer;

@@ -88,11 +88,11 @@ to perform the necessary migration.
 6. manually start the server using `systemctl` command
    - you will need admin ssh credentials to do this.
 
-## owner column
+## writer column
 
-Every table will have an `owner` column which will be a `uuid`. This will be used primarily
+Every table will have a `writer` column which will be a `uuid`. This will be used primarily
 by the tests to avoid clashes between store tests and end-to-end flow tests.
 
-All teardown functions will only delete entries in the db based on the `owner` column, similarly
-the asserts should be based on queries using the `owner` column. This way, even if two tests that 
+All teardown functions will only delete entries in the db based on the `writer` column, similarly
+the asserts should be based on queries using the `writer` column. This way, even if two tests that 
 modify tables run in parallel there will be no clash.
