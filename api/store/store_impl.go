@@ -16,7 +16,7 @@ func NewStore() (Store, error) {
 		return nil, err
 	}
 
-	return &StoreImpl {
-	db: db,
+	return &StoreImpl{
+		db: db,
 	}, nil
 }

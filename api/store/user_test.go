@@ -5,5 +5,5 @@ import (
 )
 
 func TestCreateUser(t *testing.T) {
-	testDB.CreateUser("param",)
+	testDB.CreateUser("param")
 }

@@ -2,14 +2,15 @@ package store
 
 import (
 	"database/sql"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"fmt"
 	"os"
+
 	"github.com/pkg/errors"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-func NewPostgresDB() (*gorm.DB,error) {
+func NewPostgresDB() (*gorm.DB, error) {
 
 	sqlDB, err := sql.Open("postgres",
 		fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
