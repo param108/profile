@@ -13,11 +13,16 @@ The following variables are injected via environment variables.
 
 ## Setup
 
-Run the following on the DB
+On Ubuntu:
 
+From the `api` directory run below command
 ```
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+make db
 ```
+
+On Other OS:
+1. create a local postgres db called `profile`
+2. run the sql file `api/db/scripts/createdb.sql` as superuser.
 
 ## Migrations
 
