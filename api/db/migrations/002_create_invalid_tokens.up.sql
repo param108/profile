@@ -1,0 +1,4 @@
+CREATE TABLE invalid_tokens (
+	token TEXT PRIMARY KEY,
+	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+)
