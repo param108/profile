@@ -36,6 +36,16 @@ CREATE TYPE public.user_role AS ENUM (
 SET default_table_access_method = heap;
 
 --
+-- Name: invalid_tokens; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.invalid_tokens (
+    token text NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -56,6 +66,14 @@ CREATE TABLE public.users (
     role public.user_role,
     writer uuid NOT NULL
 );
+
+
+--
+-- Name: invalid_tokens invalid_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.invalid_tokens
+    ADD CONSTRAINT invalid_tokens_pkey PRIMARY KEY (token);
 
 
 --

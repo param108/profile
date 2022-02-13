@@ -34,7 +34,7 @@ Each user may have multiple login methods
 CREATE TYPE login_source AS ENUM ('google', 'twitter', 'facebook');
 
 CREATE TABLE login_methods (
-    id uuid default (create uuid),
+    id uuid default uuid_generate_v4(),
     user_id uuid NOT NULL,
     source login_source NOT NULL,
     attributes jsonb default '{}' -- source specific attributes
