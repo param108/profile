@@ -42,7 +42,7 @@ SET default_table_access_method = heap;
 CREATE TABLE public.invalid_tokens (
     token text NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    owner uuid NOT NULL
+    writer uuid NOT NULL
 );
 
 
