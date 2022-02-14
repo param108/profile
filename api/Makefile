@@ -24,11 +24,13 @@ schema:
 
 
 db: 	build
-	sudo su postgres /bin/bash -c psql < db/scripts/createdb.sql
+	cp db/scripts/createdb.sql /tmp/createdb.sql
+	pushd /tmp; sudo su postgres /bin/bash -c psql < /tmp/createdb.sql; popd
 	build/server migrate --migrationsPath db/migrations
 
 db-destroy:
-	sudo su postgres /bin/bash -c psql < db/scripts/destroydb.sql
+	cp db/scripts/destroydb.sql /tmp/
+	pushd /tmp; sudo su postgres /bin/bash -c psql < /tmp/destroydb.sql; popd
 
 db-ci:	build
 	cp ci.env test.env
