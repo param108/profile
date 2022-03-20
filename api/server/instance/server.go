@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/param108/profile/api/users"
 	"gorm.io/gorm"
 )
 
@@ -51,4 +52,6 @@ func (s *Server) RegisterHandlers() {
 		rw.WriteHeader(http.StatusOK)
 		rw.Write(version)
 	})
+
+	s.r.HandleFunc("/users/login", users.ServiceProviderRedirect ).Methods(http.MethodGet)
 }
