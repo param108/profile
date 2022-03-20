@@ -4,29 +4,19 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/param108/profile/api/models"
 )
 
 func ServiceProviderRedirect(rw http.ResponseWriter, r *http.Request) {
-	v := mux.Vars(r)
+	serviceProvider := r.URL.Query().Get("source")
 
 	resp := models.Response{}
 
-	if serviceProvider, ok := v["source"]; ok {
-		switch serviceProvider {
-		default:
-			rw.WriteHeader(http.StatusBadRequest)
-			resp.Success = false
-			resp.Errors = []string{"invalid source: " + serviceProvider}
-			b, _ := json.Marshal(resp)
-			rw.Write(b)
-			return
-		}
-	} else {
+	switch serviceProvider {
+	default:
 		rw.WriteHeader(http.StatusBadRequest)
 		resp.Success = false
-		resp.Errors = []string{"missing source"}
+		resp.Errors = []string{"invalid source: " + serviceProvider}
 		b, _ := json.Marshal(resp)
 		rw.Write(b)
 		return
