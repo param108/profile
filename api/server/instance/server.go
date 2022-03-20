@@ -53,5 +53,5 @@ func (s *Server) RegisterHandlers() {
 		rw.Write(version)
 	})
 
-	s.r.HandleFunc("/users/login", users.ServiceProviderRedirect ).Methods(http.MethodGet)
+	s.r.HandleFunc("/users/login", users.ServiceProviderRedirect).Methods(http.MethodGet)
 }
