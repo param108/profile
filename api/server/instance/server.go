@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"time"
 
@@ -73,6 +74,9 @@ END_PERIODIC:
 }
 
 func (s *Server) Serve() {
+	// seed the random number generator
+	rand.Seed(time.Now().UnixNano())
+
 	go s.StartPeriodic()
 	log.Fatal(s.s.ListenAndServe())
 }
@@ -93,6 +97,6 @@ func (s *Server) RegisterHandlers() {
 		users.CreateServiceProviderLoginRedirect(s.DB)).
 		Methods(http.MethodGet)
 
-	s.r.HandleFunc("/users/authorize/{{service_provider}}",
+	s.r.HandleFunc("/users/authorize/{service_provider}",
 		users.CreateServiceProviderAuthorizeRedirect(s.DB))
 }
