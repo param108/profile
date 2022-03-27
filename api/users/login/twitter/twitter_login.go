@@ -56,7 +56,7 @@ const (
 )
 
 func (tlp *TwitterLoginProvider) Periodic() {
-	tlp.DB.DeleteOldTwitterChallenges(time.Hour * 24)
+	tlp.DB.DeleteOldTwitterChallenges(time.Hour)
 }
 
 func (tlp *TwitterLoginProvider) HandleLogin(rw http.ResponseWriter, r *http.Request) {
