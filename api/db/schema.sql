@@ -57,6 +57,18 @@ CREATE TABLE public.schema_migrations (
 
 
 --
+-- Name: twitter_challenges; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.twitter_challenges (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    challenge text,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    writer uuid NOT NULL
+);
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -86,6 +98,14 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
+-- Name: twitter_challenges twitter_challenges_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.twitter_challenges
+    ADD CONSTRAINT twitter_challenges_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: users users_handle_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -99,6 +119,13 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: idx_twitter_challenges_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_twitter_challenges_created_at ON public.twitter_challenges USING btree (created_at);
 
 
 --
