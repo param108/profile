@@ -82,7 +82,6 @@ func (tlp *TwitterLoginProvider) HandleLogin(rw http.ResponseWriter, r *http.Req
 		url.QueryEscape(key),
 		url.QueryEscape(challenge))
 
-
 	log.Println("redirect success", redirectURL)
 
 	http.Redirect(rw, r, redirectURL, 302)
