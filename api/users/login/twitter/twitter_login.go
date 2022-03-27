@@ -3,6 +3,7 @@ package twitter
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -64,6 +65,7 @@ func (tlp *TwitterLoginProvider) HandleLogin(rw http.ResponseWriter, r *http.Req
 
 	key, err := tlp.DB.CreateTwitterChallenge(challenge, os.Getenv("WRITER"))
 	if err != nil {
+		log.Println("login failed:", err.Error())
 		rw.WriteHeader(http.StatusInternalServerError)
 		rw.Write([]byte("login failed"))
 		return
@@ -84,6 +86,8 @@ func (tlp *TwitterLoginProvider) HandleLogin(rw http.ResponseWriter, r *http.Req
 		clientID,
 		myRedirectURI,
 	)
+
+	log.Println("redirect success", redirectURL)
 
 	http.Redirect(rw, r, redirectURL, 302)
 }
