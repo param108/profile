@@ -2,8 +2,10 @@ package twitter
 
 import (
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 
@@ -33,6 +35,7 @@ func RandStringBytesMask(n int) string {
 
 type TwitterLoginProvider struct {
 	http.Client
+	DB store.Store
 }
 
 func NewTwitterLoginProvider(db store.Store) *TwitterLoginProvider {
@@ -40,6 +43,7 @@ func NewTwitterLoginProvider(db store.Store) *TwitterLoginProvider {
 		Client: http.Client{
 			Timeout: time.Second * 30,
 		},
+		DB: db,
 	}
 
 	return tlp
@@ -53,15 +57,24 @@ const (
 func (tlp *TwitterLoginProvider) HandleLogin(rw http.ResponseWriter, r *http.Request) {
 	clientID := os.Getenv("TWITTER_CLIENT_ID")
 
+	challenge := RandStringBytesMask(16)
+
+	key, err := tlp.DB.CreateTwitterChallenge(challenge, os.Getenv("WRITER"))
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+		rw.Write([]byte("login failed"))
+		return
+	}
 	// The redirect url when authentication has succeeded.
 	// scope: users.read
 	// code_challenge: 16 char long random string
 	myRedirectURI := fmt.Sprintf(
-		"https://%s%s&scope=%s&state=state&code_challenge=%s&code_challenge_method=plain",
+		"https://%s%s&scope=%s&state=%s&code_challenge=%s&code_challenge_method=plain",
 		os.Getenv("HOST"),
 		baseAuthorizeURL,
 		"users.read",
-		RandStringBytesMask(16),
+		key,
+		challenge,
 	)
 
 	redirectURL := fmt.Sprintf(redirectAuthorizeURL,
@@ -82,12 +95,44 @@ func (tlp *TwitterLoginProvider) HandlerAuthorize(rw http.ResponseWriter, r *htt
 	if len(code) == 0 {
 		rw.WriteHeader(http.StatusBadRequest)
 		rw.Write([]byte("Authentication Failed"))
+		return
 	}
 
-	_, err := tlp.Post(getTokenURL, "application/x-www-form-urlencoded", nil)
+	state := r.URL.Query().Get("state")
+	if len(state) == 0 {
+		rw.WriteHeader(http.StatusBadRequest)
+		rw.Write([]byte("Authentication Failed"))
+		return
+	}
+
+	challenge, err := tlp.DB.GetTwitterChallenge(state, os.Getenv("WRITER"))
+	if err != nil {
+		rw.WriteHeader(http.StatusBadRequest)
+		rw.Write([]byte("Authentication Failed"))
+		return
+	}
+
+	values := url.Values{}
+	values.Add("code", code)
+	values.Add("grant_type", "authorization_code")
+	values.Add("client_id", os.Getenv("TWITTER_CLIENT_ID"))
+	values.Add("redirect_uri", fmt.Sprintf("https://%s%s", os.Getenv("HOST"), baseAuthorizeURL))
+	values.Add("code_verifier", challenge)
+
+	resp, err := tlp.PostForm(getTokenURL, values)
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 		rw.Write([]byte("Authentication Failed"))
+		return
 	}
 
+	d, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+		rw.Write([]byte("Authentication Failed"))
+		return
+	}
+
+	rw.WriteHeader(http.StatusOK)
+	rw.Write(d)
 }
