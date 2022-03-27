@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/param108/profile/api/store"
@@ -114,17 +115,18 @@ func (tlp *TwitterLoginProvider) HandleAuthorize(rw http.ResponseWriter, r *http
 		return
 	}
 
-	req, err := http.NewRequest(http.MethodPost, getTokenURL, nil)
+	form := url.Values{}
+	form.Add("code", code)
+	form.Add("grant_type", "authorization_code")
+	form.Add("redirect_uri", fmt.Sprintf("https://%s%s", os.Getenv("HOST"), baseAuthorizeURL))
+	form.Add("code_verifier", challenge)
+
+	req, err := http.NewRequest(http.MethodPost, getTokenURL, strings.NewReader(form.Encode()))
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 		rw.Write([]byte("Authentication Failed"))
 		return
 	}
-	values := req.PostForm
-	values.Add("code", code)
-	values.Add("grant_type", "authorization_code")
-	values.Add("redirect_uri", fmt.Sprintf("https://%s%s", os.Getenv("HOST"), baseAuthorizeURL))
-	values.Add("code_verifier", challenge)
 
 	req.SetBasicAuth(os.Getenv("TWITTER_CLIENT_ID"), os.Getenv("TWITTER_CLIENT_SECRET"))
 	resp, err := tlp.Do(req)
