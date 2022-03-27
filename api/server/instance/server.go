@@ -33,8 +33,6 @@ func NewServer(port int) (*Server, error) {
 	server := &Server{}
 	server.r = mux.NewRouter()
 
-	server.RegisterHandlers()
-
 	server.periodicDone = make(chan struct{})
 	server.periodicQuit = make(chan struct{})
 
@@ -51,6 +49,9 @@ func NewServer(port int) (*Server, error) {
 	} else {
 		server.DB = db
 	}
+
+	// Must be done at the end
+	server.RegisterHandlers()
 
 	return server, nil
 }
