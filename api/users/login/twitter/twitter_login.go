@@ -129,6 +129,9 @@ func (tlp *TwitterLoginProvider) HandleAuthorize(rw http.ResponseWriter, r *http
 	}
 
 	req.SetBasicAuth(os.Getenv("TWITTER_CLIENT_ID"), os.Getenv("TWITTER_CLIENT_SECRET"))
+
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
 	resp, err := tlp.Do(req)
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
