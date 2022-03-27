@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 
@@ -50,7 +51,7 @@ func NewTwitterLoginProvider(db store.Store) *TwitterLoginProvider {
 }
 
 const (
-	redirectAuthorizeURL = "https://twitter.com/i/oauth2/authorize?response_type=code&client_id=%s&redirect_uri=%s"
+	redirectAuthorizeURL = "https://twitter.com/i/oauth2/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&state=%s&code_challenge=%s&code_challenge_method=plain"
 	baseAuthorizeURL     = "/users/authorize/twitter"
 )
 
@@ -70,22 +71,17 @@ func (tlp *TwitterLoginProvider) HandleLogin(rw http.ResponseWriter, r *http.Req
 		rw.Write([]byte("login failed"))
 		return
 	}
+
 	// The redirect url when authentication has succeeded.
 	// scope: users.read
 	// code_challenge: 16 char long random string
-	myRedirectURI := fmt.Sprintf(
-		"https://%s%s&scope=%s&state=%s&code_challenge=%s&code_challenge_method=plain",
-		os.Getenv("HOST"),
-		baseAuthorizeURL,
-		"users.read",
-		key,
-		challenge,
-	)
-
 	redirectURL := fmt.Sprintf(redirectAuthorizeURL,
-		clientID,
-		myRedirectURI,
-	)
+		url.QueryEscape(clientID),
+		url.QueryEscape("https://"+os.Getenv("HOST")+baseAuthorizeURL),
+		url.QueryEscape("users.read"),
+		url.QueryEscape(key),
+		url.QueryEscape(challenge))
+
 
 	log.Println("redirect success", redirectURL)
 
