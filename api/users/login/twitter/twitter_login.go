@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"net/http"
-	"net/url"
 	"os"
 	"time"
 
@@ -116,14 +115,20 @@ func (tlp *TwitterLoginProvider) HandleAuthorize(rw http.ResponseWriter, r *http
 		return
 	}
 
-	values := url.Values{}
+	req, err := http.NewRequest(http.MethodPost, getTokenURL, nil)
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+		rw.Write([]byte("Authentication Failed"))
+		return
+	}
+	values := req.PostForm
 	values.Add("code", code)
 	values.Add("grant_type", "authorization_code")
-	values.Add("client_id", os.Getenv("TWITTER_CLIENT_ID"))
 	values.Add("redirect_uri", fmt.Sprintf("https://%s%s", os.Getenv("HOST"), baseAuthorizeURL))
 	values.Add("code_verifier", challenge)
 
-	resp, err := tlp.PostForm(getTokenURL, values)
+	req.SetBasicAuth(os.Getenv("TWITTER_CLIENT_ID"), os.Getenv("TWITTER_CLIENT_SECRET"))
+	resp, err := tlp.Do(req)
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 		rw.Write([]byte("Authentication Failed"))
