@@ -5,7 +5,7 @@ _view on large screen or with wrap off_
 _Mobile flow_
 
 TODO: Fix this for oauth2
-
+```
 **mobile**                          **tribist.com**                             **twitter.com**
     |     /users/login?source=twitter     |                                           |
     --------------->----------------------+                                           |
@@ -44,3 +44,4 @@ TODO: Fix this for oauth2
     |                                     |                                           |
     |                                     |                                           |
     |                                     |                                           |
+```
