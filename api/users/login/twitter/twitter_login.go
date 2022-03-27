@@ -54,6 +54,10 @@ const (
 	baseAuthorizeURL     = "/users/authorize/twitter"
 )
 
+func (tlp *TwitterLoginProvider) Periodic() {
+	tlp.DB.DeleteOldTwitterChallenges(time.Hour * 24)
+}
+
 func (tlp *TwitterLoginProvider) HandleLogin(rw http.ResponseWriter, r *http.Request) {
 	clientID := os.Getenv("TWITTER_CLIENT_ID")
 
@@ -89,7 +93,7 @@ const (
 	getTokenURL = "https://api.twitter.com/2/oauth2/token"
 )
 
-func (tlp *TwitterLoginProvider) HandlerAuthorize(rw http.ResponseWriter, r *http.Request) {
+func (tlp *TwitterLoginProvider) HandleAuthorize(rw http.ResponseWriter, r *http.Request) {
 
 	code := r.URL.Query().Get("code")
 	if len(code) == 0 {

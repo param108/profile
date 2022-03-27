@@ -8,15 +8,22 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/param108/profile/api/store"
 	"github.com/param108/profile/api/users"
-	"gorm.io/gorm"
+	"github.com/param108/profile/api/users/login/twitter"
 )
 
 type Server struct {
 	port int
 	r    *mux.Router
 	s    *http.Server
-	db   *gorm.DB
+	DB   store.Store
+
+	// periodicQuit External call to quit
+	periodicQuit chan struct{}
+
+	// periodicDone broadcast that periodic is done
+	periodicDone chan struct{}
 }
 
 //go:embed version.txt
@@ -28,6 +35,9 @@ func NewServer(port int) (*Server, error) {
 
 	server.RegisterHandlers()
 
+	server.periodicDone = make(chan struct{})
+	server.periodicQuit = make(chan struct{})
+
 	server.s = &http.Server{
 		Handler: server.r,
 		Addr:    fmt.Sprintf("127.0.0.1:%d", port),
@@ -36,14 +46,39 @@ func NewServer(port int) (*Server, error) {
 		ReadTimeout:  15 * time.Second,
 	}
 
+	if db, err := store.NewStore(); err != nil {
+		return nil, err
+	} else {
+		server.DB = db
+	}
+
 	return server, nil
 }
 
+// Simple Hourly Periodic Jobs
+func (s *Server) StartPeriodic() {
+	ticker := time.NewTicker(time.Hour)
+END_PERIODIC:
+	for {
+		select {
+		case <-s.periodicQuit:
+			break END_PERIODIC
+		case <-ticker.C:
+			twitter.NewTwitterLoginProvider(s.DB).Periodic()
+		}
+	}
+	ticker.Stop()
+	close(s.periodicDone)
+}
+
 func (s *Server) Serve() {
+	go s.StartPeriodic()
 	log.Fatal(s.s.ListenAndServe())
 }
 
 func (s *Server) Quit() {
+	close(s.periodicQuit)
+	<-s.periodicDone
 	s.s.Close()
 }
 
@@ -53,5 +88,10 @@ func (s *Server) RegisterHandlers() {
 		rw.Write(version)
 	})
 
-	s.r.HandleFunc("/users/login", users.ServiceProviderRedirect).Methods(http.MethodGet)
+	s.r.HandleFunc("/users/login",
+		users.CreateServiceProviderLoginRedirect(s.DB)).
+		Methods(http.MethodGet)
+
+	s.r.HandleFunc("/users/authorize/{{service_provider}}",
+		users.CreateServiceProviderAuthorizeRedirect(s.DB))
 }
