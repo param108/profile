@@ -42,7 +42,7 @@ jobs:
     - name: setup db
       run: |
            pushd api
-           go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.15.1
+           go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.15.2
            go get github.com/golang-migrate/migrate/v4/database/postgres
            go mod tidy
            popd
