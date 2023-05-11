@@ -1,7 +1,6 @@
 # Profile 
 
-A completely open source platform to share small 30 second audio files.
-Think Twitter but with Audio.
+A completely open source platform to blog but using tweets.
 
 # Build Status
 
