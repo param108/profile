@@ -41,8 +41,10 @@ jobs:
 
     - name: setup db
       run: |
+           pushd api
            go get github.com/golang-migrate/migrate/v4/database/postgres
            go mod tidy
+           popd
            PGPASSWORD=postgres PGHOST=localhost PGUSER=postgres make -C api db-ci
 
     - name: Test
