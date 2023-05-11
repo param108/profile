@@ -40,7 +40,7 @@ jobs:
       run: go install golang.org/x/tools/cmd/goimports@latest
 
     - name: Install goimports
-      run: go get github.com/golang-migrate/migrate/v4/database/postgres
+      run: go install github.com/golang-migrate/migrate/v4@latest
 
     - name: setup db
       run: PGPASSWORD=postgres PGHOST=localhost PGUSER=postgres make -C api db-ci
