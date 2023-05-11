@@ -72,6 +72,10 @@ func migrateCmd(c *cli.Context) error {
 
 	path := fmt.Sprintf("file://%s", migrationsPath)
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	if err != nil {
+		log.Fatalf("failed driver connect: %s", err.Error())
+	}
+
 	m, err := migrate.NewWithDatabaseInstance(
 		path,
 		"postgres",
