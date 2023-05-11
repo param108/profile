@@ -62,6 +62,14 @@ func migrateCmd(c *cli.Context) error {
 		log.Fatalf("failed to connect db:%s", err.Error())
 	}
 
+	fmt.Printf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+			os.Getenv("DB_USER"),
+			os.Getenv("DB_PASS"),
+			os.Getenv("DB_HOST"),
+			os.Getenv("DB_PORT"),
+			os.Getenv("DB_NAME"),
+	)
+
 	path := fmt.Sprintf("file://%s", migrationsPath)
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	m, err := migrate.NewWithDatabaseInstance(
