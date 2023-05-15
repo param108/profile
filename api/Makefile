@@ -37,3 +37,6 @@ db-ci:	build
 	cp ci.env .env
 	PGPASSWORD=${PGPASSWORD} psql -h ${PGHOST} -U ${PGUSER} < db/scripts/createdb.sql
 	build/server migrate --migrationsPath db/migrations
+
+migrate:
+	./build/server migrate --migrationsPath db/migrations
