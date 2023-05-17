@@ -78,11 +78,6 @@ func (s *StoreImpl) UpdateTweet(userID, tweetID,
 
 }
 
-// DeleteTweet soft deletes a tweet
-func (s *StoreImpl) DeleteTweet(tweetID string, writer string) (*models.Tweet, error) {
-	return nil, nil
-}
-
 // GetTags return all tags for a user
 // writer is optional. Empty value is all writers
 func (s *StoreImpl) GetTags(userID, writer string) ([]*models.Tag, error) {
@@ -107,4 +102,17 @@ func (s *StoreImpl) GetTweetTags(userID, tweetID, writer string) ([]*models.Tag,
 		return nil, errors.New("user_id mandatory, tweetID mandatory")
 	}
 	return s.db.GetTweetTags(userID, tweetID, writer)
+}
+
+func (s *StoreImpl) GetTweets(userID string, offset int, limit int, writer string) ([]*models.Tweet, error) {
+	return s.db.GetTweets(userID, offset, limit, writer)
+}
+
+func (s *StoreImpl) GetTweet(userID string, tweetID string, writer string) (*models.Tweet, error) {
+	return s.db.GetTweet(userID, tweetID, writer)
+}
+
+// DeleteTweet soft deletes a tweet
+func (s *StoreImpl) DeleteTweet(userID string, tweetID string, writer string) (*models.Tweet, error) {
+	return s.db.DeleteTweet(userID, tweetID, writer)
 }

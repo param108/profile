@@ -275,3 +275,52 @@ and tweet_tags.writer = ? and tags.writer = ?`,
 
 	return tags, nil
 }
+
+func (db *PostgresDB) GetTweet(userID, tweetID, writer string) (*models.Tweet, error) {
+	tweets := []*models.Tweet{}
+	if err := db.db.Where(
+		"user_id = ? AND id = ? AND writer = ? AND deleted = false",
+		userID, tweetID, writer).Find(tweets).Error; err != nil {
+		return nil, err
+	}
+
+	if len(tweets) == 0 {
+		return nil, errors.New("tweet not found")
+	}
+	return tweets[0], nil
+}
+
+// GetRawTweet Ignore the delete flag and return deleted flags.
+func (db *PostgresDB) GetRawTweet(userID, tweetID, writer string) (*models.Tweet, error) {
+	tweet := &models.Tweet{}
+	if err := db.db.Where(
+		"user_id = ? AND id = ? AND writer = ?",
+		userID, tweetID, writer).First(tweet).Error; err != nil {
+		return nil, err
+	}
+
+	return tweet, nil
+}
+
+func (db *PostgresDB) GetTweets(userID string,
+	offset, limit int,
+	writer string) ([]*models.Tweet, error) {
+	tweets := []*models.Tweet{}
+	if err := db.db.Where(
+		"user_id = ? AND writer = ? AND deleted = false",
+		userID, writer).Order("created_at desc").Offset(offset).Limit(limit).Find(&tweets).Error; err != nil {
+		return nil, err
+	}
+
+	return tweets, nil
+}
+
+func (db *PostgresDB) DeleteTweet(userID, tweetID, writer string) (*models.Tweet, error) {
+	if err := db.db.Table("tweets").Where(
+		"user_id = ? AND id = ? AND writer = ?",
+		userID, tweetID, writer).Update("deleted", true).Error; err != nil {
+		return nil, err
+	}
+
+	return db.GetRawTweet(userID, tweetID, writer)
+}

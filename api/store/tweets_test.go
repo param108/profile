@@ -33,6 +33,7 @@ func TestInsertTweet(t *testing.T) {
 	userID := "80e2663c-3842-431b-886e-ad440bc29850"
 
 	oldTweetID := ""
+	secondTweetID := ""
 	t.Run("Insert a tweet and a few tags", func(t *testing.T) {
 		tw, tags, err := testDB.(*StoreImpl).InsertTweet(userID,
 			`#display
@@ -60,6 +61,7 @@ The first #tweet is a short
 
 		// A new tweet should have been inserted with a new ID
 		assert.NotEqual(t, oldTweetID, tw.ID, "same id returned for tweet")
+		secondTweetID = tw.ID
 		assert.Equal(t, 3, len(tags), "incorrect number of tags")
 		for _, tag := range tags {
 			assert.NotEmpty(t, tag.ID, "empty ID")
@@ -197,5 +199,46 @@ The first is a short
 			foundTags, "invalid tweet found")
 
 	})
+
+	t.Run("get tweets", func(t *testing.T) {
+		tweets, err := testDB.GetTweets(userID, 0, 10, tweetWriter)
+		assert.Nil(t, err, "failed to get tweets")
+		assert.Equal(t, 2, len(tweets))
+	})
+
+	t.Run("get tweets after the first one", func(t *testing.T) {
+		tweets, err := testDB.GetTweets(userID, 1, 10, tweetWriter)
+		assert.Nil(t, err, "failed to get tweets")
+		assert.Equal(t, 1, len(tweets))
+		// Make sure its the earliest one
+		assert.Equal(t, oldTweetID, tweets[0].ID)
+	})
+
+	t.Run("delete the first tweet", func(t *testing.T) {
+		tweet, err := testDB.DeleteTweet(userID, oldTweetID, tweetWriter)
+		assert.Nil(t, err, "failed to delete")
+		assert.Equal(t, oldTweetID, tweet.ID, "returned incorrect tweet")
+	})
+
+	t.Run("get tweets. Only one should be returned", func(t *testing.T) {
+		tweets, err := testDB.GetTweets(userID, 0, 10, tweetWriter)
+		assert.Nil(t, err, "failed to get tweets")
+		assert.Equal(t, 1, len(tweets))
+		// Make sure its the second one
+		assert.Equal(t, secondTweetID, tweets[0].ID)
+	})
+
+	t.Run("Insert 20 tweets, when we get Tweets we should only get the limit mentioned",
+		func(t *testing.T) {
+			for i := 0; i < 20; i++ {
+				testDB.(*StoreImpl).InsertTweet(userID,
+					`#display
+The first #tweet is a short
+#Hello #World.`, "", tweetWriter)
+			}
+			tweets, err := testDB.GetTweets(userID, 0, 10, tweetWriter)
+			assert.Nil(t, err, "failed to get tweets")
+			assert.Equal(t, 10, len(tweets))
+		})
 
 }

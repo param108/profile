@@ -36,8 +36,14 @@ type Store interface {
 	UpdateTweet(userID, tweetID, tweet, flags,
 		writer string) (*models.Tweet, []*models.Tag, error)
 
+	// GetTweets get tweets between a offset and limit
+	GetTweets(userID string, offset int, limit int, writer string) ([]*models.Tweet, error)
+
+	// GetTweets get tweets between a offset and limit
+	GetTweet(userID string, tweetID string, writer string) (*models.Tweet, error)
+
 	// DeleteTweet deletes a tweet
-	DeleteTweet(tweetID string, writer string) (*models.Tweet, error)
+	DeleteTweet(userID string, tweetID string, writer string) (*models.Tweet, error)
 
 	// GetTags return all tags for a user
 	// writer is optional. Empty value is all writers
@@ -45,6 +51,7 @@ type Store interface {
 
 	// GetTweetTags return all the TweetTags for a tweet
 	GetTweetTags(userID, tweetID, writer string) ([]*models.Tag, error)
+
 	// SearchTweetsByTags return all tweets for user
 	// by tag. Return in Chronologically descending order.
 	// writer is optional. Empty value is all writers.
