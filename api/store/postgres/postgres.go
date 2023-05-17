@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type PostgresDB struct {
@@ -57,4 +58,220 @@ func (db *PostgresDB) GetUser(userID string, writer string) (*models.User, error
 func (db *PostgresDB) Delete(table string, writer string) error {
 	query := fmt.Sprintf("delete from %s where writer = ?", table)
 	return db.db.Exec(query, writer).Error
+}
+
+// InsertTweet Inserts the tweet and all the tags and
+// creates the necessary tweet tags as well.
+func (db *PostgresDB) InsertTweet(
+	tweet *models.Tweet,
+	tags []*models.Tag,
+) (*models.Tweet, []*models.Tag, error) {
+
+	err := db.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(tweet).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Clauses(clause.OnConflict{
+			DoNothing: true,
+		}).Create(tags).Error; err != nil {
+			return err
+		}
+
+		if len(tags) > 0 {
+			query := ""
+			tagArray := []interface{}{}
+
+			tagIDNil := false
+			// In case of conflicts we should update the ID in
+			// the responses with the values found in the db
+			for _, tag := range tags {
+				if len(query) != 0 {
+					query = query + "or "
+				}
+
+				// If atleast one tagID is nil then we need
+				// to query to find it's ID
+				if len(tag.ID) == 0 {
+					tagIDNil = true
+				} else {
+					continue
+				}
+
+				query = query + "tag = ? "
+				tagArray = append(tagArray, tag.Tag)
+			}
+
+			// Only do below if atleast one TagID is Null.
+			if tagIDNil {
+				foundTags := []*models.Tag{}
+				if err := tx.Where(query, tagArray...).Find(&foundTags).Error; err != nil {
+					return err
+				}
+
+				tagMap := map[string]string{}
+				for _, tag := range foundTags {
+					tagMap[tag.Tag] = tag.ID
+				}
+
+				for idx := range tags {
+					if id, ok := tagMap[tags[idx].Tag]; ok {
+						tags[idx].ID = id
+					}
+				}
+			}
+
+		}
+
+		// Finally connect tags to tweets using tweet_tags
+		tweetTags := []*models.TweetTag{}
+		for _, tag := range tags {
+			tweetTag := &models.TweetTag{
+				Tag:     tag.Tag,
+				TweetID: tweet.ID,
+				Writer:  tweet.Writer,
+				UserID:  tweet.UserID,
+			}
+
+			tweetTags = append(tweetTags, tweetTag)
+		}
+
+		if err := tx.Create(tweetTags).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	return tweet, tags, err
+}
+
+func (db *PostgresDB) UpdateTweet(
+	tweet *models.Tweet,
+	tags []*models.Tag) (*models.Tweet, []*models.Tag, error) {
+	err := db.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Save(tweet).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where(
+			"tweet_id = ?", tweet.ID).Delete(
+			&models.TweetTag{}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Clauses(clause.OnConflict{
+			DoNothing: true,
+		}).Create(tags).Error; err != nil {
+			return err
+		}
+
+		if len(tags) > 0 {
+			query := ""
+			tagArray := []interface{}{}
+
+			tagIDNil := false
+			// In case of conflicts we should update the ID in
+			// the responses with the values found in the db
+			for _, tag := range tags {
+				if len(query) != 0 {
+					query = query + "or "
+				}
+
+				// If atleast one tagID is nil then we need
+				// to query to find it's ID
+				if len(tag.ID) == 0 {
+					tagIDNil = true
+				} else {
+					continue
+				}
+
+				query = query + "tag = ? "
+				tagArray = append(tagArray, tag.Tag)
+			}
+
+			// Only do below if atleast one TagID is Null.
+			if tagIDNil {
+				foundTags := []*models.Tag{}
+				if err := tx.Where(query, tagArray...).Find(&foundTags).Error; err != nil {
+					return err
+				}
+
+				tagMap := map[string]string{}
+				for _, tag := range foundTags {
+					tagMap[tag.Tag] = tag.ID
+				}
+
+				for idx := range tags {
+					if id, ok := tagMap[tags[idx].Tag]; ok {
+						tags[idx].ID = id
+					}
+				}
+			}
+
+		}
+
+		// Finally connect tags to tweets using tweet_tags
+		tweetTags := []*models.TweetTag{}
+		for _, tag := range tags {
+			tweetTag := &models.TweetTag{
+				Tag:     tag.Tag,
+				TweetID: tweet.ID,
+				Writer:  tweet.Writer,
+				UserID:  tweet.UserID,
+			}
+
+			tweetTags = append(tweetTags, tweetTag)
+		}
+
+		if err := tx.Create(tweetTags).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	return tweet, tags, err
+
+}
+
+func (db *PostgresDB) GetTags(userID, writer string) ([]*models.Tag, error) {
+	tags := []*models.Tag{}
+	if len(writer) == 0 {
+		if err := db.db.Where(
+			"user_id = ?", userID).Order("tag asc").Find(&tags).Error; err != nil {
+			return nil, err
+		}
+	} else {
+		if err := db.db.Where(
+			"user_id = ? and writer = ?", userID, writer).Order("tag asc").Find(&tags).Error; err != nil {
+			return nil, err
+		}
+	}
+
+	return tags, nil
+}
+
+func (db *PostgresDB) GetTweetTags(userID, tweetID, writer string) ([]*models.Tag, error) {
+	tags := []*models.Tag{}
+	if len(writer) == 0 {
+		if err := db.db.Joins("JOIN tweet_tags ON tags.tag = tweet_tags.tag").Where(
+			"tweet_tags.user_id = ? AND tweet_tags.tweet_id = ? AND tags.user_id = ?",
+			userID, tweetID, userID).Order("tag asc").Find(&tags).Error; err != nil {
+			return nil, err
+		}
+	} else {
+		if err := db.db.Joins(
+			`JOIN tweet_tags on ( tags.tag = tweet_tags.tag and
+tags.user_id = tweet_tags.user_id )`).Where(
+			`tweet_tags.user_id = ? and tweet_tags.tweet_id = ? and tags.user_id = ?
+and tweet_tags.writer = ? and tags.writer = ?`,
+			userID, tweetID,
+			userID, writer,
+			writer).Order("tag asc").Find(&tags).Error; err != nil {
+			return nil, err
+		}
+	}
+
+	return tags, nil
 }

@@ -65,7 +65,7 @@ This tweet has #two tags in the same #line.`,
 	}
 
 	for tc, tweet := range tweets {
-		tags, err := extractTags(tweet.tweet)
+		tags, err := ExtractTags(tweet.tweet)
 		assert.Nil(t, err, "%d: failed to extract tags", tc)
 
 		assert.Equal(t, len(tweet.tags), len(tags), "%d: incorrect number of tags found", tc)

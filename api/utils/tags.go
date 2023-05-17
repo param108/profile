@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func extractTags(tweet string) ([]string, error) {
+func ExtractTags(tweet string) ([]string, error) {
 	p, err := regexp.Compile("[#]([a-zA-Z0-9_]{1,})")
 	if err != nil {
 		return nil, err
