@@ -92,7 +92,7 @@ func (s *StoreImpl) GetTags(userID, writer string) ([]*models.Tag, error) {
 // writer is optional. Empty value is all writers.
 func (s *StoreImpl) SearchTweetsByTags(userID string,
 	tags []string, writer string) ([]*models.Tweet, error) {
-	return nil, nil
+	return s.db.SearchTweetsByTags(userID, tags, writer)
 }
 
 // GetTweetTags return all tags for a user

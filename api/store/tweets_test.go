@@ -1,7 +1,9 @@
 package store
 
 import (
+	"fmt"
 	"log"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -240,5 +242,29 @@ The first #tweet is a short
 			assert.Nil(t, err, "failed to get tweets")
 			assert.Equal(t, 10, len(tweets))
 		})
+
+	tweetTeardown()
+	t.Run("multiple tags and single user", func(t *testing.T) {
+		for i := 0; i < 20; i++ {
+			testDB.(*StoreImpl).InsertTweet(userID,
+				fmt.Sprintf(`#display
+The first tweet is #tweet_%d
+#Hello #World.`, i), "", tweetWriter)
+		}
+		tweets, err := testDB.SearchTweetsByTags(
+			userID,
+			[]string{"tweet_1", "tweet_3", "tweet_5", "tweet_7"}, tweetWriter)
+		assert.Nil(t, err, "failed to get tweets")
+		assert.Equal(t, 4, len(tweets))
+		suffixes := []int{7, 5, 3, 1}
+		for idx, tweet := range tweets {
+			// check that the tweet has the correct tag in it
+			assert.True(t, strings.Contains(
+				tweet.Tweet,
+				fmt.Sprintf(
+					"tweet_%d",
+					suffixes[idx])), "invalid tweet found")
+		}
+	})
 
 }

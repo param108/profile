@@ -11,6 +11,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"gorm.io/gorm/logger"
 )
 
 type PostgresDB struct {
@@ -323,4 +324,38 @@ func (db *PostgresDB) DeleteTweet(userID, tweetID, writer string) (*models.Tweet
 	}
 
 	return db.GetRawTweet(userID, tweetID, writer)
+}
+
+func (db *PostgresDB) SearchTweetsByTags(userID string,
+	tags []string, writer string) ([]*models.Tweet, error) {
+
+	query := ""
+	// arguments to the query are
+	// user_id, writer, tags...
+	args := []interface{}{userID, writer}
+	for _, tag := range tags {
+		if len(query) > 0 {
+			query = query + " OR"
+		}
+		query = query + " tag = ?"
+		args = append(args, tag)
+	}
+
+	if len(query) > 0 {
+		query = "AND ( " + query + " )"
+	}
+
+	query = "tweets.user_id = ? AND tweets.writer = ? AND tweets.deleted = FALSE " + query
+
+	tweets := []*models.Tweet{}
+
+	db.db.Logger = db.db.Logger.LogMode(logger.Info)
+	if err := db.db.Joins(
+		"Join tweet_tags on tweet_tags.tweet_id = tweets.id").Where(
+		query, args...).Order("tweets.created_at DESC").Find(&tweets).Error; err != nil {
+		return nil, err
+	}
+	db.db.Logger = db.db.Logger.LogMode(logger.Error)
+
+	return tweets, nil
 }
