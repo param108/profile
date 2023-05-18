@@ -11,7 +11,6 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	"gorm.io/gorm/logger"
 )
 
 type PostgresDB struct {
@@ -349,13 +348,11 @@ func (db *PostgresDB) SearchTweetsByTags(userID string,
 
 	tweets := []*models.Tweet{}
 
-	db.db.Logger = db.db.Logger.LogMode(logger.Info)
 	if err := db.db.Joins(
 		"Join tweet_tags on tweet_tags.tweet_id = tweets.id").Where(
 		query, args...).Order("tweets.created_at DESC").Find(&tweets).Error; err != nil {
 		return nil, err
 	}
-	db.db.Logger = db.db.Logger.LogMode(logger.Error)
 
 	return tweets, nil
 }

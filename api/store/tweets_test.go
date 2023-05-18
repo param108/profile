@@ -256,6 +256,8 @@ The first tweet is #tweet_%d
 			[]string{"tweet_1", "tweet_3", "tweet_5", "tweet_7"}, tweetWriter)
 		assert.Nil(t, err, "failed to get tweets")
 		assert.Equal(t, 4, len(tweets))
+
+		// tweets will be ordered oldest first
 		suffixes := []int{7, 5, 3, 1}
 		for idx, tweet := range tweets {
 			// check that the tweet has the correct tag in it
@@ -265,6 +267,13 @@ The first tweet is #tweet_%d
 					"tweet_%d",
 					suffixes[idx])), "invalid tweet found")
 		}
+
+		tweets, err = testDB.SearchTweetsByTags(
+			userID,
+			[]string{"tweet_199"}, tweetWriter)
+		assert.Nil(t, err, "failed to get tweets")
+		assert.Equal(t, 0, len(tweets))
+
 	})
 
 }
