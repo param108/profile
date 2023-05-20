@@ -12,6 +12,7 @@ import (
 
 func CreateServiceProviderLoginRedirect(db store.Store) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
+
 		serviceProvider := r.URL.Query().Get("source")
 
 		resp := models.Response{}

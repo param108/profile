@@ -17,9 +17,9 @@ func (db *PostgresDB) CreateTwitterChallenge(token, writer string) (string, erro
 	return id, nil
 }
 
-func (db *PostgresDB) GetTwitterChallenge(key, writer string) (string, error) {
+func (db *PostgresDB) GetTwitterChallenge(token, writer string) (string, error) {
 	ret := &models.TwitterChallenge{}
-	if err := db.db.First(ret, "id = ? and writer = ?", key, writer).Error; err != nil {
+	if err := db.db.First(ret, "id = ? and writer = ?", token, writer).Error; err != nil {
 		return "", err
 	}
 

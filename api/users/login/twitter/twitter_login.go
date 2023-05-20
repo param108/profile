@@ -61,6 +61,21 @@ func (tlp *TwitterLoginProvider) Periodic() {
 }
 
 func (tlp *TwitterLoginProvider) HandleLogin(rw http.ResponseWriter, r *http.Request) {
+
+	jwtString := r.Header.Get("TRIBIST_USER")
+	// try and login using jwt
+	if len(jwtString) > 0 {
+		back := r.URL.Query().Get("redirect_url")
+
+		// the redirect_url must begin with /
+		if len(back) == 0 || !strings.HasPrefix(back, "/") {
+			back = "/"
+		}
+
+		http.Redirect(rw, r, back, http.StatusTemporaryRedirect)
+		return
+	}
+
 	clientID := os.Getenv("TWITTER_CLIENT_ID")
 
 	challenge := RandStringBytesMask(16)
@@ -79,7 +94,7 @@ func (tlp *TwitterLoginProvider) HandleLogin(rw http.ResponseWriter, r *http.Req
 	redirectURL := fmt.Sprintf(redirectAuthorizeURL,
 		url.QueryEscape(clientID),
 		url.QueryEscape("https://"+os.Getenv("HOST")+baseAuthorizeURL),
-		url.QueryEscape("users.read"),
+		url.QueryEscape("users.read,tweet.read"),
 		url.QueryEscape(key),
 		url.QueryEscape(challenge))
 
