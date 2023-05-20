@@ -115,5 +115,5 @@ func CreateSignedToken(username, userID string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// Sign and get the complete encoded token as a string using the secret
-	return token.SignedString(os.Getenv("TRIBIST_JWT_KEY"))
+	return token.SignedString([]byte(os.Getenv("TRIBIST_JWT_KEY")))
 }
