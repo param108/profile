@@ -19,7 +19,7 @@ func teardown() {
 func TestUser(t *testing.T) {
 	teardown()
 	t.Run("can create user", func(t *testing.T) {
-		user, err := testDB.CreateUser("param", "user", testUserWriter)
+		user, err := testDB.CreateUser("param", "twitter", "user", testUserWriter)
 		assert.Nil(t, err, "failed create user")
 
 		fetchedUser, err := testDB.GetUser(user.ID, testUserWriter)

@@ -96,7 +96,7 @@ func checkMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func createSignedToken(username, userID string) (string, error) {
+func CreateSignedToken(username, userID string) (string, error) {
 	timeNow := time.Now()
 	claims := Claims{
 		Username: username,

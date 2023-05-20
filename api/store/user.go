@@ -4,11 +4,12 @@ import (
 	"github.com/param108/profile/api/models"
 )
 
-func (s *StoreImpl) CreateUser(handle string, role models.UserRole, writer string) (*models.User, error) {
+func (s *StoreImpl) CreateUser(handle string, profile string, role models.UserRole, writer string) (*models.User, error) {
 	user := &models.User{
-		Handle: handle,
-		Role:   role,
-		Writer: writer,
+		Handle:  handle,
+		Role:    role,
+		Profile: profile,
+		Writer:  writer,
 	}
 	if err := s.db.CreateUser(user); err != nil {
 		return nil, err

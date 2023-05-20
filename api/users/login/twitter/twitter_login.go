@@ -1,6 +1,8 @@
 package twitter
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -12,6 +14,8 @@ import (
 	"time"
 
 	"github.com/param108/profile/api/store"
+	"github.com/param108/profile/api/users/login/common"
+	"github.com/param108/profile/api/utils"
 )
 
 const (
@@ -107,6 +111,44 @@ const (
 	getTokenURL = "https://api.twitter.com/2/oauth2/token"
 )
 
+func (tlp *TwitterLoginProvider) getUsername(accessToken string) (string, error) {
+	userDataURL := "https://api.twitter.com/2/users/me"
+
+	req, err := http.NewRequest(http.MethodGet, userDataURL, strings.NewReader(""))
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Add("Authorization", "Bearer "+accessToken)
+
+	resp, err := tlp.Do(req)
+	if err != nil {
+		return "", err
+	}
+
+	d, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	val := map[string]interface{}{}
+	if err := json.Unmarshal(d, &val); err != nil {
+		return "", err
+	}
+
+	m, ok := val["data"].(map[string]interface{})
+	if !ok {
+		return "", errors.New("invalid user data")
+	}
+
+	username, ok := m["username"].(string)
+	if !ok {
+		return "", errors.New("invalid user data")
+	}
+
+	return username, nil
+}
+
 func (tlp *TwitterLoginProvider) HandleAuthorize(rw http.ResponseWriter, r *http.Request) {
 
 	code := r.URL.Query().Get("code")
@@ -161,6 +203,63 @@ func (tlp *TwitterLoginProvider) HandleAuthorize(rw http.ResponseWriter, r *http
 		return
 	}
 
+	loginData := map[string]interface{}{}
+	// extract the access token
+	err = json.Unmarshal(d, &loginData)
+	if err != nil {
+		log.Printf("failed to unmarshall loginData: %s", err.Error())
+		rw.WriteHeader(http.StatusBadRequest)
+		rw.Write([]byte("Authentication Failed"))
+		return
+	}
+
+	accessToken, ok := loginData["access_token"].(string)
+	if !ok {
+		rw.WriteHeader(http.StatusBadRequest)
+		rw.Write([]byte("Authentication Failed"))
+		return
+	}
+
+	// got the access token with appropriate scope.
+	// now we need to use that to get the user_id
+	// after this we don't care for the accessToken
+	// (atleast for now)
+	username, err := tlp.getUsername(accessToken)
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+		rw.Write([]byte("failure"))
+		return
+	}
+
+	// check if the user is already in the database.
+	u, err := common.FindOrCreateTPUser(tlp.DB, username, "twitter", os.Getenv("WRITER"))
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+		rw.Write([]byte("failure"))
+		return
+	}
+
+	token, err := utils.CreateSignedToken(u.Handle, u.ID)
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+		rw.Write([]byte("create token failure"))
+		return
+	}
+
+	cred := map[string]interface{}{
+		"data": map[string]interface{}{
+			"access_token": token,
+		},
+	}
+
+	d, err = json.Marshal(cred)
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+		rw.Write([]byte("create token failure"))
+		return
+	}
+
+	// userID, err := users.FindOrCreateTPAUser(username, "twitter")
 	rw.WriteHeader(http.StatusOK)
 	rw.Write(d)
 }
