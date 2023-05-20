@@ -26,4 +26,14 @@ func TestUser(t *testing.T) {
 		assert.Nil(t, err, "failed fetch user")
 		assert.Exactly(t, user, fetchedUser, "created and fetched do not match")
 	})
+
+	t.Run("find or create user", func(t *testing.T) {
+		user, err := testDB.FindOrCreateUser("param", "twitter", "user", testUserWriter)
+		assert.Nil(t, err, "failed to find user")
+
+		fetchedUser, err := testDB.GetUser(user.ID, testUserWriter)
+		assert.Nil(t, err, "failed fetch user")
+		assert.Exactly(t, user, fetchedUser, "created and fetched do not match")
+	})
+
 }

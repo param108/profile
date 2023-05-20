@@ -6,5 +6,5 @@ import (
 )
 
 func FindOrCreateTPUser(db store.Store, handle, profile, writer string) (*models.User, error) {
-	return db.CreateUser(handle, profile, models.RoleUser, writer)
+	return db.FindOrCreateUser(handle, profile, models.RoleUser, writer)
 }

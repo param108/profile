@@ -11,6 +11,7 @@ import (
 // What is important is the Data flow.
 type Store interface {
 	CreateUser(handle string, profile string, role models.UserRole, writer string) (*models.User, error)
+	FindOrCreateUser(handle string, profile string, role models.UserRole, writer string) (*models.User, error)
 	GetUser(userID string, writer string) (*models.User, error)
 	CreateInvalidToken(token string, writer string) error
 	IsInvalidToken(token string, writer string) (bool, error)

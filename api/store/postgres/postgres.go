@@ -47,6 +47,18 @@ func (db *PostgresDB) CreateUser(u *models.User) error {
 	return db.db.Create(u).Error
 }
 
+func (db *PostgresDB) FindOrCreateUser(u *models.User) (*models.User, error) {
+	ret := &models.User{}
+	if err := db.db.Where(
+		"handle = ? and profile = ?",
+		u.Handle,
+		u.Profile).FirstOrCreate(ret).Error; err != nil {
+		return nil, err
+	}
+
+	return ret, nil
+}
+
 func (db *PostgresDB) GetUser(userID string, writer string) (*models.User, error) {
 	user := &models.User{}
 	err := db.db.Find(user).Where("id = ? and writer = ?", userID, writer).Error
