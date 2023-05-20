@@ -94,7 +94,7 @@ func (tlp *TwitterLoginProvider) HandleLogin(rw http.ResponseWriter, r *http.Req
 	redirectURL := fmt.Sprintf(redirectAuthorizeURL,
 		url.QueryEscape(clientID),
 		url.QueryEscape("https://"+os.Getenv("HOST")+baseAuthorizeURL),
-		url.QueryEscape("users.read,tweet.read"),
+		url.QueryEscape("users.read tweet.read"),
 		url.QueryEscape(key),
 		url.QueryEscape(challenge))
 
