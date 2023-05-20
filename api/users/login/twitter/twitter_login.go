@@ -241,6 +241,7 @@ func (tlp *TwitterLoginProvider) HandleAuthorize(rw http.ResponseWriter, r *http
 
 	token, err := utils.CreateSignedToken(u.Handle, u.ID)
 	if err != nil {
+		log.Printf("Failed to create token %s\n", err.Error())
 		rw.WriteHeader(http.StatusInternalServerError)
 		rw.Write([]byte("create token failure"))
 		return
@@ -255,7 +256,7 @@ func (tlp *TwitterLoginProvider) HandleAuthorize(rw http.ResponseWriter, r *http
 	d, err = json.Marshal(cred)
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
-		rw.Write([]byte("create token failure"))
+		rw.Write([]byte("Token marshalling failure"))
 		return
 	}
 
