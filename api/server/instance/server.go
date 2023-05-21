@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -67,6 +68,7 @@ END_PERIODIC:
 			break END_PERIODIC
 		case <-ticker.C:
 			twitter.NewTwitterLoginProvider(s.DB).Periodic()
+			store.Periodic(s.DB, os.Getenv("WRITER"))
 		}
 	}
 	ticker.Stop()

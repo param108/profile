@@ -41,3 +41,13 @@ func (db *PostgresDB) GetOneTime(
 func (db *PostgresDB) SaveOneTime(onetime *models.Onetime) error {
 	return db.db.Table("onetime").Save(onetime).Error
 }
+
+func (db *PostgresDB) DeleteOldOneTimes(expiry time.Duration, writer string) error {
+	expired := time.Now().UTC().Add(-expiry)
+	if err := db.db.Table("onetime").Where(
+		"created_at < ? and writer = ?",
+		expired, writer).Delete(&models.Onetime{}).Error; err != nil {
+		return err
+	}
+	return nil
+}

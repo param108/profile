@@ -46,4 +46,12 @@ func TestOneTime(t *testing.T) {
 		assert.Nil(t, onetime, "onetime not nil")
 	})
 
+	t.Run("delete old onetimes", func(t *testing.T) {
+		err := testDB.DeleteOldOneTimes(time.Second*5, onetimeWriter)
+		assert.Nil(t, err, "failed to delete old onetime")
+
+		onetime, err := testDB.GetOneTime(oldOnetime.ID, time.Second*50, onetimeWriter)
+		assert.Equal(t, "not found", err.Error(), "invalid error seen")
+		assert.Nil(t, onetime, "onetime not nil")
+	})
 }

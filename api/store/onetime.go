@@ -16,3 +16,7 @@ func (s *StoreImpl) GetOneTime(
 	writer string) (*models.Onetime, error) {
 	return s.db.GetOneTime(id, expiry, writer)
 }
+
+func (s *StoreImpl) DeleteOldOneTimes(expiry time.Duration, writer string) error {
+	return s.db.DeleteOldOneTimes(expiry, writer)
+}

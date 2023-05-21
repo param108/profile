@@ -1,6 +1,7 @@
 package store
 
 import (
+	"log"
 	"time"
 
 	"github.com/param108/profile/api/models"
@@ -64,4 +65,13 @@ type Store interface {
 	// GetOneTime Returns a onetime record by id and writer if it
 	// is not older than expiry
 	GetOneTime(id string, expiry time.Duration, writer string) (*models.Onetime, error)
+
+	// DeleteOldOneTimes Delete all one time entries older than one hour
+	DeleteOldOneTimes(expiry time.Duration, writer string) error
+}
+
+func Periodic(s Store, writer string) {
+	if err := s.DeleteOldOneTimes(time.Hour, writer); err != nil {
+		log.Printf("Failed delete old one times: %s", err.Error())
+	}
 }
