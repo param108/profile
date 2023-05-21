@@ -1,0 +1,1 @@
+ALTER TABLE onetime ADD COLUMN writer uuid NOT NULL DEFAULT '6bd8d353-927e-463b-abb4-4b3c08c7c3af';

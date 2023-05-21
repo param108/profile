@@ -57,4 +57,11 @@ type Store interface {
 	// by tag. Return in Chronologically descending order.
 	// writer is optional. Empty value is all writers.
 	SearchTweetsByTags(userID string, tags []string, writer string) ([]*models.Tweet, error)
+
+	// OneTime APIs
+	SetOneTime(val, writer string) (*models.Onetime, error)
+
+	// GetOneTime Returns a onetime record by id and writer if it
+	// is not older than expiry
+	GetOneTime(id string, expiry time.Duration, writer string) (*models.Onetime, error)
 }
