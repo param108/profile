@@ -40,10 +40,10 @@ jobs:
         name: twitter.tgz
         path: ${{ github.workspace }}/twitter.tgz
 
-#    - name: trigger new image
-#      uses: fifsky/ssh-action@master
-#      with:
-#        command: sudo /usr/bin/restart_twitter.sh
-#        host: ${{ secrets.API_HOST }}
-#        user: cicd
-#        key: ${{ secrets.API_PRIVATE_KEY}}
+    - name: trigger new image
+      uses: fifsky/ssh-action@master
+      with:
+        command: sudo /usr/bin/restart_twitter.sh
+        host: ${{ secrets.API_HOST }}
+        user: cicd
+        key: ${{ secrets.API_PRIVATE_KEY}}
