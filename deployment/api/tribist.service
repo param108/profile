@@ -1,3 +1,6 @@
+# Needs a gh.txt in /home/tribist/api which contains the
+# github access token.
+
 [Unit]
 Description=Tribist
 

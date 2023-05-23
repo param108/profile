@@ -3,6 +3,8 @@ name: api_deploy
 on:
   push:
     branches: [ main ]
+    paths:
+        - 'api/**'
 jobs:
 
   build:

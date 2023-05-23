@@ -1,0 +1,13 @@
+# Needs a gh.txt in WorkingDirectory which contains the
+# github access token.
+
+[Unit]
+Description=Twitter
+[Service]
+WorkingDirectory=/home/tribist/
+Type=simple
+Restart=always
+RestartSec=30s
+ExecStart=/usr/bin/twitter.sh -c start -g gh.txt
+ExecStop=/usr/bin/twitter.sh -c stop -g gh.txt
+ExecReload=/usr/bin/twitter.sh -c reload -g gh.txt

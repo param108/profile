@@ -1,0 +1,49 @@
+name: twitterlike
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+        - 'twitterlike/**'
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set Node.js 16.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16.x
+
+    - name: Run install
+      uses: borales/actions-yarn@v4
+      with:
+        cmd: install # will run `yarn install` command
+        dir: ${{ github.workspace }}/twitterlike
+
+    - name: Run build
+      uses: borales/actions-yarn@v4
+      with:
+        cmd: build # will run `yarn build` command
+        dir: ${{ github.workspace }}/twitterlike
+    - name: Bundle
+      run : |
+          echo "${{ secrets.TWTR_ENV_CONFIG }}" > ${{ github.workspace }}/twitterlike/.env.local
+          cd ${{ github.workspace }}; tar -zcvf twitter.tgz twitterlike
+
+    - name: upload twitter.tgz artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: twitter.tgz
+        path: ${{ github.workspace }}/twitter.tgz
+
+#    - name: trigger new image
+#      uses: fifsky/ssh-action@master
+#      with:
+#        command: sudo /usr/bin/restart_twitter.sh
+#        host: ${{ secrets.API_HOST }}
+#        user: cicd
+#        key: ${{ secrets.API_PRIVATE_KEY}}
