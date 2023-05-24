@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths:
         - 'twitterlike/**'
+        - '.github/workflows/twitterlike.yml'
 jobs:
 
   build:
@@ -40,7 +41,7 @@ jobs:
         name: twitter.tgz
         path: ${{ github.workspace }}/twitter.tgz
 
-    - name: trigger new image
+    - name: trigger new twitter image
       uses: fifsky/ssh-action@master
       with:
         command: sudo /usr/bin/restart_twitter.sh
