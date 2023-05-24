@@ -44,7 +44,7 @@ jobs:
     - name: trigger new twitter image
       uses: fifsky/ssh-action@master
       with:
-        command: sudo /usr/bin/twitter_restart.sh
+        command: sudo /usr/bin/restart_twitter.sh
         host: ${{ secrets.API_HOST }}
         user: cicd
         key: ${{ secrets.API_PRIVATE_KEY}}
