@@ -22,8 +22,8 @@ export default function Tweet(props: TweetProps) {
                 onClick={()=>{
                     props.router.push('/tweets/'+props.tweet_id+"/show");
                 }}>
-                <b>{formatDate(props.date)}</b><br/>
-                {formatTweet(props.tweet)}
+                <i className="text-gray-300">{formatDate(props.date)}</i><br/>
+                <span className="text-gray-600">{formatTweet(props.tweet)}</span>
             </div>
     );
 }

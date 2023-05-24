@@ -14,7 +14,8 @@ export default function Editor(props: EditorProps) {
                     What are you thinking about ?
                 </textarea>
             ):(
-                <div className="w-[500px] h-[150px] bg-white mt-[5px] mx-[5px] p-[5px] rounded focus:outline-none overflow-x-auto">
+                <div className="w-[500px] h-[150px] bg-white
+mt-[5px] mx-[5px] p-[5px] rounded focus:outline-none overflow-x-auto text-gray-600">
                 {formatTweet(props.defaultMessage)}
                 </div>    
             )}

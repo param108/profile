@@ -1,41 +1,79 @@
 "use client";
-import Image from 'next/image'
 import Tweet from './components/tweet'
-import Editor from './components/editor'
 import Header from './components/header'
-import { useState } from 'react'
 import { useRouter } from 'next/navigation';
+import Editor from './components/editor';
+
+const welcomeTweets = [
+  {
+    time: `At the beginning.`,
+    tweet: `
+I think in tweets.
+
+*Short paragraphs of thought*
+
+**Shorter the Better**
+`},
+  {
+    time: `A little later.`,
+    tweet: `
+These thoughts could be **independent**
+
+OR
+
+They could be *connected* as **threads** or
+*related* through **#tags**
+`},
+  {
+    time: `Even later.`,
+    tweet: `
+I re-read my tweets a lot. Over & Over.
+
+Sometimes **Narcissm** & sometimes to **remind** me
+
+of things I already know.
+`},
+  {
+    time: `Even later....er.`,
+    tweet: `
+At times I want to **explore** them and **discover** new connections,
+or new **insights** or wallow in old ones.
+
+I like **high-lighting** and _italics_.
+Did I mention, we support **Markdown!**"
+`},
+  {
+    time: `Right Here, Right Now.`,
+    tweet: `
+You can do all this here and you own your data,
+download as you wish.
+
+Unlike twitter this is not a **performance**,
+
+this is **recreation**. This is **expression**.
+
+This is **Freedom**!
+
+_Interested ?_
+
+Then [**signup**](https://google.com)!
+`}
+];
 
 export default function Home() {
-  const [tweets, setTweets] = useState(Array(10).fill(0));
   const router = useRouter();
   return (
     <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
       <Header></Header>
-      <Editor isLoggedIn={false} defaultMessage={
-        `#font:kamal
-If these tweets **contribute** to you, 
-
-please consider, **contributing** at 
-
-[http://paymenow.com/param108](http://paymenow.com/param108)`}></Editor>
+      <Editor isLoggedIn={false} defaultMessage={`
+This is a blog. A **blog** of _tweets_.
+Used to be called **micro-blogging** until twitter
+**Hijacked** the space.
+`}></Editor>
       {
-        tweets.map((k,idx)=>{
-          return (<Tweet router={router} tweet_id={"a-b-123211-bs"} key={idx} tweet={
-`
-The world is full of too many of these tweets.
-
-There are too many of these tweets.
-
-There are tweets and too many of them.
-
-There are only tweets and lots of them.            
-
-There is no tweet left to tweet.
-`
-            } date={
-  `13:00 Thu`
-}></Tweet>)
+        welcomeTweets.map((k,idx)=>{
+          return (<Tweet router={router} tweet_id={idx.toString()} key={idx} tweet={k.tweet}
+                  date={k.time}></Tweet>)
         })
       }
     </main>
