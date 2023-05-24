@@ -55,3 +55,9 @@ in `/deployments/twitterlike` directory of this repository.
    ProxyRequests Off
    ProxyPass / http://localhost:9090/
 ```
+
+# Github
+
+We use `TWTR_HOST` and `TWTR_PRIVATE_KEY` repository secrets to control this command.
+In the authorized_keys file we setup forced commands for corresponding public key to only
+call `restart_twitter.sh`

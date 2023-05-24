@@ -45,6 +45,6 @@ jobs:
       uses: fifsky/ssh-action@master
       with:
         command: sudo /usr/bin/restart_twitter.sh
-        host: ${{ secrets.API_HOST }}
+        host: ${{ secrets.TWTR_HOST }}
         user: cicd
-        key: ${{ secrets.API_PRIVATE_KEY}}
+        key: ${{ secrets.TWTR_PRIVATE_KEY}}
