@@ -33,7 +33,7 @@ jobs:
     - name: Bundle
       run : |
           echo "${{ secrets.TWTR_ENV_CONFIG }}" > ${{ github.workspace }}/twitterlike/.env.local
-          cd ${{ github.workspace }}; tar -zcvf twitter.tgz twitterlike
+          cd ${{ github.workspace }}; tar -zcf twitter.tgz twitterlike
 
     - name: upload twitter.tgz artifact
       uses: actions/upload-artifact@v2
