@@ -65,7 +65,7 @@ export default function Home() {
   return (
     <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
       <Header></Header>
-      <Editor isLoggedIn={false} defaultMessage={`
+      <Editor isLoggedIn={true} defaultMessage={`
 This is a blog. A **blog** of _tweets_.
 Used to be called **micro-blogging** until twitter
 **Hijacked** the space.

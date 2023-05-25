@@ -8,10 +8,10 @@ type EditorProps = {
 
 export default function Editor(props: EditorProps) {
     return (
-        <div className="bg-sky-200 rounded mt-[60px] mb-[10px]">
+        <div className="bg-sky-200 w-[96%] md:w-[510px] rounded mt-[60px] mb-[10px]">
             {props.isLoggedIn ? (
-                <textarea className="block w-[90%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[5px] p-[5px] rounded focus:outline-none">
-                    What are you thinking about ?
+                <textarea placeholder={"What are you thinking about ?"}
+                    className="block w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] p-[5px] rounded focus:outline-none">
                 </textarea>
             ):(
                 <div className="w-[96%] md:w-[500px] h-[150px] bg-white
