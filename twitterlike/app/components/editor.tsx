@@ -10,12 +10,12 @@ export default function Editor(props: EditorProps) {
     return (
         <div className="bg-sky-200 rounded mt-[60px] mb-[10px]">
             {props.isLoggedIn ? (
-                <textarea className="block w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[5px] p-[5px] rounded focus:outline-none">
+                <textarea className="block w-[90%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[5px] p-[5px] rounded focus:outline-none">
                     What are you thinking about ?
                 </textarea>
             ):(
-                <div className="w-[500px] h-[150px] bg-white
-mt-[5px] mx-[5px] p-[5px] rounded focus:outline-none overflow-x-auto text-gray-600">
+                <div className="w-[96%] md:w-[500px] h-[150px] bg-white
+mt-[5px] mx-[2%] md:mx-[5px] p-[5px] rounded focus:outline-none overflow-x-auto text-gray-600">
                 {formatTweet(props.defaultMessage)}
                 </div>    
             )}

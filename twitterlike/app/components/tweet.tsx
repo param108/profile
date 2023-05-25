@@ -16,7 +16,7 @@ export default function Tweet(props: TweetProps) {
     }
     return (
             <div className="border border-t-slate-100 
-            bg-white hover:bg-cyan-50 w-[510px] 
+            bg-white hover:bg-cyan-50 w-[90%] md:w-[510px]
             min-h-[100px] px-[5px] pt-[5px] 
             pb-[40px] overflow-x-auto"
                 onClick={()=>{
