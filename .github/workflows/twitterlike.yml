@@ -61,6 +61,10 @@ jobs:
         cmd: build # will run `yarn install` command
         dir: ${{ github.workspace }}/twitterlike
 
+    - name: Bundle
+      run : |
+          echo "${{ secrets.TWTR_ENV_CONFIG }}" > ${{ github.workspace }}/twitterlike/.env.local
+          cd ${{ github.workspace }}; tar -zcf twitter.tgz twitterlike
 
     - name: upload twitter.tgz artifact
       uses: actions/upload-artifact@v2
