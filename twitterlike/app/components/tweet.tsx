@@ -7,7 +7,7 @@ type TweetProps = {
     tweet: string,
     key: Number,
     date: string,
-    router: AppRouterInstance
+    router: null|AppRouterInstance
 }
 
 export default function Tweet(props: TweetProps) {
@@ -20,7 +20,7 @@ export default function Tweet(props: TweetProps) {
             min-h-[100px] px-[5px] pt-[5px] 
             pb-[40px] overflow-x-auto"
                 onClick={()=>{
-                    props.router.push('/tweets/'+props.tweet_id+"/show");
+                    props.router?.push('/tweets/'+props.tweet_id+"/show");
                 }}>
                 <i className="text-gray-300">{formatDate(props.date)}</i><br/>
                 <span className="text-gray-600">{formatTweet(props.tweet)}</span>
