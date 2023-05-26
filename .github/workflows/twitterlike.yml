@@ -25,6 +25,7 @@ jobs:
         cmd: install --silent # will run `yarn install` command
         dir: ${{ github.workspace }}/twitterlike
 
+  test:
     - name: Run lint
       uses: borales/actions-yarn@v4
       with:
@@ -47,6 +48,7 @@ jobs:
           echo "${{ secrets.TWTR_ENV_CONFIG }}" > ${{ github.workspace }}/twitterlike/.env.local
           cd ${{ github.workspace }}; tar -zcf twitter.tgz twitterlike
 
+  deploy:
     - name: upload twitter.tgz artifact
       uses: actions/upload-artifact@v2
       with:
