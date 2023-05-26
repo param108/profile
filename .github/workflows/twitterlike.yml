@@ -25,6 +25,18 @@ jobs:
         cmd: install --silent # will run `yarn install` command
         dir: ${{ github.workspace }}/twitterlike
 
+    - name: Run lint
+      uses: borales/actions-yarn@v4
+      with:
+        cmd: lint
+        dir: ${{ github.workspace }}/twitterlike
+
+    - name: Run test
+      uses: borales/actions-yarn@v4
+      with:
+        cmd: citest
+        dir: ${{ github.workspace }}/twitterlike
+
     - name: Run build
       uses: borales/actions-yarn@v4
       with:
