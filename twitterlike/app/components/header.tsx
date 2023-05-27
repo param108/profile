@@ -74,7 +74,7 @@ export default function Header() {
 
     const loginDiv = function(): ReactElement {
         return (
-            <div className="relative top-[50%] w-full flex flex-col items-center -translate-y-1/2">
+            <div className="relative top-[50%] w-full flex flex-col items-center -translate-y-1/2 text-gray-600">
                 <span>If you are already signed up, this will log you in. </span>
                 <span>If not, this will <b>sign you up</b></span>
                 {twitterLogin()}
@@ -85,7 +85,7 @@ export default function Header() {
 
     const aboutDiv = function(): ReactElement {
         return (
-            <div className="pt-[50px] px-[5px] md:px-[50px]">
+            <div className="pt-[50px] px-[5px] md:px-[50px] text-gray-600">
                 <p>I am a twitter addict. I tweet throughout the day even on bad days.
                 My tweets cover everything from my random thoughts, to stuff I have read, to politics. Some of these are
                 only output and seldom re-read while others I like to revisit over and over again.</p><br/>
