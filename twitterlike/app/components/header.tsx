@@ -3,7 +3,6 @@
 import { MouseEventHandler, ReactElement, useEffect, useState } from "react";
 import { FiCloudRain, FiZap } from "react-icons/fi";
 import ReactModal from "react-modal";
-import { JsxElement } from "typescript";
 
 const bigModalStyle = {
     content: {
@@ -28,13 +27,12 @@ export default function Header() {
     var [openModal, setOpenModal] = useState("")
 
     const [largeScreen, setLargeScreen] = useState(
-        window.matchMedia("(min-width: 768px)").matches
+        (typeof window === "undefined")?true:window.matchMedia("(min-width: 768px)").matches
     )
 
     useEffect(() => {
-        window
-            .matchMedia("(min-width: 768px)")
-            .addEventListener('change', e => setLargeScreen( e.matches ));
+        (typeof window === "undefined")?true:window.matchMedia("(min-width: 768px)")
+                .addEventListener('change', e => setLargeScreen( e.matches ));
     }, []);
 
     const menuClick = function (itemName:string):MouseEventHandler {
@@ -66,15 +64,6 @@ export default function Header() {
                 <span>If not, this will <b>sign you up</b></span>
                 {twitterLogin()}
                 <span><i>Your username will be your twitter handle.</i></span>
-            </div>
-        )
-    };
-
-    const signupDiv = function(): ReactElement {
-        return (
-            <div className="h-full w-full flex flex-col items-center">
-                <span>When you signup, your twitter handle becomes your username...</span>
-                {twitterLogin()}
             </div>
         )
     };
