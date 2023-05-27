@@ -4,6 +4,14 @@ import { MouseEventHandler, ReactElement, useEffect, useState } from "react";
 import { FiCloudRain, FiZap } from "react-icons/fi";
 import ReactModal from "react-modal";
 
+const largeModalStyle = {
+    content: {
+        left: "25%",
+        right: "25%",
+        top: "100px"
+    }
+};
+
 const bigModalStyle = {
     content: {
         left: "10%",
@@ -27,12 +35,19 @@ export default function Header() {
     var [openModal, setOpenModal] = useState("")
 
     const [largeScreen, setLargeScreen] = useState(
+        (typeof window === "undefined")?true:window.matchMedia("(min-width: 1024px)").matches
+    )
+    const [bigScreen, setBigScreen] = useState(
         (typeof window === "undefined")?true:window.matchMedia("(min-width: 768px)").matches
     )
 
     useEffect(() => {
-        (typeof window === "undefined")?true:window.matchMedia("(min-width: 768px)")
-                .addEventListener('change', e => setLargeScreen( e.matches ));
+        (typeof window === "undefined")?true:window.matchMedia("(min-width: 768px)").addEventListener('change', (e) => {
+            setBigScreen( e.matches );
+        });
+        (typeof window === "undefined")?true:window.matchMedia("(min-width: 1024px)").addEventListener('change', (e) => {
+            setLargeScreen( e.matches );
+        });
     }, []);
 
     const menuClick = function (itemName:string):MouseEventHandler {
@@ -116,30 +131,26 @@ export default function Header() {
                 }
             })(showVMenu)}
             </div>
-            {((isLargeScreen) => {
-                return (
-                    <div>
-                    <ReactModal
-                        style={isLargeScreen?bigModalStyle:smallModalStyle}
+            <div>
+                <ReactModal
+                        style={largeScreen?largeModalStyle:(bigScreen)?bigModalStyle:smallModalStyle}
                         isOpen={openModal=="login"}>
                         <FiZap
                             size={30}
                             className="text-pink-600 float-right"
                             onClick={()=>{setOpenModal("closed")}}/>
                         {loginDiv()}
-                    </ReactModal>
-                    <ReactModal
-                        style={isLargeScreen?bigModalStyle:smallModalStyle}
+                </ReactModal>
+                <ReactModal
+                        style={largeScreen?largeModalStyle:(bigScreen)?bigModalStyle:smallModalStyle}
                         isOpen={openModal=="about"}>
-                        <FiZap
+                    <FiZap
                             size={30}
                             className="text-pink-600 float-right"
                             onClick={()=>{setOpenModal("closed")}}/>
                         {aboutDiv()}
-                    </ReactModal>
-                    </div>
-                )
-            })(largeScreen)}
+                </ReactModal>
+            </div>
         </div>
     );
 }
