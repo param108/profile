@@ -6,16 +6,16 @@ import ReactModal from "react-modal";
 
 const bigModalStyle = {
     content: {
-        left: "25%",
-        right: "25%",
+        left: "10%",
+        right: "10%",
         top: "100px"
     }
 };
 
 const smallModalStyle = {
     content: {
-        left: "10%",
-        right: "10%",
+        left: "2%",
+        right: "2%",
         top: "100px"
     }
 };
@@ -70,7 +70,20 @@ export default function Header() {
 
     const aboutDiv = function(): ReactElement {
         return (
-            <div></div>
+            <div className="pt-[50px] px-[5px] md:px-[50px]">
+                <p>I am a twitter addict. I tweet throughout the day even on bad days.
+                My tweets cover everything from my random thoughts, to stuff I have read, to politics. Some of these are
+                only output and seldom re-read while others I like to revisit over and over again.</p><br/>
+                <p>I wanted a place to organize and re-organize my tweets to extract different perspectives and share these new perspectives
+                with others. Unfortunately twitter is not great for this. So I decided to develop my own microblog.</p><br/>
+                <p>This blog is optimized for viewing, organizing, studying and finally sharing tweets.
+                In time, I hope you will be able to sell your organized tweets to your readers. I am not a fan of ad-revenue and want this
+                place to be where you find your tribe of real people who you will inspire and gather inspiration from.</p><br/>
+                <p>You can follow me on twitter <a className="text-indigo-600" href="https://twitter.com/param108">{"@param108"}</a><br/>
+                My microblog on tribist is <a className="text-indigo-600" href="https://ui.tribist.com/param108">{"@param108"}</a></p><br/>
+                <p>This <b>microblog</b> is work in progress and is <b>Open Source.</b> If you would like to contribute,
+                send me a pull request or create an issue at <a href="https://github.com/param108/profile">github.com/param108/profile</a>.</p>
+            </div>
         )
     };
 
@@ -103,12 +116,11 @@ export default function Header() {
                 }
             })(showVMenu)}
             </div>
-            {(() => {
-                var modalStyle = largeScreen?bigModalStyle:smallModalStyle;
+            {((isLargeScreen) => {
                 return (
                     <div>
                     <ReactModal
-                        style={modalStyle}
+                        style={isLargeScreen?bigModalStyle:smallModalStyle}
                         isOpen={openModal=="login"}>
                         <FiZap
                             size={30}
@@ -117,7 +129,7 @@ export default function Header() {
                         {loginDiv()}
                     </ReactModal>
                     <ReactModal
-                        style={modalStyle}
+                        style={isLargeScreen?bigModalStyle:smallModalStyle}
                         isOpen={openModal=="about"}>
                         <FiZap
                             size={30}
@@ -127,7 +139,7 @@ export default function Header() {
                     </ReactModal>
                     </div>
                 )
-            })()}
+            })(largeScreen)}
         </div>
     );
 }

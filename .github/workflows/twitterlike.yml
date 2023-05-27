@@ -37,6 +37,13 @@ jobs:
         cmd: citest
         dir: ${{ github.workspace }}/twitterlike
 
+    - name: Run build
+      uses: borales/actions-yarn@v4
+      with:
+        cmd: build # will run `yarn install` command
+        dir: ${{ github.workspace }}/twitterlike
+
+
   deploy:
     needs: test
     runs-on: ubuntu-latest
