@@ -29,7 +29,7 @@ They could be *connected* as **threads** or
     tweet: `
 I re-read my tweets a lot. Over & Over.
 
-Sometimes **Narcissm** & sometimes to **remind** me
+Sometimes **Narcissism** & sometimes to **remind** me
 
 of things I already know.
 `},
@@ -56,7 +56,7 @@ This is **Freedom**!
 
 _Interested ?_
 
-Then [**signup**](https://google.com)!
+Then [**signup**](https://ui.tribist.com/)!
 `}
 ];
 
