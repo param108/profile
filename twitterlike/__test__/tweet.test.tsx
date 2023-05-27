@@ -29,7 +29,7 @@ Then [**signup**](https://google.com)!
   "baseElement": <body>
     <div>
       <div
-        class="border border-t-slate-100  bg-white hover:bg-cyan-50 w-[90%] md:w-[510px] min-h-[100px] px-[5px] pt-[5px]  pb-[40px] overflow-x-auto"
+        class="border border-t-slate-100  bg-white hover:bg-cyan-50 w-[90%] md:w-[510px] min-h-[100px] pl-[15px] pr-[5px] pt-[5px] pb-[40px] overflow-x-auto"
       >
         <i
           class="text-gray-300"
@@ -107,7 +107,7 @@ download as you wish.
   </body>,
   "container": <div>
     <div
-      class="border border-t-slate-100  bg-white hover:bg-cyan-50 w-[90%] md:w-[510px] min-h-[100px] px-[5px] pt-[5px]  pb-[40px] overflow-x-auto"
+      class="border border-t-slate-100  bg-white hover:bg-cyan-50 w-[90%] md:w-[510px] min-h-[100px] pl-[15px] pr-[5px] pt-[5px] pb-[40px] overflow-x-auto"
     >
       <i
         class="text-gray-300"
