@@ -41,6 +41,9 @@ download_latest_image() {
 
 GH_CONFIG_PATH=/home/cicd/gh.txt
 
+# wait 10 seconds for the image to be uploaded on github
+sleep 10
+
 download_latest_image
 
 systemctl stop twitter
