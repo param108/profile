@@ -14,7 +14,7 @@ download_latest_image() {
 	fi
 
 	# download artifact
-	IMAGE_ID=`/usr/bin/gh run -R param108/profile list -w twitterlike --json conclusion,databaseId,workflowDatabaseId -L 1 -q 'select(.[].conclusion = "success")' | jq .[0].databaseId`
+    IMAGE_ID=`/usr/bin/gh run -R param108/profile list -w twitterlike --json conclusion,databaseId,workflowDatabaseId | jq '[.[]|select(.conclusion=="failure")][0] | .databaseId'`
 
 	echo "DOWNLOADING......"
 
