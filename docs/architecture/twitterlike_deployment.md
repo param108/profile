@@ -19,19 +19,22 @@ When a push is made to main in the twitterlike directory, an artifact is created
 The workflow then calls `restart_twitter.sh` on the server. This command basically does
 
 ```
+download_new_image
 systemctl stop twitter
 sleep 5
 systemctl start twitter
 ```
 
-The first line just kills existing `twitter.sh` process and all children.
+The first line just downloads the latest bundle from cicd. 
+The second line kills existing `twitter.sh` process and all children.
 `systemctl start twitter` runs `/usr/bin/twitter.sh -c start -g gh.txt`. The `twitter.sh`
 script is available in `/deployments/twitterlike` directory in this repo. 
 
 
 ## Start command
 
-This command uses gh cli to download the latest `twitter.tgz` and untars it. After that
+It checks if /home/cicd/twitterlike_new is available and if so copies it over the current
+twitterlike directory.
 it kills the current `twitter.sh` process and then runs
 
 `yarn run start -p 9090` 
