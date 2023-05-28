@@ -6,5 +6,4 @@ Backend for profile project in golang.
 
 golang 1.17.3+
 
-
-
+Read the `/docs` directory!
