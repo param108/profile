@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/param108/profile/api/common"
 	"github.com/param108/profile/api/store"
 	"github.com/param108/profile/api/users"
 	"github.com/param108/profile/api/users/login/twitter"
@@ -101,4 +102,7 @@ func (s *Server) RegisterHandlers() {
 
 	s.r.HandleFunc("/users/authorize/{service_provider}",
 		users.CreateServiceProviderAuthorizeRedirect(s.DB))
+
+	s.r.HandleFunc("/onetime",
+		common.CreateGetOneTimeHandler(s.DB))
 }

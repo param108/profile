@@ -20,7 +20,7 @@ func TestTwitter(t *testing.T) {
 
 	var twitterKey1 string
 	t.Run("Should be able to create challenge", func(t *testing.T) {
-		key, err := testDB.CreateTwitterChallenge("JustForTesting1", testWriter)
+		key, err := testDB.CreateTwitterChallenge("JustForTesting1", "url1", testWriter)
 		assert.Nil(t, err, "couldnt create twitter challenge")
 		assert.Greater(t, len(key), 0, "bad key returned")
 		twitterKey1 = key
@@ -28,22 +28,24 @@ func TestTwitter(t *testing.T) {
 
 	var twitterKey2 string
 	t.Run("Should be able to create second challenge", func(t *testing.T) {
-		key, err := testDB.CreateTwitterChallenge("JustForTesting2", testWriter)
+		key, err := testDB.CreateTwitterChallenge("JustForTesting2", "url2", testWriter)
 		assert.Nil(t, err, "couldnt create twitter challenge")
 		assert.Greater(t, len(key), 0, "bad key returned")
 		twitterKey2 = key
 	})
 
 	t.Run("Should get challenge for key 1", func(t *testing.T) {
-		token, err := testDB.GetTwitterChallenge(twitterKey1, testWriter)
+		token, urlStr, err := testDB.GetTwitterChallenge(twitterKey1, testWriter)
 		assert.Nil(t, err, "couldnt get twitter challenge")
 		assert.Equal(t, "JustForTesting1", token, "bad key returned")
+		assert.Equal(t, "url1", urlStr, "invalid redirect url")
 	})
 
 	t.Run("Should get challenge for key 2", func(t *testing.T) {
-		token, err := testDB.GetTwitterChallenge(twitterKey2, testWriter)
+		token, urlStr, err := testDB.GetTwitterChallenge(twitterKey2, testWriter)
 		assert.Nil(t, err, "couldnt get twitter challenge")
 		assert.Equal(t, "JustForTesting2", token, "bad key returned")
+		assert.Equal(t, "url2", urlStr, "invalid redirect url")
 	})
 
 	time.Sleep(time.Second * 5)
@@ -51,9 +53,9 @@ func TestTwitter(t *testing.T) {
 	t.Run("Should delete older than 1 second", func(t *testing.T) {
 		testDB.DeleteOldTwitterChallenges(time.Second)
 
-		_, err := testDB.GetTwitterChallenge(twitterKey1, testWriter)
+		_, _, err := testDB.GetTwitterChallenge(twitterKey1, testWriter)
 		assert.NotNil(t, err, "twitter challenge not deleted")
-		_, err = testDB.GetTwitterChallenge(twitterKey2, testWriter)
+		_, _, err = testDB.GetTwitterChallenge(twitterKey2, testWriter)
 		assert.NotNil(t, err, "twitter challenge not deleted")
 	})
 

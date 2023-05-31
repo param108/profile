@@ -19,11 +19,11 @@ type Store interface {
 
 	// CreateTwitterChallenge Takes a token and returns a uuid
 	// which can be passed to GetTwitterChallenge to retrieve it
-	CreateTwitterChallenge(token, writer string) (string, error)
+	CreateTwitterChallenge(token, redirectURL, writer string) (string, error)
 
 	// GetTwitterChallenge Takes a uuid previously returned by CreateTwitterChallenge
 	// and returns the saved challenge string
-	GetTwitterChallenge(key, writer string) (string, error)
+	GetTwitterChallenge(key, writer string) (string, string, error)
 
 	// DeleteOldTwitterChallenges Deletes TwitterChallenges > 24 hours old
 	DeleteOldTwitterChallenges(d time.Duration)
