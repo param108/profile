@@ -14,6 +14,7 @@ import (
 	"github.com/param108/profile/api/store"
 	"github.com/param108/profile/api/users"
 	"github.com/param108/profile/api/users/login/twitter"
+	"github.com/param108/profile/api/utils"
 )
 
 type Server struct {
@@ -101,7 +102,7 @@ func (s *Server) RegisterHandlers() {
 	})
 
 	s.r.HandleFunc("/users/login",
-		users.CreateServiceProviderLoginRedirect(s.DB)).
+		utils.CheckM(users.CreateServiceProviderLoginRedirect(s.DB)).ServeHTTP).
 		Methods(http.MethodGet)
 
 	s.r.HandleFunc("/users/authorize/{service_provider}",

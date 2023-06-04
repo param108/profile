@@ -50,10 +50,10 @@ func parseToken(jwtStr string) (*Claims, error) {
 	return claims, nil
 }
 
-// authenticatedMiddleware delete TRIBIST_USER header and then
+// AuthM delete TRIBIST_USER header and then
 // repopulate with an empty value if unauthenticated,
 // returns 401 or 403 if failure and does not proceed to handler.
-func authenticatedMiddleware(next http.Handler) http.Handler {
+func AuthM(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		r.Header.Del("TRIBIST_USER")
 
@@ -76,10 +76,10 @@ func authenticatedMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-// checkMiddleware will delete the TRIBIST_USER and will try and parse
+// CheckM will delete the TRIBIST_USER and will try and parse
 // the TRIBIST_JWT header. If successful will set TRIBIST_USER.
 // Even if authentication fails this middleware will call the handler.
-func checkMiddleware(next http.Handler) http.Handler {
+func CheckM(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		r.Header.Del("TRIBIST_USER")
 
