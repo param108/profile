@@ -298,7 +298,8 @@ func (tlp *TwitterLoginProvider) HandleAuthorize(rw http.ResponseWriter, r *http
 	http.Redirect(rw, r, redirectURL.String(), http.StatusSeeOther)*/
 
 	ret := map[string]interface{}{
-		"onetime": oneTime.ID,
+		"onetime":      oneTime.ID,
+		"redirect_url": redirectURL.String(),
 	}
 
 	retData, err := json.Marshal(ret)
