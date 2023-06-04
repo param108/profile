@@ -6,6 +6,7 @@ on:
     paths:
         - 'twitterlike/**'
         - '.github/workflows/twitterlike.yml'
+        - '.github/workflows/twitterlike_deploy.yml'
 jobs:
 
   test:
