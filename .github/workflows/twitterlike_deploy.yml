@@ -7,7 +7,7 @@ on:
     types: [completed]
 jobs:
 
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -15,7 +15,7 @@ jobs:
     - name: trigger new image
       uses: fifsky/ssh-action@master
       with:
-        command: sudo /usr/bin/restart_server.sh
+        command: sudo /usr/bin/restart_twitter.sh
         host: ${{ secrets.TWTR_HOST }}
         user: cicd
         key: ${{ secrets.TWTR_PRIVATE_KEY}}
