@@ -21,7 +21,8 @@ func CreateGetOneTimeHandler(db store.Store) http.HandlerFunc {
 			return
 		}
 
-		onetime, err := db.GetOneTime(id, time.Second*60, os.Getenv("WRITER"))
+		// Fixme: made this 600 (10 min) for testing
+		onetime, err := db.GetOneTime(id, time.Second*600, os.Getenv("WRITER"))
 		if err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
 			rw.Write([]byte("no one time"))
