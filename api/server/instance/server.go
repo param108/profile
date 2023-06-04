@@ -106,5 +106,4 @@ func (s *Server) RegisterHandlers() {
 	s.r.HandleFunc("/onetime",
 		common.CreateGetOneTimeHandler(s.DB)).Methods(http.MethodGet)
 
-
 }
