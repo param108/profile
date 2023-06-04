@@ -64,19 +64,42 @@ func (tlp *TwitterLoginProvider) Periodic() {
 	tlp.DB.DeleteOldTwitterChallenges(time.Hour)
 }
 
+func isValidRedirectURL(back string) bool {
+	clients := strings.Split(os.Getenv("ALLOWED_CLIENTS"), ",")
+	if len(clients) == 0 {
+		return false
+	}
+	found := false
+	for _, client := range clients {
+		if len(client) == 0 {
+			continue
+		}
+		if strings.HasPrefix(back, "https://"+client) {
+			found = true
+			break
+		}
+	}
+	return found
+}
+
 func (tlp *TwitterLoginProvider) HandleLogin(rw http.ResponseWriter, r *http.Request) {
 
-	jwtString := r.Header.Get("TRIBIST_USER")
-	// try and login using jwt
-	if len(jwtString) > 0 {
-		back := r.URL.Query().Get("redirect_url")
+	user := strings.Split(r.Header.Get("TRIBIST_USER"), ":")
+	userID := user[0]
 
-		// the redirect_url must begin with /
-		if len(back) == 0 || !strings.HasPrefix(back, "/") {
-			back = "/"
+	// try and login using jwt
+	back := r.URL.Query().Get("redirect_url")
+
+	if len(userID) > 0 {
+		// check for validity of jwtString
+		// check if it is a valid redirect
+		if isValidRedirectURL(back) {
+			http.Redirect(rw, r, back, http.StatusTemporaryRedirect)
+			return
 		}
 
-		http.Redirect(rw, r, back, http.StatusTemporaryRedirect)
+		rw.WriteHeader(http.StatusBadRequest)
+		rw.Write([]byte("invalid redirect"))
 		return
 	}
 
@@ -84,7 +107,7 @@ func (tlp *TwitterLoginProvider) HandleLogin(rw http.ResponseWriter, r *http.Req
 
 	challenge := RandStringBytesMask(16)
 
-	key, err := tlp.DB.CreateTwitterChallenge(challenge, os.Getenv("WRITER"))
+	key, err := tlp.DB.CreateTwitterChallenge(challenge, back, os.Getenv("WRITER"))
 	if err != nil {
 		log.Println("login failed:", err.Error())
 		rw.WriteHeader(http.StatusInternalServerError)
@@ -165,7 +188,7 @@ func (tlp *TwitterLoginProvider) HandleAuthorize(rw http.ResponseWriter, r *http
 		return
 	}
 
-	challenge, err := tlp.DB.GetTwitterChallenge(state, os.Getenv("WRITER"))
+	challenge, savedRedirect, err := tlp.DB.GetTwitterChallenge(state, os.Getenv("WRITER"))
 	if err != nil {
 		rw.WriteHeader(http.StatusBadRequest)
 		rw.Write([]byte("Authentication Failed"))
@@ -247,20 +270,43 @@ func (tlp *TwitterLoginProvider) HandleAuthorize(rw http.ResponseWriter, r *http
 		return
 	}
 
-	cred := map[string]interface{}{
-		"data": map[string]interface{}{
-			"access_token": token,
-		},
+	// Now we have a token but we don't want to send it to
+	// a frontend as url parameter, so we send a onetime token
+	// instead which can be exchanged for the actual token.
+
+	oneTime, err := tlp.DB.SetOneTime(token, os.Getenv("WRITER"))
+	if err != nil {
+		log.Printf("Failed to create OneTime %s\n", err.Error())
+		rw.WriteHeader(http.StatusInternalServerError)
+		rw.Write([]byte("create onetime failure"))
 	}
 
-	d, err = json.Marshal(cred)
+	redirectURL, err := url.Parse(savedRedirect)
+	if err != nil {
+		log.Printf("Invalid redirectURL %s\n", err.Error())
+		rw.WriteHeader(http.StatusBadRequest)
+		rw.Write([]byte("redirect url"))
+	}
+
+	// Add oneTime as onetime parameter
+	params := redirectURL.Query()
+
+	params.Set("onetime", oneTime.ID)
+
+	/*redirectURL.RawQuery = params.Encode()
+
+	http.Redirect(rw, r, redirectURL.String(), http.StatusSeeOther)*/
+
+	ret := map[string]interface{}{
+		"onetime":      oneTime.ID,
+		"redirect_url": redirectURL.String(),
+	}
+
+	retData, err := json.Marshal(ret)
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
-		rw.Write([]byte("Token marshalling failure"))
-		return
+		rw.Write([]byte("marshall onetime failure"))
 	}
-
-	// userID, err := users.FindOrCreateTPAUser(username, "twitter")
 	rw.WriteHeader(http.StatusOK)
-	rw.Write(d)
+	rw.Write(retData)
 }

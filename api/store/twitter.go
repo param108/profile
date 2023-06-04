@@ -5,12 +5,12 @@ import (
 	"time"
 )
 
-func (s *StoreImpl) CreateTwitterChallenge(token, writer string) (string, error) {
+func (s *StoreImpl) CreateTwitterChallenge(token, redirectURL, writer string) (string, error) {
 	if len(token) == 0 {
 		return "", errors.New("invalid challenge")
 	}
 
-	if key, err := s.db.CreateTwitterChallenge(token, writer); err != nil {
+	if key, err := s.db.CreateTwitterChallenge(token, redirectURL, writer); err != nil {
 		return "", err
 	} else {
 		return key, nil
@@ -18,11 +18,11 @@ func (s *StoreImpl) CreateTwitterChallenge(token, writer string) (string, error)
 
 }
 
-func (s *StoreImpl) GetTwitterChallenge(key, writer string) (string, error) {
-	if token, err := s.db.GetTwitterChallenge(key, writer); err != nil {
-		return "", err
+func (s *StoreImpl) GetTwitterChallenge(key, writer string) (string, string, error) {
+	if token, redirect, err := s.db.GetTwitterChallenge(key, writer); err != nil {
+		return "", "", err
 	} else {
-		return token, nil
+		return token, redirect, nil
 	}
 }
 

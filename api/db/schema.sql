@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
--- Dumped by pg_dump version 14.7 (Ubuntu 14.7-0ubuntu0.22.04.1)
+-- Dumped from database version 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1)
+-- Dumped by pg_dump version 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -47,6 +47,18 @@ CREATE TABLE public.invalid_tokens (
 
 
 --
+-- Name: onetime; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.onetime (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    data text NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    writer uuid DEFAULT '6bd8d353-927e-463b-abb4-4b3c08c7c3af'::uuid NOT NULL
+);
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -64,7 +76,8 @@ CREATE TABLE public.tags (
     id bigint NOT NULL,
     user_id uuid NOT NULL,
     tag character varying(50) NOT NULL,
-    created_at timestamp with time zone DEFAULT (now() AT TIME ZONE 'utc'::text) NOT NULL
+    created_at timestamp with time zone DEFAULT (now() AT TIME ZONE 'utc'::text) NOT NULL,
+    writer uuid NOT NULL
 );
 
 
@@ -95,7 +108,8 @@ CREATE TABLE public.tweet_tags (
     id bigint NOT NULL,
     tag character varying(50) NOT NULL,
     tweet_id uuid NOT NULL,
-    user_id uuid NOT NULL
+    user_id uuid NOT NULL,
+    writer uuid NOT NULL
 );
 
 
@@ -127,7 +141,9 @@ CREATE TABLE public.tweets (
     user_id uuid NOT NULL,
     tweet character varying(300) NOT NULL,
     flags character varying(100) DEFAULT ''::character varying NOT NULL,
-    created_at timestamp with time zone DEFAULT (now() AT TIME ZONE 'utc'::text) NOT NULL
+    created_at timestamp with time zone DEFAULT (now() AT TIME ZONE 'utc'::text) NOT NULL,
+    writer uuid NOT NULL,
+    deleted boolean DEFAULT false NOT NULL
 );
 
 
@@ -139,7 +155,8 @@ CREATE TABLE public.twitter_challenges (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     challenge text,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    writer uuid NOT NULL
+    writer uuid NOT NULL,
+    redirect_uri text DEFAULT ''::text NOT NULL
 );
 
 
@@ -176,6 +193,14 @@ ALTER TABLE ONLY public.tweet_tags ALTER COLUMN id SET DEFAULT nextval('public.t
 
 ALTER TABLE ONLY public.invalid_tokens
     ADD CONSTRAINT invalid_tokens_pkey PRIMARY KEY (token);
+
+
+--
+-- Name: onetime onetime_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.onetime
+    ADD CONSTRAINT onetime_pkey PRIMARY KEY (id);
 
 
 --
@@ -257,10 +282,24 @@ CREATE INDEX idx_tags_tag ON public.tags USING btree (tag);
 
 
 --
+-- Name: idx_tags_writer; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_tags_writer ON public.tags USING btree (writer);
+
+
+--
 -- Name: idx_tweet_tags_user_id_tag; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_tweet_tags_user_id_tag ON public.tweet_tags USING btree (user_id, tag);
+
+
+--
+-- Name: idx_tweet_tags_writer; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_tweet_tags_writer ON public.tweet_tags USING btree (writer);
 
 
 --
@@ -275,6 +314,13 @@ CREATE INDEX idx_tweets_timestamp ON public.tweets USING btree (created_at);
 --
 
 CREATE INDEX idx_tweets_user_timestamp ON public.tweets USING btree (user_id, created_at);
+
+
+--
+-- Name: idx_tweets_writer; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_tweets_writer ON public.tweets USING btree (writer);
 
 
 --
