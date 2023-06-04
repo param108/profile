@@ -93,7 +93,11 @@ func (s *Server) Quit() {
 func (s *Server) RegisterHandlers() {
 	s.r.HandleFunc("/version", func(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusOK)
-		rw.Write(version)
+		rw.Write(
+			append(
+				version,
+				[]byte("\nwriter:"+os.Getenv("WRITER")+
+					"\nHost:"+os.Getenv("HOST"))...))
 	})
 
 	s.r.HandleFunc("/users/login",
