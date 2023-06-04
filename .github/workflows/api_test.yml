@@ -9,7 +9,8 @@ on:
         - '.github/workflows/api_test.yml'
   pull_request:
     branches: [ main ]
-    paths: 'api/**'
+    paths:
+        - 'api/**'
         - '.github/workflows/api_deploy.yml'
         - '.github/workflows/api_test.yml'
 
