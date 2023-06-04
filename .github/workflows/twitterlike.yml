@@ -78,11 +78,3 @@ jobs:
       with:
         name: twitter.tgz
         path: ${{ github.workspace }}/twitter.tgz
-
-    - name: trigger new twitter image
-      uses: fifsky/ssh-action@master
-      with:
-        command: sudo /usr/bin/restart_twitter.sh
-        host: ${{ secrets.TWTR_HOST }}
-        user: cicd
-        key: ${{ secrets.TWTR_PRIVATE_KEY}}

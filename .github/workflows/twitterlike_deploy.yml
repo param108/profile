@@ -1,10 +1,10 @@
-name: api_deploy
+name: twitterlike_deploy
 
 on:
   workflow_run:
-    workflows: [ api_test ]
-    types: [completed]
+    workflows: [ twitterlike ]
     branches: [main]
+    types: [completed]
 jobs:
 
   build:
@@ -16,6 +16,6 @@ jobs:
       uses: fifsky/ssh-action@master
       with:
         command: sudo /usr/bin/restart_server.sh
-        host: ${{ secrets.API_HOST }}
+        host: ${{ secrets.TWTR_HOST }}
         user: cicd
-        key: ${{ secrets.API_PRIVATE_KEY}}
+        key: ${{ secrets.TWTR_PRIVATE_KEY}}

@@ -3,10 +3,15 @@ name: api_test
 on:
   push:
     branches: [ main ]
-    paths: 'api/**'
+    paths:
+        - 'api/**'
+        - '.github/workflows/api_deploy.yml'
+        - '.github/workflows/api_test.yml'
   pull_request:
     branches: [ main ]
     paths: 'api/**'
+        - '.github/workflows/api_deploy.yml'
+        - '.github/workflows/api_test.yml'
 
 jobs:
 
@@ -48,3 +53,15 @@ jobs:
 
     - name: Build
       run: make -C api build
+
+    - name: Bundle
+      run : |
+          echo "${{ secrets.API_ENV_CONFIG }}" > ${{ github.workspace }}/api/build/env
+          cp -R ${{ github.workspace }}/api/db ${{ github.workspace }}/api/build/
+          cd ${{ github.workspace }}/api; tar -zcvf server.tgz build
+
+    - name: upload server.tgz artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: server.tgz
+        path: ${{ github.workspace }}/api/server.tgz
