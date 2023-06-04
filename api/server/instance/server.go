@@ -104,5 +104,7 @@ func (s *Server) RegisterHandlers() {
 		users.CreateServiceProviderAuthorizeRedirect(s.DB))
 
 	s.r.HandleFunc("/onetime",
-		common.CreateGetOneTimeHandler(s.DB))
+		common.CreateGetOneTimeHandler(s.DB)).Methods(http.MethodGet)
+
+
 }

@@ -278,7 +278,7 @@ func (tlp *TwitterLoginProvider) HandleAuthorize(rw http.ResponseWriter, r *http
 	if err != nil {
 		log.Printf("Failed to create OneTime %s\n", err.Error())
 		rw.WriteHeader(http.StatusInternalServerError)
-		rw.Write([]byte("create token failure"))
+		rw.Write([]byte("create onetime failure"))
 	}
 
 	redirectURL, err := url.Parse(savedRedirect)
@@ -293,7 +293,19 @@ func (tlp *TwitterLoginProvider) HandleAuthorize(rw http.ResponseWriter, r *http
 
 	params.Set("onetime", oneTime.ID)
 
-	redirectURL.RawQuery = params.Encode()
+	/*redirectURL.RawQuery = params.Encode()
 
-	http.Redirect(rw, r, redirectURL.String(), http.StatusSeeOther)
+	http.Redirect(rw, r, redirectURL.String(), http.StatusSeeOther)*/
+
+	ret := map[string]interface{}{
+		"onetime": oneTime.ID,
+	}
+
+	retData, err := json.Marshal(ret)
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+		rw.Write([]byte("marshall onetime failure"))
+	}
+	rw.WriteHeader(http.StatusOK)
+	rw.Write(retData)
 }
