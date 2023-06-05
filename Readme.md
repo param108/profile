@@ -4,7 +4,7 @@ A completely open source platform to blog but using tweets.
 
 # Build Status
 
-![api build status](https://github.com/param108/profile/actions/workflows/api.yml/badge.svg)
+![api build status](https://github.com/param108/profile/actions/workflows/api_test.yml/badge.svg)
 
 # Contributing
 
