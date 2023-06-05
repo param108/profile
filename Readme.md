@@ -4,7 +4,11 @@ A completely open source platform to blog but using tweets.
 
 # Build Status
 
-![api build status](https://github.com/param108/profile/actions/workflows/api.yml/badge.svg)
+Backend: ![api build status](https://github.com/param108/profile/actions/workflows/api_test.yml/badge.svg)
+
+Web Frontend: ![web build status](https://github.com/param108/profile/actions/workflows/twitterlike.yml/badge.svg)
+
+Deployed API Version: [api version](https://data.tribist.com/version)
 
 # Contributing
 
