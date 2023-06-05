@@ -10,6 +10,8 @@ Web Frontend: ![web build status](https://github.com/param108/profile/actions/wo
 
 Deployed API Version: [api version](https://data.tribist.com/version)
 
+Deployed web version: [web version](https://ui.tribist.com/version.txt)
+
 # Contributing
 
 Please read [How to contribute](https://github.com/param108/profile/blob/main/docs/how-to-contribute.md).
