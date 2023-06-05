@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest --watch",
-    "citest": "jest --all"
+    "citest": "jest --all",
+    "set_version": "make version"
   },
   "dependencies": {
     "@types/node": "^20.2.3",
