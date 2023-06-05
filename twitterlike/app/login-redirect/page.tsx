@@ -92,7 +92,7 @@ export default function LoginUser() {
         setOneTime(oneTimeValue);
 
         setProgress(3)
-    }, []);
+    }, [searchParams]);
 
     // use onetime to get the token
     useEffect(()=>{
@@ -131,7 +131,7 @@ export default function LoginUser() {
 
         router.push(redirectURL)
 
-    }, [tokenWritten])
+    }, [tokenWritten, redirectURL, router])
 
     return (
         <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
