@@ -63,7 +63,7 @@ jobs:
         cmd: install --silent # will run `yarn install` command
         dir: ${{ github.workspace }}/twitterlike
 
-- name: Run install
+    - name: set version
       uses: borales/actions-yarn@v4
       with:
         cmd: set_version # creates version.txt
