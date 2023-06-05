@@ -8,9 +8,7 @@ Backend: ![api build status](https://github.com/param108/profile/actions/workflo
 
 Web Frontend: ![web build status](https://github.com/param108/profile/actions/workflows/twitterlike.yml/badge.svg)
 
-Deployed API Version: 
-
-[api version](https://data.tribist.com/version)
+Deployed API Version: [api version](https://data.tribist.com/version)
 
 # Contributing
 
