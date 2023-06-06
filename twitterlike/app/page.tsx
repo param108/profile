@@ -4,6 +4,11 @@ import Header from './components/header'
 import { useRouter } from 'next/navigation';
 import Editor from './components/editor';
 import { useEffect, useState } from 'react';
+import { getProfile } from './apis/login';
+
+const loggedInTweets = [
+
+]
 
 const welcomeTweets = [
   {
@@ -73,10 +78,26 @@ export default function Home() {
     }
   }, [])
 
+  useEffect(()=>{
+    if (APIToken.length == 0) {
+      return
+    }
+
+    getProfile(APIToken).
+      then((res)=>{
+        setLoggedIn(true)
+        localStorage.setItem('username', res.data.data.username)
+        localStorage.setItem('user_id', res.data.data.user_id)
+      }).
+      catch(()=>{
+        // clear out the api_token
+        localStorage.removeItem('api_token')
+      })
+  }, [APIToken])
   return (
     <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
       <Header></Header>
-      <Editor isLoggedIn={false} defaultMessage={`
+      <Editor isLoggedIn={loggedIn} defaultMessage={`
 This is a blog. A **blog** of _tweets_.
 Used to be called **micro-blogging** until twitter
 **Hijacked** the space.
