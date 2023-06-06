@@ -10,8 +10,9 @@ type OneTime = {
 }
 
 type profileData = {
-    id: string,
-    name: string
+    user_id: string,
+    username: string,
+    profile: string
 }
 
 type Profile = {
