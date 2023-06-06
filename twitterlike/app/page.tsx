@@ -3,6 +3,7 @@ import Tweet from './components/tweet'
 import Header from './components/header'
 import { useRouter } from 'next/navigation';
 import Editor from './components/editor';
+import { useEffect, useState } from 'react';
 
 const welcomeTweets = [
   {
@@ -62,6 +63,16 @@ Then [**signup**](https://ui.tribist.com/)!
 
 export default function Home() {
   const router = useRouter();
+  var [ APIToken, setAPIToken ] = useState("")
+  var [ loggedIn, setLoggedIn ] = useState(false)
+
+  useEffect(()=>{
+    const token = localStorage.getItem('api_token');
+    if (token && token.length > 0) {
+      setAPIToken(token)
+    }
+  }, [])
+
   return (
     <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
       <Header></Header>

@@ -111,4 +111,8 @@ func (s *Server) RegisterHandlers() {
 	s.r.HandleFunc("/onetime",
 		common.CreateGetOneTimeHandler(s.DB)).Methods(http.MethodGet)
 
+	s.r.HandleFunc("/profile",
+		utils.AuthM(
+			users.CreateGetProfileHandler(s.DB)).ServeHTTP).
+		Methods(http.MethodGet)
 }

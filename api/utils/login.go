@@ -82,12 +82,13 @@ func AuthM(next http.Handler) http.Handler {
 func CheckM(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		r.Header.Del("TRIBIST_USER")
-
+		r.Header.Del("TRIBIST_USERID")
 		jwtStr := r.Header.Get("TRIBIST_JWT")
 		if len(jwtStr) > 0 {
 			claims, err := parseToken(jwtStr)
 			if err == nil {
-				r.Header.Set("TRIBIST_USER", claims.UserID+":"+claims.Username)
+				r.Header.Set("TRIBIST_USER", claims.Username)
+				r.Header.Set("TRIBIST_USERID", claims.UserID)
 			}
 		}
 		// Call the next handler anyway. It is expected that the next handler
