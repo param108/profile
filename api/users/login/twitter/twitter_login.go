@@ -65,21 +65,7 @@ func (tlp *TwitterLoginProvider) Periodic() {
 }
 
 func isValidRedirectURL(back string) bool {
-	clients := strings.Split(os.Getenv("ALLOWED_CLIENTS"), ",")
-	if len(clients) == 0 {
-		return false
-	}
-	found := false
-	for _, client := range clients {
-		if len(client) == 0 {
-			continue
-		}
-		if strings.HasPrefix(back, "https://"+client) {
-			found = true
-			break
-		}
-	}
-	return found
+	return strings.HasPrefix(back, "/")
 }
 
 func (tlp *TwitterLoginProvider) HandleLogin(rw http.ResponseWriter, r *http.Request) {
@@ -281,7 +267,8 @@ func (tlp *TwitterLoginProvider) HandleAuthorize(rw http.ResponseWriter, r *http
 		rw.Write([]byte("create onetime failure"))
 	}
 
-	redirectURL, err := url.Parse(savedRedirect)
+	// TODO this url should not be hardcoded.
+	redirectURL, err := url.Parse("https://ui.tribist.com/login-redirect")
 	if err != nil {
 		log.Printf("Invalid redirectURL %s\n", err.Error())
 		rw.WriteHeader(http.StatusBadRequest)
@@ -292,21 +279,8 @@ func (tlp *TwitterLoginProvider) HandleAuthorize(rw http.ResponseWriter, r *http
 	params := redirectURL.Query()
 
 	params.Set("onetime", oneTime.ID)
+	params.Set("redirect_url", savedRedirect)
+	redirectURL.RawQuery = params.Encode()
 
-	/*redirectURL.RawQuery = params.Encode()
-
-	http.Redirect(rw, r, redirectURL.String(), http.StatusSeeOther)*/
-
-	ret := map[string]interface{}{
-		"onetime":      oneTime.ID,
-		"redirect_url": redirectURL.String(),
-	}
-
-	retData, err := json.Marshal(ret)
-	if err != nil {
-		rw.WriteHeader(http.StatusInternalServerError)
-		rw.Write([]byte("marshall onetime failure"))
-	}
-	rw.WriteHeader(http.StatusOK)
-	rw.Write(retData)
+	http.Redirect(rw, r, redirectURL.String(), http.StatusFound)
 }
