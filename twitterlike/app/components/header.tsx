@@ -1,5 +1,7 @@
 "use client";
 
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
+import { usePathname } from "next/navigation";
 import { MouseEventHandler, ReactElement, useEffect, useState } from "react";
 import { FiCloudRain, FiZap } from "react-icons/fi";
 import ReactModal from "react-modal";
@@ -30,6 +32,8 @@ const smallModalStyle = {
 
 export default function Header() {
     var [showVMenu, setShowVMenu] = useState(false)
+
+    const path = usePathname();
 
     // Which modal is open
     var [openModal, setOpenModal] = useState("")
@@ -77,7 +81,12 @@ export default function Header() {
             <div className="relative top-[50%] w-full flex flex-col items-center -translate-y-1/2 text-gray-600">
                 <span>If you are already signed up, this will log you in. </span>
                 <span>If not, this will <b>sign you up</b></span>
+                <div onClick={()=>{
+                    location.href ="https://data.tribist.com/users/login?source=twitter&redirect_url="+
+                        path;
+                }}>
                 {twitterLogin()}
+                </div>
                 <span><i>Your username will be your twitter handle.</i></span>
             </div>
         )
