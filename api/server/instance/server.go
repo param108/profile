@@ -7,8 +7,10 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/param108/profile/api/common"
 	"github.com/param108/profile/api/store"
@@ -40,8 +42,13 @@ func NewServer(port int) (*Server, error) {
 	server.periodicDone = make(chan struct{})
 	server.periodicQuit = make(chan struct{})
 
+	allowedClients := strings.Split(os.Getenv("ALLOWED_CLIENTS"), ",")
+	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type"})
+	originsOk := handlers.AllowedOrigins(allowedClients)
+	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
+
 	server.s = &http.Server{
-		Handler: server.r,
+		Handler: handlers.CORS(originsOk, headersOk, methodsOk)(server.r),
 		Addr:    fmt.Sprintf("127.0.0.1:%d", port),
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
