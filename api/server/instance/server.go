@@ -43,7 +43,7 @@ func NewServer(port int) (*Server, error) {
 	server.periodicQuit = make(chan struct{})
 
 	allowedClients := strings.Split(os.Getenv("ALLOWED_CLIENTS"), ",")
-	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type"})
+	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "TRIBIST_JWT"})
 	originsOk := handlers.AllowedOrigins(allowedClients)
 	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
 
