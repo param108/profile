@@ -22,7 +22,7 @@ type Profile = {
 
 export const getOneTime = async (onetime:string) => {
     const res = await axios.get<OneTime>(
-       'https://data.tribist.com/onetime?onetime='+onetime
+       'https://data.tribist.com/onetime?id='+onetime
     );
     return res;
 }
