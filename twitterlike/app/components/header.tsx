@@ -1,8 +1,8 @@
 "use client";
 
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
-import { usePathname } from "next/navigation";
-import { MouseEventHandler, ReactElement, useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { MouseEventHandler, ReactElement, useEffect, useReducer, useState } from "react";
 import { FiCloudRain, FiZap } from "react-icons/fi";
 import ReactModal from "react-modal";
 
@@ -92,6 +92,15 @@ export default function Header() {
         )
     };
 
+    var [loggedInUser, setLoggedInUser] = useState("")
+
+    useEffect(()=>{
+        const username = localStorage.getItem('username')
+        if (username && username.length > 0) {
+            setLoggedInUser(username)
+        } 
+    }, [])
+
     const aboutDiv = function(): ReactElement {
         return (
             <div className="pt-[50px] px-[5px] md:px-[50px] text-gray-600">
@@ -111,9 +120,13 @@ export default function Header() {
         )
     };
 
+    const router = useRouter()
     return (
         <div className="fixed bg-black h-[50px] md:p-[5px] mb-[5px] w-full md:items-center">
             <div className="hidden md:block w-full">
+            {(loggedInUser && loggedInUser.length > 0)?(
+                <button className="text-white float-left p-[5px] mr-[50px]"
+                onClick={() =>(router.push(`/user/${loggedInUser}/tweets`))}>{loggedInUser}</button>): null}
                 <button className="text-white float-right p-[5px] mr-[50px]"
                     onClick={menuClick("login")}>{"Login/Signup"}</button>
                 <button className="text-white float-right p-[5px] mr-[50px]"
