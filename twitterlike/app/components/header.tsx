@@ -125,7 +125,7 @@ export default function Header() {
         <div className="fixed bg-black h-[50px] md:p-[5px] mb-[5px] w-full md:items-center">
             <div className="hidden md:block w-full">
             {(loggedInUser && loggedInUser.length > 0)?(
-                <button className="text-white float-left p-[5px] mr-[50px]"
+                <button className="text-pink-600 float-left p-[5px] mr-[50px]"
                 onClick={() =>(router.push(`/user/${loggedInUser}/tweets`))}>{"@"+loggedInUser}</button>): null}
                 <button className="text-white float-right p-[5px] mr-[50px]"
                     onClick={menuClick("login")}>{"Login/Signup"}</button>
