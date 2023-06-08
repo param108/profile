@@ -38,3 +38,7 @@ func (s *StoreImpl) FindOrCreateUser(
 func (s *StoreImpl) GetUser(userID string, writer string) (*models.User, error) {
 	return s.db.GetUser(userID, writer)
 }
+
+func (s *StoreImpl) GetUserByHandle(username string, writer string) (*models.User, error) {
+	return s.db.GetUserByHandle(username, writer)
+}

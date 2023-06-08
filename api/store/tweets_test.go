@@ -21,7 +21,6 @@ func tweetTeardown() {
 	if err != nil {
 		log.Fatalf("failed delete tags: %s", err.Error())
 	}
-
 	err = testDB.(*StoreImpl).db.Delete("tweet_tags", tweetWriter)
 	if err != nil {
 		log.Fatalf("failed delete tags: %s", err.Error())
@@ -253,7 +252,7 @@ The first tweet is #tweet_%d
 		}
 		tweets, err := testDB.SearchTweetsByTags(
 			userID,
-			[]string{"tweet_1", "tweet_3", "tweet_5", "tweet_7"}, tweetWriter)
+			[]string{"tweet_1", "tweet_3", "tweet_5", "tweet_7"}, 20, tweetWriter)
 		assert.Nil(t, err, "failed to get tweets")
 		assert.Equal(t, 4, len(tweets))
 
@@ -270,7 +269,7 @@ The first tweet is #tweet_%d
 
 		tweets, err = testDB.SearchTweetsByTags(
 			userID,
-			[]string{"tweet_199"}, tweetWriter)
+			[]string{"tweet_199"}, 20, tweetWriter)
 		assert.Nil(t, err, "failed to get tweets")
 		assert.Equal(t, 0, len(tweets))
 

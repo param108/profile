@@ -1,18 +1,13 @@
 "use client";
 import { getProfile } from "@/app/apis/login";
+import { getTweetsForUser, TweetType } from "@/app/apis/tweets";
 import Editor from "@/app/components/editor";
 import Header from "@/app/components/header";
 import Tweet from "@/app/components/tweet";
 import { AxiosResponse } from "axios";
-import { NextApiRequest, NextApiResponse } from "next";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-type Tweet = {
-    tweet: string,
-    time: string,
-    id: string
-}
 
 export default function ShowTweet() {
     const params = useParams();
@@ -20,8 +15,10 @@ export default function ShowTweet() {
     var [ APIToken, setAPIToken ] = useState("")
     var [ loggedIn, setLoggedIn ] = useState(false)
     var [ username, setUsername ] = useState("")
-    var [ tweets, setTweets ] = useState<Tweet[]>([])
-
+    var [ tweets, setTweets ] = useState<TweetType[]>([])
+    var [ startOffset, setStartOffset ] = useState(0)
+    var [ errorMessage, setErrorMessage ] = useState("");
+    var [ showError, setShowError ] = useState(false);
     useEffect(()=>{
         const token = localStorage.getItem('api_token');
         if (token && token.length > 0) {
@@ -29,11 +26,23 @@ export default function ShowTweet() {
         }
     }, [])
 
+    useEffect(()=> {
+        // users, tags
+        getTweetsForUser([params.username], [], startOffset).
+            then((res:AxiosResponse)=>{
+                setTweets(res.data.data)
+                setStartOffset(startOffset+res.data.data.length)
+            }).
+            catch(()=>{
+                setErrorMessage("Failed to get tweets.")
+                setShowError(true)
+            });
+    }, [])
+
     useEffect(()=>{
         if (APIToken.length == 0) {
             return
         }
-
         getProfile(APIToken).
             then((res: AxiosResponse)=>{
                 setLoggedIn(res.data.data.username === params.username)
@@ -44,7 +53,9 @@ export default function ShowTweet() {
             catch(()=>{
                 // clear out the api_token
                 localStorage.removeItem('api_token')
-            })
+                setErrorMessage("Login Failure. Please login again.")
+                setShowError(true)
+            });
                 }, [APIToken, params.username])
     return (
         <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
@@ -59,8 +70,15 @@ Used to be called **micro-blogging** until twitter
                     <span className="text-pink-600">{username}</span>
                 </div>
             )}
+            { showError?(
+                <div
+                    className="p-[5px] bg-red-200 rounded mb-[5px]"
+                    onClick={()=>setShowError(false)}>
+                    {errorMessage}
+                </div>):null
+            }
             { tweets.length > 0 ?
-                tweets.map((k: Tweet ,idx : number)=>{
+                tweets.map((k: TweetType ,idx : number)=>{
                     return (
                         <Tweet router={router} tweet_id={k.id} key={idx} tweet={k?.tweet}
                             date={k?.time}></Tweet>

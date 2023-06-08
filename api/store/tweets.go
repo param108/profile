@@ -91,8 +91,8 @@ func (s *StoreImpl) GetTags(userID, writer string) ([]*models.Tag, error) {
 // by tag. Return in Chronologically descending order.
 // writer is optional. Empty value is all writers.
 func (s *StoreImpl) SearchTweetsByTags(userID string,
-	tags []string, writer string) ([]*models.Tweet, error) {
-	return s.db.SearchTweetsByTags(userID, tags, writer)
+	tags []string, limit int, writer string) ([]*models.Tweet, error) {
+	return s.db.SearchTweetsByTags(userID, tags, limit, writer)
 }
 
 // GetTweetTags return all tags for a user

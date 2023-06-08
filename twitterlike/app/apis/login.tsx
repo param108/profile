@@ -1,4 +1,5 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
+import "./interceptors";
 
 type OneTimeData = {
     value: string
@@ -20,9 +21,17 @@ type Profile = {
     success: boolean
 }
 
+function getConfig(cfg: any): AxiosRequestConfig {
+    return cfg
+}
+
 export const getOneTime = async (onetime:string) => {
+    const config = {
+        retry: 3
+    }
     const res = await axios.get<OneTime>(
-       'https://data.tribist.com/onetime?id='+onetime
+       'https://data.tribist.com/onetime?id='+onetime,
+        getConfig(config)
     );
     return res;
 }
@@ -31,7 +40,8 @@ export const getProfile = async (token:string) => {
     const config = {
         headers:{
             "TRIBIST_JWT": token,
-        }
+        },
+        retry: 3
     };
 
     const res = await axios.get<Profile>(

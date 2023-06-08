@@ -338,7 +338,7 @@ func (db *PostgresDB) DeleteTweet(userID, tweetID, writer string) (*models.Tweet
 }
 
 func (db *PostgresDB) SearchTweetsByTags(userID string,
-	tags []string, writer string) ([]*models.Tweet, error) {
+	tags []string, limit int, writer string) ([]*models.Tweet, error) {
 
 	query := ""
 	// arguments to the query are
@@ -362,9 +362,25 @@ func (db *PostgresDB) SearchTweetsByTags(userID string,
 
 	if err := db.db.Joins(
 		"Join tweet_tags on tweet_tags.tweet_id = tweets.id").Where(
-		query, args...).Order("tweets.created_at DESC").Find(&tweets).Error; err != nil {
+		query, args...).Order("tweets.created_at DESC").Limit(limit).Find(&tweets).Error; err != nil {
 		return nil, err
 	}
 
 	return tweets, nil
+}
+
+func (db *PostgresDB) GetUserByHandle(username, writer string) (*models.User, error) {
+	users := []*models.User{}
+	if err := db.db.Where(
+		"handle = ? and writer = ?",
+		username,
+		writer).Find(users).Error; err != nil {
+		return nil, err
+	}
+
+	if len(users) == 0 {
+		return nil, errors.New("not found")
+	}
+
+	return users[0], nil
 }
