@@ -45,7 +45,7 @@ export default function ShowTweet() {
                 // clear out the api_token
                 localStorage.removeItem('api_token')
             })
-                }, [APIToken])
+                }, [APIToken, params.username])
     return (
         <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
             <Header></Header>
