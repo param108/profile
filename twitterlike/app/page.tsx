@@ -3,7 +3,7 @@ import Tweet from './components/tweet'
 import Header from './components/header'
 import { useRouter } from 'next/navigation';
 import Editor from './components/editor';
-import { useEffect, useState } from 'react';
+import { MouseEventHandler, useEffect, useState } from 'react';
 import { getProfile } from './apis/login';
 
 const loggedInTweets = [
@@ -70,7 +70,7 @@ export default function Home() {
   const router = useRouter();
   var [ APIToken, setAPIToken ] = useState("")
   var [ loggedIn, setLoggedIn ] = useState(false)
-
+  var [ username, setUsername ] = useState("")
   useEffect(()=>{
     const token = localStorage.getItem('api_token');
     if (token && token.length > 0) {
@@ -86,6 +86,7 @@ export default function Home() {
     getProfile(APIToken).
       then((res)=>{
         setLoggedIn(true)
+        setUsername(res.data.data.username)
         localStorage.setItem('username', res.data.data.username)
         localStorage.setItem('user_id', res.data.data.user_id)
       }).
@@ -97,11 +98,17 @@ export default function Home() {
   return (
     <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
       <Header></Header>
+      <div onClick={(e)=>{
+        if (loggedIn) {
+          location.href=`/user/${username}/tweets`;
+          e.stopPropagation()
+        }}}>
       <Editor isLoggedIn={loggedIn} defaultMessage={`
 This is a blog. A **blog** of _tweets_.
 Used to be called **micro-blogging** until twitter
 **Hijacked** the space.
 `}></Editor>
+      </div>
       {
         welcomeTweets.map((k,idx)=>{
           return (<Tweet router={router} tweet_id={idx.toString()} key={idx} tweet={k.tweet}
