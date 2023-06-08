@@ -36,4 +36,16 @@ func TestUser(t *testing.T) {
 		assert.Exactly(t, user, fetchedUser, "created and fetched do not match")
 	})
 
+	t.Run("find by handle", func(t *testing.T) {
+		user, err := testDB.GetUserByHandle("param", testUserWriter)
+		assert.Nil(t, err, "failed to find user")
+		assert.Equal(t, "param", user.Handle, "Invalid user found")
+	})
+
+	t.Run("proper error when not found", func(t *testing.T) {
+		user, err := testDB.GetUserByHandle("param1", testUserWriter)
+		assert.NotNil(t, err, "found user")
+		assert.Nil(t, user, "found non nil user")
+	})
+
 }

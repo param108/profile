@@ -374,7 +374,7 @@ func (db *PostgresDB) GetUserByHandle(username, writer string) (*models.User, er
 	if err := db.db.Where(
 		"handle = ? and writer = ?",
 		username,
-		writer).Find(users).Error; err != nil {
+		writer).Find(&users).Error; err != nil {
 		return nil, err
 	}
 
