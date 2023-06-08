@@ -69,7 +69,7 @@ Then [**signup**](https://ui.tribist.com/users/login?source=twitter&redirect_url
 export default function Home() {
   const router = useRouter();
   var [ APIToken, setAPIToken ] = useState("")
-  var [ loggedIn, setLoggedIn ] = useState(true)
+  var [ loggedIn, setLoggedIn ] = useState(false)
   var [ username, setUsername ] = useState("")
   useEffect(()=>{
     const token = localStorage.getItem('api_token');
@@ -98,7 +98,7 @@ export default function Home() {
   return (
     <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
       <Header></Header>
-      <div className='flex' onClick={(e)=>{
+      <div className='flex flex-col w-full items-center' onClick={(e)=>{
         if (loggedIn) {
           location.href=`/user/${username}/tweets`;
           e.stopPropagation()

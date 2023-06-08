@@ -143,6 +143,9 @@ export default function Header() {
                     return (
                 <div className="bg-black text-white max-w-[70%]">
                     <ul className="">
+                            {(loggedInUser && loggedInUser.length > 0)?(
+                                <li className="bg-black hover:bg-slate-500 w-full pl-[5px] py-[5px] block"
+                                    onClick={() =>(router.push(`/user/${loggedInUser}/tweets`))}>{"@"+loggedInUser}</li>): null}
                             <li className="bg-black hover:bg-slate-500 w-full pl-[5px] py-[5px] block"
                                 onClick={menuClick("login")}>{"Login/Signup"}</li>
                             <li className="bg-black hover:bg-slate-500 w-full pl-[5px] py-[5px] block"
