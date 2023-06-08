@@ -37,7 +37,7 @@ export default function ShowTweet() {
                 setErrorMessage("Failed to get tweets.")
                 setShowError(true)
             });
-    }, [])
+    }, [params.username, startOffset])
 
     useEffect(()=>{
         if (APIToken.length == 0) {
