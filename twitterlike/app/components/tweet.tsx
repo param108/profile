@@ -20,7 +20,8 @@ export default function Tweet(props: TweetProps) {
             min-h-[100px] pl-[15px] pr-[5px] pt-[5px]
             pb-[40px] overflow-x-auto"
                 onClick={()=>{
-                    props.router?.push('/tweets/'+props.tweet_id+"/show");
+                    // FIXME: Turning this off until it is implemented
+                    // props.router?.push('/tweets/'+props.tweet_id+"/show");
                 }}>
                 <i className="text-gray-300">{formatDate(props.date)}</i><br/>
                 <span className="text-gray-600">{formatTweet(props.tweet)}</span>
