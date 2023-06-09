@@ -4,7 +4,7 @@ import "./interceptors";
 
 export type TweetType = {
     tweet: string,
-    time: string,
+    created_at: string,
     id: string
 }
 

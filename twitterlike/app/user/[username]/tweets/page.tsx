@@ -132,7 +132,7 @@ Used to be called **micro-blogging** until twitter
                 tweets.map((k: TweetType ,idx : number)=>{
                     return (
                         <Tweet router={router} tweet_id={k.id} key={idx} tweet={k?.tweet}
-                            date={k?.time}></Tweet>
+                            date={k?.created_at}></Tweet>
                     )
                 }) : (
                     <Tweet router={router} tweet_id={"1"}  tweet={`

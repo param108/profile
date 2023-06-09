@@ -12,7 +12,7 @@ const loggedInTweets = [
 
 const welcomeTweets = [
   {
-    time: `At the beginning.`,
+    created_at: `At the beginning.`,
     tweet: `
 I think in tweets.
 
@@ -21,7 +21,7 @@ I think in tweets.
 **Shorter the Better**
 `},
   {
-    time: `A little later.`,
+    created_at: `A little later.`,
     tweet: `
 These thoughts could be **independent**
 
@@ -31,7 +31,7 @@ They could be *connected* as **threads** or
 *related* through **#tags**
 `},
   {
-    time: `Even later.`,
+    created_at: `Even later.`,
     tweet: `
 I re-read my tweets a lot. Over & Over.
 
@@ -40,7 +40,7 @@ Sometimes **Narcissism** & sometimes to **remind** me
 of things I already know.
 `},
   {
-    time: `Even later....er.`,
+    created_at: `Even later....er.`,
     tweet: `
 At times I want to **explore** them and **discover** new connections,
 or new **insights** or wallow in old ones.
@@ -49,7 +49,7 @@ I like **high-lighting** and _italics_.
 Did I mention, we support **Markdown!**"
 `},
   {
-    time: `Right Here, Right Now.`,
+    created_at: `Right Here, Right Now.`,
     tweet: `
 You can do all this here and you own your data,
 download as you wish.
