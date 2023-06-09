@@ -22,6 +22,8 @@ export default function ShowTweet() {
     var [ errorMessage, setErrorMessage ] = useState("");
     var [ showError, setShowError ] = useState(false);
 
+    console.log("rerendering user-tweet-page");
+
     useEffect(()=>{
         const token = localStorage.getItem('api_token');
         if (token && token.length > 0) {
@@ -32,8 +34,11 @@ export default function ShowTweet() {
     const refreshTweets = useCallback(()=> {
         getTweetsForUser([params.username], [], startOffset).
             then((res:AxiosResponse)=>{
-                setTweets(tweets.concat(res.data.data))
-                setStartOffset(startOffset+res.data.data.length)
+                // only update if we actually got some data
+                if (res.data.data.length > 0) {
+                    setTweets(tweets.concat(res.data.data))
+                    setStartOffset(startOffset+res.data.data.length)
+                }
             }).
             catch(()=>{
                 setErrorMessage("Failed to get tweets.")
@@ -51,10 +56,9 @@ export default function ShowTweet() {
 
     // Add infinite scroll!
     useEffect(()=> {
-        console.log("offset data", params.username, startOffset)
         refreshTweets();
         window.addEventListener('scroll', infiniteScroll)
-    }, [params.username, startOffset, infiniteScroll, refreshTweets])
+    }, [refreshTweets, infiniteScroll])
 
     useEffect(()=>{
         if (APIToken.length == 0) {
