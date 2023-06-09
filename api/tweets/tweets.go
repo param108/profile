@@ -17,8 +17,23 @@ const MAX_TWEETS_PER_QUERY = 20
 
 func CreateGetTweetsHandler(db store.Store) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		users := strings.Split(r.URL.Query().Get("users"), ",")
-		tags := strings.Split(r.URL.Query().Get("tags"), ",")
+		usersStr := strings.TrimSpace(r.URL.Query().Get("users"))
+		tagsStr := strings.TrimSpace(r.URL.Query().Get("tags"))
+
+		if len(usersStr) == 0 {
+			utils.WriteError(rw, http.StatusBadRequest, "need exactly one user")
+			return
+		}
+
+		users := strings.Split(usersStr, ",")
+
+		// Split of empty string returns a slice of one element.
+		// The element is empty string and will not match any tags.
+		// Check if the input is empty before trying to split it.
+		var tags []string
+		if len(tagsStr) > 0 {
+			tags = strings.Split(tagsStr, ",")
+		}
 
 		if len(users) != 1 {
 			utils.WriteError(rw, http.StatusBadRequest, "need exactly one user")
