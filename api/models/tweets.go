@@ -28,5 +28,5 @@ type TweetTag struct {
 }
 
 type PostTweetsRequest struct {
-	Tweet string
+	Tweet string `json:"tweet"`
 }
