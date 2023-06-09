@@ -39,6 +39,8 @@ export default function ShowTweet() {
                     setTweets(tweets.concat(res.data.data))
                     setStartOffset(startOffset+res.data.data.length)
                 }
+                setUsername(params.username)
+
             }).
             catch(()=>{
                 setErrorMessage("Failed to get tweets.")
@@ -67,7 +69,6 @@ export default function ShowTweet() {
         getProfile(APIToken).
             then((res: AxiosResponse)=>{
                 setLoggedIn(res.data.data.username === params.username)
-                setUsername(res.data.data.username)
                 localStorage.setItem('username', res.data.data.username)
                 localStorage.setItem('user_id', res.data.data.user_id)
             }).
