@@ -103,7 +103,11 @@ export default function Home() {
           location.href=`/user/${username}/tweets`;
           e.stopPropagation()
         }}}>
-      <Editor isLoggedIn={loggedIn} defaultMessage={`
+      <Editor isLoggedIn={loggedIn} onChange={()=>{}}
+        onSendClicked={()=>{}}
+        showLoading={false}
+        value={""}
+        defaultMessage={`
 This is a blog. A **blog** of _tweets_.
 Used to be called **micro-blogging** until twitter
 **Hijacked** the space.

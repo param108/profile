@@ -29,3 +29,22 @@ export const getTweetsForUser = async (users:string[], tags:string[], offset:num
     );
     return res;
 }
+
+export const sendTweet = async (token: string, tweet: string) => {
+    const config = {
+        headers:{
+            "TRIBIST_JWT": token,
+        },
+        retry: 3
+    };
+
+    const res = await axios.post<TweetType>(
+       'https://data.tribist.com/tweets',
+        {
+            tweet: tweet
+        },
+        config
+    );
+    return res;
+
+}
