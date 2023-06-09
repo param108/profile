@@ -43,9 +43,10 @@ func NewServer(port int) (*Server, error) {
 	server.periodicDone = make(chan struct{})
 	server.periodicQuit = make(chan struct{})
 
-	allowedClients := strings.Split(os.Getenv("ALLOWED_CLIENTS"), ",")
+	// FIXME: Turning off cors for development. Need to turn it back on.
+	//allowedClients := strings.Split(os.Getenv("ALLOWED_CLIENTS"), ",")
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "TRIBIST_JWT"})
-	originsOk := handlers.AllowedOrigins(allowedClients)
+	originsOk := handlers.AllowedOrigins([]string{"*"})
 	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
 
 	server.s = &http.Server{
