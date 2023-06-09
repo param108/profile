@@ -1,7 +1,6 @@
-import { NextRouter, useRouter } from "next/router";
 import { formatTweet } from "../strings";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
-
+import moment from "moment";
 type TweetProps = {
     tweet_id: string,
     tweet: string,
@@ -11,7 +10,12 @@ type TweetProps = {
 }
 
 export default function Tweet(props: TweetProps) {
-    function formatDate(date:String):String {
+    function formatDate(date:string):String {
+        if ((new Date(date)).getTime() > 0) {
+            // valid timestamp
+            return moment(date).format('llll')
+        }
+
         return date;
     }
     return (
