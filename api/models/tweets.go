@@ -26,3 +26,7 @@ type TweetTag struct {
 	Writer  string
 	UserID  string
 }
+
+type PostTweetsRequest struct {
+	Tweet string
+}

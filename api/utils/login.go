@@ -57,6 +57,7 @@ func parseToken(jwtStr string) (*Claims, error) {
 func AuthM(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		r.Header.Del("TRIBIST_USER")
+		r.Header.Del("TRIBIST_USERID")
 
 		jwtStr := r.Header.Get("TRIBIST_JWT")
 
@@ -71,8 +72,8 @@ func AuthM(next http.Handler) http.Handler {
 			}
 			return
 		}
-
-		r.Header.Set("TRIBIST_USER", claims.UserID+":"+claims.Username)
+		r.Header.Set("TRIBIST_USERID", claims.UserID)
+		r.Header.Set("TRIBIST_USER", claims.Username)
 		next.ServeHTTP(w, r)
 	})
 }

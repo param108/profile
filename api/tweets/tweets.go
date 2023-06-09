@@ -1,6 +1,8 @@
 package tweets
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -64,5 +66,34 @@ func CreateGetTweetsHandler(db store.Store) http.HandlerFunc {
 		}
 
 		utils.WriteData(rw, http.StatusOK, tweets)
+	}
+}
+
+func CreatePostTweetsHandler(db store.Store) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		data, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "couldnt read:"+err.Error())
+			return
+		}
+
+		req := models.PostTweetsRequest{}
+		if err := json.Unmarshal(data, &req); err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "couldnt parse:"+err.Error())
+			return
+		}
+
+		userID := r.Header.Get("TRIBIST_USERID")
+		if len(userID) == 0 {
+			utils.WriteError(rw, http.StatusForbidden, "unknown user")
+			return
+		}
+
+		tweet, _, err := db.InsertTweet(userID, req.Tweet, "", os.Getenv("WRITER"))
+		if err != nil {
+			utils.WriteError(rw, http.StatusInternalServerError, err.Error())
+			return
+		}
+		utils.WriteData(rw, http.StatusOK, tweet)
 	}
 }
