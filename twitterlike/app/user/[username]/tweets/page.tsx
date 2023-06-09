@@ -13,7 +13,7 @@ export default function ShowTweet() {
     const params = useParams();
     const router = useRouter();
     var [ APIToken, setAPIToken ] = useState("")
-    var [ loggedIn, setLoggedIn ] = useState(true)
+    var [ loggedIn, setLoggedIn ] = useState(false)
     var [ editorLoading, setEditorLoading ] = useState(false)
     var [ editorValue, setEditorValue ] = useState("")
     var [ username, setUsername ] = useState("")
