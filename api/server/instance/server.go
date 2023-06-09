@@ -129,7 +129,7 @@ func (s *Server) RegisterHandlers() {
 
 	s.r.HandleFunc("/tweets",
 		utils.AuthM(
-			tweets.CreatePostTweetsHandler(s.DB)
+			tweets.CreatePostTweetsHandler(s.DB),
 		).ServeHTTP).
 		Methods(http.MethodPost)
 
