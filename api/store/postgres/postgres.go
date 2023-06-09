@@ -11,6 +11,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"gorm.io/gorm/logger"
 )
 
 type PostgresDB struct {
@@ -318,11 +319,13 @@ func (db *PostgresDB) GetTweets(userID string,
 	offset, limit int,
 	writer string) ([]*models.Tweet, error) {
 	tweets := []*models.Tweet{}
+	db.db.Logger = logger.Default.LogMode(logger.Info)
 	if err := db.db.Where(
 		"user_id = ? AND writer = ? AND deleted = false",
 		userID, writer).Order("created_at desc").Offset(offset).Limit(limit).Find(&tweets).Error; err != nil {
 		return nil, err
 	}
+	db.db.Logger = logger.Default.LogMode(logger.Error)
 
 	return tweets, nil
 }
