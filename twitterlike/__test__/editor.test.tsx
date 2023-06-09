@@ -208,6 +208,21 @@ Used to be called **micro-blogging** until twitter
               />
             </svg>
           </button>
+          <div
+            class="inline-block float-right pr-[10px]"
+          >
+            <span
+              class="inline-block"
+              style="display: inherit; width: 30px; height: 30px; position: relative;"
+            >
+              <span
+                style="position: absolute; top: 0px; left: 0px; width: 30px; height: 30px; border: 3px solid #ec4899; opacity: 0.4; border-radius: 100%; animation-fill-mode: forwards; animation: react-spinners-RingLoader-right 2s 0s infinite linear;"
+              />
+              <span
+                style="position: absolute; top: 0px; left: 0px; width: 30px; height: 30px; border: 3px solid #ec4899; opacity: 0.4; border-radius: 100%; animation-fill-mode: forwards; animation: react-spinners-RingLoader-left 2s 0s infinite linear;"
+              />
+            </span>
+          </div>
           <button
             class="px-[10px] float-right"
           >
@@ -282,6 +297,21 @@ Used to be called **micro-blogging** until twitter
             />
           </svg>
         </button>
+        <div
+          class="inline-block float-right pr-[10px]"
+        >
+          <span
+            class="inline-block"
+            style="display: inherit; width: 30px; height: 30px; position: relative;"
+          >
+            <span
+              style="position: absolute; top: 0px; left: 0px; width: 30px; height: 30px; border: 3px solid #ec4899; opacity: 0.4; border-radius: 100%; animation-fill-mode: forwards; animation: react-spinners-RingLoader-right 2s 0s infinite linear;"
+            />
+            <span
+              style="position: absolute; top: 0px; left: 0px; width: 30px; height: 30px; border: 3px solid #ec4899; opacity: 0.4; border-radius: 100%; animation-fill-mode: forwards; animation: react-spinners-RingLoader-left 2s 0s infinite linear;"
+            />
+          </span>
+        </div>
         <button
           class="px-[10px] float-right"
         >
