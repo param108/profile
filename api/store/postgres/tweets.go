@@ -19,13 +19,13 @@ func (db *PostgresDB) InsertTweet(
 			return err
 		}
 
-		if err := tx.Clauses(clause.OnConflict{
-			DoNothing: true,
-		}).Create(tags).Error; err != nil {
-			return err
-		}
-
 		if len(tags) > 0 {
+			if err := tx.Clauses(clause.OnConflict{
+				DoNothing: true,
+			}).Create(tags).Error; err != nil {
+				return err
+			}
+
 			query := ""
 			tagArray := []interface{}{}
 
@@ -68,25 +68,23 @@ func (db *PostgresDB) InsertTweet(
 				}
 			}
 
-		}
+			// Finally connect tags to tweets using tweet_tags
+			tweetTags := []*models.TweetTag{}
+			for _, tag := range tags {
+				tweetTag := &models.TweetTag{
+					Tag:     tag.Tag,
+					TweetID: tweet.ID,
+					Writer:  tweet.Writer,
+					UserID:  tweet.UserID,
+				}
 
-		// Finally connect tags to tweets using tweet_tags
-		tweetTags := []*models.TweetTag{}
-		for _, tag := range tags {
-			tweetTag := &models.TweetTag{
-				Tag:     tag.Tag,
-				TweetID: tweet.ID,
-				Writer:  tweet.Writer,
-				UserID:  tweet.UserID,
+				tweetTags = append(tweetTags, tweetTag)
 			}
 
-			tweetTags = append(tweetTags, tweetTag)
+			if err := tx.Create(tweetTags).Error; err != nil {
+				return err
+			}
 		}
-
-		if err := tx.Create(tweetTags).Error; err != nil {
-			return err
-		}
-
 		return nil
 	})
 

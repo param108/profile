@@ -35,6 +35,18 @@ func TestInsertTweet(t *testing.T) {
 
 	oldTweetID := ""
 	secondTweetID := ""
+
+	t.Run("Insert a tweet with no tags", func(t *testing.T) {
+		tw, tags, err := testDB.(*StoreImpl).InsertTweet(userID,
+			`#display
+The first tweet has no tags.
+notags.`, "", tweetWriter)
+		assert.Nil(t, err, "failed to insert tweets and tags")
+		assert.NotNil(t, tw.CreatedAt, "empty created_at")
+		assert.NotEmpty(t, tw.ID, "ID is empty")
+		assert.Equal(t, 0, len(tags), "incorrect number of tags")
+	})
+
 	t.Run("Insert a tweet and a few tags", func(t *testing.T) {
 		tw, tags, err := testDB.(*StoreImpl).InsertTweet(userID,
 			`#display
@@ -44,11 +56,11 @@ The first #tweet is a short
 		assert.NotNil(t, tw.CreatedAt, "empty created_at")
 		assert.NotEmpty(t, tw.ID, "ID is empty")
 		assert.Equal(t, 3, len(tags), "incorrect number of tags")
+		oldTweetID = tw.ID
 		for _, tag := range tags {
 			assert.NotEmpty(t, tag.ID, "empty ID")
 			assert.NotNil(t, tag.CreatedAt, "empty created at")
 		}
-		oldTweetID = tw.ID
 	})
 
 	t.Run("Insert a second tweet with repeat tags", func(t *testing.T) {
@@ -204,15 +216,15 @@ The first is a short
 	t.Run("get tweets", func(t *testing.T) {
 		tweets, err := testDB.GetTweets(userID, 0, 10, tweetWriter)
 		assert.Nil(t, err, "failed to get tweets")
-		assert.Equal(t, 2, len(tweets))
+		assert.Equal(t, 3, len(tweets))
 	})
 
 	t.Run("get tweets after the first one", func(t *testing.T) {
 		tweets, err := testDB.GetTweets(userID, 1, 10, tweetWriter)
 		assert.Nil(t, err, "failed to get tweets")
-		assert.Equal(t, 1, len(tweets))
+		assert.Equal(t, 2, len(tweets))
 		// Make sure its the earliest one
-		assert.Equal(t, oldTweetID, tweets[0].ID)
+		assert.Equal(t, oldTweetID, tweets[1].ID)
 	})
 
 	t.Run("delete the first tweet", func(t *testing.T) {
@@ -221,10 +233,10 @@ The first is a short
 		assert.Equal(t, oldTweetID, tweet.ID, "returned incorrect tweet")
 	})
 
-	t.Run("get tweets. Only one should be returned", func(t *testing.T) {
+	t.Run("get tweets. Only two should be returned", func(t *testing.T) {
 		tweets, err := testDB.GetTweets(userID, 0, 10, tweetWriter)
 		assert.Nil(t, err, "failed to get tweets")
-		assert.Equal(t, 1, len(tweets))
+		assert.Equal(t, 2, len(tweets))
 		// Make sure its the second one
 		assert.Equal(t, secondTweetID, tweets[0].ID)
 	})
@@ -274,5 +286,4 @@ The first tweet is #tweet_%d
 		assert.Equal(t, 0, len(tweets))
 
 	})
-
 }
