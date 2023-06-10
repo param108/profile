@@ -18,7 +18,6 @@ export default function ShowTweet() {
     var [ editorValue, setEditorValue ] = useState("")
     var [ username, setUsername ] = useState("")
     var [ tweets, setTweets ] = useState<TweetType[]>([])
-    var [ startOffset, setStartOffset ] = useState(0)
     var [ errorMessage, setErrorMessage ] = useState("");
     var [ showError, setShowError ] = useState(false);
 
@@ -31,22 +30,57 @@ export default function ShowTweet() {
         }
     }, [])
 
+    // merge the retrieved tweets with the existing.
+    function mergeTweets(oldTweets: TweetType[],newTweets: TweetType[]): TweetType[] {
+        let found :{[k: string]: boolean} ={}
+        let final: TweetType[]= [];
+
+        // newTweets first as they maybe updated
+        newTweets.forEach((x)=>{
+            found[x.id]=true;
+            final.push(x);
+        });
+
+        // merge
+        oldTweets.forEach((x)=>{
+            if (found[x.id]) {
+                return
+            }
+            final.push(x)
+        })
+
+        // finally sort
+        final.sort((x,y)=>{
+            let dx = new Date(x.created_at);
+            let dy = new Date(y.created_at);
+
+            if (dx > dy) {
+                // x is later means x should be before in the list
+                return -1;
+            }
+
+            if (dy < dx) {
+                // y is later so y should be before in the list
+                return 1;
+            }
+
+            return 0
+        })
+        return final;
+    }
+
     const refreshTweets = useCallback(()=> {
-        getTweetsForUser([params.username], [], startOffset).
+        console.log("getting tweets again", tweets.length);
+        getTweetsForUser([params.username], [], 0).
             then((res:AxiosResponse)=>{
-
-                // only update if we actually got some data
-                if (res.data.data.length > 0) {
-                    setTweets(_.union(tweets, res.data.data))
-                }
+                setTweets(mergeTweets(tweets, res.data.data))
                 setUsername(params.username)
-
             }).
             catch(()=>{
                 setErrorMessage("Failed to get tweets.")
                 setShowError(true)
             });
-    }, [params.username, startOffset, tweets])
+    }, [params.username, tweets])
 
     const infiniteScroll = useCallback(() => {
 // End of the document reached?
@@ -56,11 +90,16 @@ export default function ShowTweet() {
         }
     }, [refreshTweets])
 
+    // Once in the beginning
+    useEffect(()=>{
+        refreshTweets();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
     // Add infinite scroll!
     useEffect(()=> {
-        refreshTweets();
         window.addEventListener('scroll', infiniteScroll)
-    }, [refreshTweets, infiniteScroll])
+    }, [infiniteScroll])
 
     useEffect(()=>{
         if (APIToken.length == 0) {
