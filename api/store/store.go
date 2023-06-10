@@ -40,7 +40,7 @@ type Store interface {
 		writer string) (*models.Tweet, []*models.Tag, error)
 
 	// GetTweets get tweets between a offset and limit
-	GetTweets(userID string, offset int, limit int, writer string) ([]*models.Tweet, error)
+	GetTweets(userID string, offset, limit int, writer string) ([]*models.Tweet, error)
 
 	// GetTweets get tweets between a offset and limit
 	GetTweet(userID string, tweetID string, writer string) (*models.Tweet, error)

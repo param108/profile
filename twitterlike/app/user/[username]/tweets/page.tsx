@@ -7,7 +7,7 @@ import Tweet from "@/app/components/tweet";
 import { AxiosResponse } from "axios";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-
+import _ from "underscore";
 
 export default function ShowTweet() {
     const params = useParams();
@@ -34,10 +34,10 @@ export default function ShowTweet() {
     const refreshTweets = useCallback(()=> {
         getTweetsForUser([params.username], [], startOffset).
             then((res:AxiosResponse)=>{
+
                 // only update if we actually got some data
                 if (res.data.data.length > 0) {
-                    setTweets(tweets.concat(res.data.data))
-                    setStartOffset(startOffset+res.data.data.length)
+                    setTweets(_.union(tweets, res.data.data))
                 }
                 setUsername(params.username)
 

@@ -104,7 +104,7 @@ func (s *StoreImpl) GetTweetTags(userID, tweetID, writer string) ([]*models.Tag,
 	return s.db.GetTweetTags(userID, tweetID, writer)
 }
 
-func (s *StoreImpl) GetTweets(userID string, offset int, limit int, writer string) ([]*models.Tweet, error) {
+func (s *StoreImpl) GetTweets(userID string, offset, limit int, writer string) ([]*models.Tweet, error) {
 	return s.db.GetTweets(userID, offset, limit, writer)
 }
 
