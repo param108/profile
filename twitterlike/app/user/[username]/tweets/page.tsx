@@ -69,8 +69,24 @@ export default function ShowTweet() {
         return final;
     }
 
-    const refreshTweets = useCallback(()=> {
-        console.log("getting tweets again", tweets.length);
+    const infiniteScroll = useCallback(() => {
+        // End of the document reached?
+        if (window.innerHeight + document.documentElement.scrollTop
+            === document.documentElement.offsetHeight){
+            getTweetsForUser([params.username], [], tweets.length).
+                then((res:AxiosResponse)=>{
+                    setTweets(mergeTweets(tweets, res.data.data))
+                    setUsername(params.username)
+                }).
+                catch(()=>{
+                    setErrorMessage("Failed to get tweets.")
+                    setShowError(true)
+                });
+        }
+    }, [params.username, tweets])
+
+    // Once in the beginning
+    useEffect(()=>{
         getTweetsForUser([params.username], [], 0).
             then((res:AxiosResponse)=>{
                 setTweets(mergeTweets(tweets, res.data.data))
@@ -80,21 +96,8 @@ export default function ShowTweet() {
                 setErrorMessage("Failed to get tweets.")
                 setShowError(true)
             });
-    }, [params.username, tweets])
-
-    const infiniteScroll = useCallback(() => {
-// End of the document reached?
-        if (window.innerHeight + document.documentElement.scrollTop
-            === document.documentElement.offsetHeight){
-            refreshTweets();
-        }
-    }, [refreshTweets])
-
-    // Once in the beginning
-    useEffect(()=>{
-        refreshTweets();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [params.username])
 
     // Add infinite scroll!
     useEffect(()=> {
@@ -120,25 +123,32 @@ export default function ShowTweet() {
                 }, [APIToken, params.username])
 
     const onSendClicked= (tweet: string) => {
-        //if (loggedIn) {
+        if (loggedIn) {
             setEditorLoading(true)
 
             // save the value returned so that we don't lose it
             // if there is some error.
-            console.log("tweet", tweet)
             setEditorValue(tweet)
             sendTweet(APIToken, tweet).
                 then(()=>{
                     setEditorValue("")
                     setEditorLoading(false)
-                    refreshTweets()
+                    getTweetsForUser([params.username], [], 0).
+                        then((res:AxiosResponse)=>{
+                            setTweets(mergeTweets(tweets, res.data.data))
+                            setUsername(params.username)
+                        }).
+                        catch(()=>{
+                            setErrorMessage("Failed to get tweets.")
+                            setShowError(true)
+                        });
                 }).
                 catch(()=>{
                     setShowError(true)
                     setErrorMessage("Failed to upload tweet")
                     setEditorLoading(false)
                 })
-        //}
+        }
     }
 
     const onChanged= (newValue: string) => {
