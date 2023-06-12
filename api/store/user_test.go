@@ -8,12 +8,19 @@ import (
 )
 
 const testUserWriter = "9435ff03-4600-4413-a1b2-ab4ed205418c"
+const anotherUserWriter = "a2e314d4-6729-4e29-8da3-7546394d7564"
 
 func teardown() {
 	err := testDB.(*StoreImpl).db.Delete("users", testUserWriter)
 	if err != nil {
 		log.Fatalf("failed delete users: %s", err.Error())
 	}
+
+	err = testDB.(*StoreImpl).db.Delete("users", anotherUserWriter)
+	if err != nil {
+		log.Fatalf("failed delete users: %s", err.Error())
+	}
+
 }
 
 func TestUser(t *testing.T) {
@@ -25,6 +32,18 @@ func TestUser(t *testing.T) {
 		fetchedUser, err := testDB.GetUser(user.ID, testUserWriter)
 		assert.Nil(t, err, "failed fetch user")
 		assert.Exactly(t, user, fetchedUser, "created and fetched do not match")
+	})
+
+	t.Run("can create second user", func(t *testing.T) {
+		user, err := testDB.CreateUser("param2", "twitter", "user", anotherUserWriter)
+		assert.Nil(t, err, "failed create user")
+
+		fetchedUser, err := testDB.GetUser(user.ID, anotherUserWriter)
+		assert.Nil(t, err, "failed fetch user")
+		assert.Exactly(t, user, fetchedUser, "created and fetched do not match")
+
+		_, err = testDB.GetUser(user.ID, testUserWriter)
+		assert.NotNil(t, err, "found the user providing wrong writer")
 	})
 
 	t.Run("find or create user", func(t *testing.T) {

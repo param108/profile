@@ -62,7 +62,7 @@ This is **Freedom**!
 
 _Interested ?_
 
-Then [**signup**](https://ui.tribist.com/users/login?source=twitter&redirect_url=/)!
+Then [**signup**](${process.env.NEXT_PUBLIC_BE_URL}/users/login?source=twitter&redirect_url=/)!
 `}
 ];
 

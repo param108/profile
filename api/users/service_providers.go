@@ -2,16 +2,33 @@ package users
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/param108/profile/api/models"
 	"github.com/param108/profile/api/store"
+	"github.com/param108/profile/api/users/login/common"
 	"github.com/param108/profile/api/users/login/twitter"
 )
 
+func loginDevUser(rw http.ResponseWriter, r *http.Request, db store.Store) {
+	fmt.Println("Logging in dev user")
+	common.LoginUser(rw, r, db, "param108",
+		"a592e6ab-91d1-49a7-9435-ab3c04f77ab9", r.URL.Query().Get("redirect_url"))
+}
+
 func CreateServiceProviderLoginRedirect(db store.Store) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
+
+		env := os.Getenv("ENV")
+
+		if env == "dev" {
+			// We have only one dev user.
+			loginDevUser(rw, r, db)
+			return
+		}
 
 		serviceProvider := r.URL.Query().Get("source")
 

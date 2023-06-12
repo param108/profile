@@ -82,8 +82,7 @@ export default function Header() {
                 <span>If you are already signed up, this will log you in. </span>
                 <span>If not, this will <b>sign you up</b></span>
                 <div onClick={()=>{
-                    location.href ="https://data.tribist.com/users/login?source=twitter&redirect_url="+
-                        path;
+                    location.href =`${process.env.NEXT_PUBLIC_BE_URL}/users/login?source=twitter&redirect_url=${path}`;
                 }}>
                 {twitterLogin()}
                 </div>

@@ -27,7 +27,6 @@ func parseToken(jwtStr string) (*Claims, error) {
 			// Signing Key will come from env
 			jwtKey := os.Getenv("TRIBIST_JWT_KEY")
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				fmt.Println("YABABABADOOOO")
 				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 			}
 

@@ -22,9 +22,16 @@ func (db *PostgresDB) FindOrCreateUser(u *models.User) (*models.User, error) {
 }
 
 func (db *PostgresDB) GetUser(userID string, writer string) (*models.User, error) {
-	user := &models.User{}
-	err := db.db.Find(user).Where("id = ? and writer = ?", userID, writer).Error
-	return user, err
+	users := []*models.User{}
+	err := db.db.Where("id = ? and writer = ?", userID, writer).Find(&users).Error
+	if err != nil {
+		return nil, err
+	}
+
+	if len(users) == 0 {
+		return nil, errors.New("not found")
+	}
+	return users[0], err
 }
 
 func (db *PostgresDB) GetUserByHandle(username, writer string) (*models.User, error) {

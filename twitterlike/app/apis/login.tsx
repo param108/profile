@@ -30,7 +30,7 @@ export const getOneTime = async (onetime:string) => {
         retry: 3
     }
     const res = await axios.get<OneTime>(
-       'https://data.tribist.com/onetime?id='+onetime,
+       `${process.env.NEXT_PUBLIC_BE_URL}/onetime?id=${onetime}`,
         getConfig(config)
     );
     return res;
@@ -45,7 +45,7 @@ export const getProfile = async (token:string) => {
     };
 
     const res = await axios.get<Profile>(
-       'https://data.tribist.com/profile',
+       `${process.env.NEXT_PUBLIC_BE_URL}/profile`,
         config
     );
     return res;

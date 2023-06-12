@@ -15,7 +15,6 @@ import (
 
 	"github.com/param108/profile/api/store"
 	"github.com/param108/profile/api/users/login/common"
-	"github.com/param108/profile/api/utils"
 )
 
 const (
@@ -248,39 +247,5 @@ func (tlp *TwitterLoginProvider) HandleAuthorize(rw http.ResponseWriter, r *http
 		return
 	}
 
-	token, err := utils.CreateSignedToken(u.Handle, u.ID)
-	if err != nil {
-		log.Printf("Failed to create token %s\n", err.Error())
-		rw.WriteHeader(http.StatusInternalServerError)
-		rw.Write([]byte("create token failure"))
-		return
-	}
-
-	// Now we have a token but we don't want to send it to
-	// a frontend as url parameter, so we send a onetime token
-	// instead which can be exchanged for the actual token.
-
-	oneTime, err := tlp.DB.SetOneTime(token, os.Getenv("WRITER"))
-	if err != nil {
-		log.Printf("Failed to create OneTime %s\n", err.Error())
-		rw.WriteHeader(http.StatusInternalServerError)
-		rw.Write([]byte("create onetime failure"))
-	}
-
-	// TODO this url should not be hardcoded.
-	redirectURL, err := url.Parse("https://ui.tribist.com/login-redirect")
-	if err != nil {
-		log.Printf("Invalid redirectURL %s\n", err.Error())
-		rw.WriteHeader(http.StatusBadRequest)
-		rw.Write([]byte("redirect url"))
-	}
-
-	// Add oneTime as onetime parameter
-	params := redirectURL.Query()
-
-	params.Set("onetime", oneTime.ID)
-	params.Set("redirect_url", savedRedirect)
-	redirectURL.RawQuery = params.Encode()
-
-	http.Redirect(rw, r, redirectURL.String(), http.StatusFound)
+	common.LoginUser(rw, r, tlp.DB, u.Handle, u.ID, savedRedirect)
 }

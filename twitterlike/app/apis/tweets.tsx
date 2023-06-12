@@ -24,7 +24,7 @@ export const getTweetsForUser = async (users:string[], tags:string[], offset:num
     };
 
     const res = await axios.get<Tweets>(
-       'https://data.tribist.com/tweets',
+       `${process.env.NEXT_PUBLIC_BE_URL}/tweets`,
         config
     );
     return res;
@@ -39,7 +39,7 @@ export const sendTweet = async (token: string, tweet: string) => {
     };
 
     const res = await axios.post<TweetType>(
-       'https://data.tribist.com/tweets',
+       `${process.env.NEXT_PUBLIC_BE_URL}/tweets`,
         {
             tweet: tweet
         },

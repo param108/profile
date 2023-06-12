@@ -13,6 +13,7 @@ build:	version
 
 test:	version
 	if [ -n "`goimports -l .`" ]; then echo "lint failure"; exit 1; fi
+	cp test.env .env
 	go test -v ./...
 
 clean:
@@ -40,3 +41,8 @@ db-ci:	build
 
 migrate:
 	./build/server migrate --migrationsPath db/migrations
+
+dev:	build
+	cp dev.env .env
+	PGPASSWORD="profile" psql -h "localhost" -U "profile" < db/scripts/dev_init.sql
+	./build/server serve

@@ -5,7 +5,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FiCloudLightning } from "react-icons/fi";
 import ReactModal from "react-modal";
-import { getOneTime } from "../apis/login";
+import { getOneTime, getProfile } from "../apis/login";
 import CircularProgressBar from "../components/circular_progress_bar";
 import dynamic from 'next/dynamic';
 
@@ -115,9 +115,20 @@ export default function LoginUser() {
             return;
         }
         try {
-            localStorage.setItem('api_token', token);
-            setTokenWritten(true)
-            setProgress(6)
+            getProfile(token).
+                then((res)=>{
+                    localStorage.setItem('username', res.data.data.username)
+                    localStorage.setItem('user_id', res.data.data.user_id)
+                    localStorage.setItem('api_token', token);
+                    setProgress(6)
+                    setTokenWritten(true)
+                }).
+                catch(()=>{
+                    // clear out the api_token
+                    localStorage.removeItem('api_token')
+                    setFailureVisible(true)
+                })
+
         } catch(e) {
             setFailureVisible(true)
         }
