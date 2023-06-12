@@ -69,6 +69,10 @@ jobs:
         cmd: set_version # creates version.txt
         dir: ${{ github.workspace }}/twitterlike
 
+    - name: set env
+      run : |
+          echo "${{ secrets.TWTR_ENV_CONFIG }}" > ${{ github.workspace }}/twitterlike/.env.local
+ 
     - name: Run build
       uses: borales/actions-yarn@v4
       with:
