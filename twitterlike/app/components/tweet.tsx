@@ -6,7 +6,8 @@ type TweetProps = {
     tweet: string,
     key: Number,
     date: string,
-    router: null|AppRouterInstance
+    router: null|AppRouterInstance,
+    onClick: Function
 }
 
 export default function Tweet(props: TweetProps) {
@@ -24,6 +25,7 @@ export default function Tweet(props: TweetProps) {
             min-h-[100px] pl-[15px] pr-[5px] pt-[5px]
             pb-[40px] overflow-x-auto"
                 onClick={()=>{
+                    props.onClick(props.tweet_id)
                     // FIXME: Turning this off until it is implemented
                     // props.router?.push('/tweets/'+props.tweet_id+"/show");
                 }}>
