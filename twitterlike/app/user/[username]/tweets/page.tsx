@@ -172,6 +172,7 @@ export default function ShowTweet() {
                     onChange={onChanged} key={1} tweet={{
                         created_at: "Preview",
                         id: 'new',
+                        tweet: ''
                     }}
                     defaultMessage={`
 This is a blog. A **blog** of _tweets_.
@@ -193,11 +194,11 @@ Used to be called **micro-blogging** until twitter
                 tweets.map((k: TweetType ,idx : number)=>{
                     return (
                         <Tweet router={router} tweet_id={k.id} key={idx} tweet={k?.tweet}
-                            date={k?.created_at}></Tweet>
+                        date={k?.created_at} onClick={()=>{}}></Tweet>
                     )
                 }) : (
                     <Tweet router={router} tweet_id={"1"}  tweet={`
-Nothing here **yet**!`} key={1} date="Start of time"/>
+Nothing here **yet**!`} key={1} date="Start of time" onClick={()=>{}}/>
                 )
             }
         </main>
