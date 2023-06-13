@@ -13,6 +13,12 @@ import (
 	"github.com/param108/profile/api/users/login/twitter"
 )
 
+func loginGuestUser(rw http.ResponseWriter, r *http.Request, db store.Store) {
+	fmt.Println("Logging in guest user")
+	common.LoginUser(rw, r, db, "guest",
+		"85f724d2-0276-4b8c-aa00-529a08333cea", r.URL.Query().Get("redirect_url"))
+}
+
 func loginDevUser(rw http.ResponseWriter, r *http.Request, db store.Store) {
 	fmt.Println("Logging in dev user")
 	common.LoginUser(rw, r, db, "param108",
@@ -27,6 +33,12 @@ func CreateServiceProviderLoginRedirect(db store.Store) http.HandlerFunc {
 		if env == "dev" {
 			// We have only one dev user.
 			loginDevUser(rw, r, db)
+			return
+		}
+
+		guestVal := r.URL.Query().Get("guest")
+		if guestVal == "true" {
+			loginGuestUser(rw, r, db)
 			return
 		}
 
