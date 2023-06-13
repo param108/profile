@@ -116,7 +116,7 @@ Used to be called **micro-blogging** until twitter
       {
         welcomeTweets.map((k,idx)=>{
           return (<Tweet router={router} tweet_id={idx.toString()} key={idx} tweet={k.tweet}
-                  date={k.created_at}></Tweet>)
+                  date={k.created_at} onClick={()=>{}}></Tweet>)
         })
       }
     </main>

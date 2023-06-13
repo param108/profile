@@ -2,6 +2,7 @@
 import { getProfile } from "@/app/apis/login";
 import { getTweetsForUser, sendTweet, TweetType } from "@/app/apis/tweets";
 import Editor from "@/app/components/editor";
+import EditPair from "@/app/components/edit_tweet_pair";
 import Header from "@/app/components/header";
 import Tweet from "@/app/components/tweet";
 import { AxiosResponse } from "axios";
@@ -20,7 +21,12 @@ export default function ShowTweet() {
     var [ tweets, setTweets ] = useState<TweetType[]>([])
     var [ errorMessage, setErrorMessage ] = useState("");
     var [ showError, setShowError ] = useState(false);
+    // should we show the tweet for the editor?
+    var [ showEditorTweet, setShowEditorTweet ] = useState(false)
 
+    // this has the tweet_id of the tweet which is being editted
+    // if any
+    var [ showTweetEditor, setShowTweetEditor ] = useState("")
     console.log("rerendering user-tweet-page");
 
     useEffect(()=>{
@@ -132,6 +138,7 @@ export default function ShowTweet() {
             sendTweet(APIToken, tweet).
                 then(()=>{
                     setEditorValue("")
+                    setShowEditorTweet(false)
                     setEditorLoading(false)
                     getTweetsForUser([params.username], [], 0).
                         then((res:AxiosResponse)=>{
@@ -152,6 +159,7 @@ export default function ShowTweet() {
     }
 
     const onChanged= (newValue: string) => {
+        setShowEditorTweet(newValue.length > 0)
         setEditorValue(newValue)
     }
 
@@ -159,14 +167,18 @@ export default function ShowTweet() {
         <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
             <Header></Header>
             {loggedIn?(
-                <Editor isLoggedIn={true} showLoading={editorLoading}
-                    onSendClicked={onSendClicked} value={editorValue}
-                    onChange={onChanged}
+                <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
+                    onSendClicked={onSendClicked} value={editorValue} viewing={showEditorTweet}
+                    onChange={onChanged} key={1} tweet={{
+                        created_at: "Preview",
+                        id: 'new',
+                        tweet: ''
+                    }}
                     defaultMessage={`
 This is a blog. A **blog** of _tweets_.
 Used to be called **micro-blogging** until twitter
 **Hijacked** the space.
-`           }></Editor>):(
+`           }></EditPair>):(
                 <div className="mt-[60px] mb-[10px]">
                     <span className="text-pink-600">{username}</span>
                 </div>
@@ -182,11 +194,11 @@ Used to be called **micro-blogging** until twitter
                 tweets.map((k: TweetType ,idx : number)=>{
                     return (
                         <Tweet router={router} tweet_id={k.id} key={idx} tweet={k?.tweet}
-                            date={k?.created_at}></Tweet>
+                        date={k?.created_at} onClick={()=>{}}></Tweet>
                     )
                 }) : (
                     <Tweet router={router} tweet_id={"1"}  tweet={`
-Nothing here **yet**!`} key={1} date="Start of time"/>
+Nothing here **yet**!`} key={1} date="Start of time" onClick={()=>{}}/>
                 )
             }
         </main>
