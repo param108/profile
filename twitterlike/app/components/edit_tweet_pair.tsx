@@ -17,7 +17,7 @@ type EditPairProps = {
 
 export default function EditPair( props: EditPairProps) {
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full items-center">
         {(props.editting)?(
             <Editor
             isLoggedIn={props.isLoggedIn}
