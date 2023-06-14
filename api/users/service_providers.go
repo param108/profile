@@ -15,14 +15,14 @@ import (
 
 func loginGuestUser(rw http.ResponseWriter, r *http.Request, db store.Store) {
 	fmt.Println("Logging in guest user")
-	common.LoginUser(rw, r, db, "guest",
-		"85f724d2-0276-4b8c-aa00-529a08333cea", r.URL.Query().Get("redirect_url"))
+	common.LoginUser(rw, r, db, models.GuestUsername,
+		models.GuestUserID, r.URL.Query().Get("redirect_url"))
 }
 
 func loginDevUser(rw http.ResponseWriter, r *http.Request, db store.Store) {
 	fmt.Println("Logging in dev user")
-	common.LoginUser(rw, r, db, "param108",
-		"a592e6ab-91d1-49a7-9435-ab3c04f77ab9", r.URL.Query().Get("redirect_url"))
+	common.LoginUser(rw, r, db, models.DevUsername,
+		models.DevUserID, r.URL.Query().Get("redirect_url"))
 }
 
 func CreateServiceProviderLoginRedirect(db store.Store) http.HandlerFunc {

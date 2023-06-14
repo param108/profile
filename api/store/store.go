@@ -69,10 +69,16 @@ type Store interface {
 
 	// DeleteOldOneTimes Delete all one time entries older than one hour
 	DeleteOldOneTimes(expiry time.Duration, writer string) error
+
+	// DeleteGuestData If number of tweets > 40 delete older tweets
+	DeleteGuestData(userID string, maxTweets int, writer string) error
 }
 
 func Periodic(s Store, writer string) {
 	if err := s.DeleteOldOneTimes(time.Hour, writer); err != nil {
 		log.Printf("Failed delete old one times: %s", err.Error())
+	}
+	if err := s.DeleteGuestData(models.GuestUserID, 40, writer); err != nil {
+		log.Printf("Failed delete Guest tweets: %s", err.Error())
 	}
 }

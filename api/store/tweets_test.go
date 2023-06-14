@@ -6,22 +6,24 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/param108/profile/api/models"
 	"github.com/stretchr/testify/assert"
 )
 
 const tweetWriter = "17165df5-ee3a-4f25-9c9f-3b8f5fbcc5ac"
+const guestWriter = "75dd2fc8-7417-4558-8da5-0ddce0348c82"
 
-func tweetTeardown() {
-	err := testDB.(*StoreImpl).db.Delete("tweets", tweetWriter)
+func tweetTeardown(writer string) {
+	err := testDB.(*StoreImpl).db.Delete("tweets", writer)
 	if err != nil {
 		log.Fatalf("failed delete tweets: %s", err.Error())
 	}
 
-	err = testDB.(*StoreImpl).db.Delete("tags", tweetWriter)
+	err = testDB.(*StoreImpl).db.Delete("tags", writer)
 	if err != nil {
 		log.Fatalf("failed delete tags: %s", err.Error())
 	}
-	err = testDB.(*StoreImpl).db.Delete("tweet_tags", tweetWriter)
+	err = testDB.(*StoreImpl).db.Delete("tweet_tags", writer)
 	if err != nil {
 		log.Fatalf("failed delete tags: %s", err.Error())
 	}
@@ -29,7 +31,7 @@ func tweetTeardown() {
 }
 
 func TestInsertTweet(t *testing.T) {
-	tweetTeardown()
+	tweetTeardown(tweetWriter)
 	// userID for tweet tests
 	userID := "80e2663c-3842-431b-886e-ad440bc29850"
 
@@ -254,7 +256,7 @@ The first #tweet is a short
 			assert.Equal(t, 10, len(tweets))
 		})
 
-	tweetTeardown()
+	tweetTeardown(tweetWriter)
 	t.Run("multiple tags and single user", func(t *testing.T) {
 		for i := 0; i < 20; i++ {
 			testDB.(*StoreImpl).InsertTweet(userID,
@@ -286,4 +288,36 @@ The first tweet is #tweet_%d
 		assert.Equal(t, 0, len(tweets))
 
 	})
+}
+
+func TestDeleteGuestData(t *testing.T) {
+	tweetTeardown(guestWriter)
+	t.Run("Insert 20 tweets",
+		func(t *testing.T) {
+			for i := 0; i < 20; i++ {
+				testDB.(*StoreImpl).InsertTweet(models.GuestUserID,
+					fmt.Sprintf(`#display
+The first #tweet is a short
+#Hello #World%d.`, i), "", guestWriter)
+			}
+			tweets, err := testDB.GetTweets(models.GuestUserID, 0, 40, guestWriter)
+			assert.Nil(t, err, "failed to get tweets")
+			assert.Equal(t, 20, len(tweets))
+
+			err = testDB.DeleteGuestData(models.GuestUserID, 20, guestWriter)
+			assert.Nil(t, err, "couldnt delete")
+
+			tweets, err = testDB.GetTweets(models.GuestUserID, 0, 40, guestWriter)
+			assert.Nil(t, err, "failed to get tweets")
+			assert.Equal(t, 20, len(tweets))
+
+			err = testDB.DeleteGuestData(models.GuestUserID, 10, guestWriter)
+			assert.Nil(t, err, "couldnt delete")
+
+			tweets, err = testDB.GetTweets(models.GuestUserID, 0, 40, guestWriter)
+			assert.Nil(t, err, "failed to get tweets")
+			assert.Equal(t, 10, len(tweets))
+
+		})
+
 }

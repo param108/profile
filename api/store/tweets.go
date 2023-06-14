@@ -116,3 +116,8 @@ func (s *StoreImpl) GetTweet(userID string, tweetID string, writer string) (*mod
 func (s *StoreImpl) DeleteTweet(userID string, tweetID string, writer string) (*models.Tweet, error) {
 	return s.db.DeleteTweet(userID, tweetID, writer)
 }
+
+func (s *StoreImpl) DeleteGuestData(userID string, maxTweets int,
+	writer string) error {
+	return s.db.DeleteGuestData(userID, maxTweets, writer)
+}

@@ -301,3 +301,55 @@ func (db *PostgresDB) SearchTweetsByTags(userID string,
 
 	return tweets, nil
 }
+
+// DeleteGuestData delete tweets if number of tweets > maxTweets
+// Delete oldest ones first. Will not touch tags
+func (db *PostgresDB) DeleteGuestData(
+	userID string,
+	maxTweets int,
+	writer string) error {
+
+	var totalTweets int64
+	// First check how many tweets are there
+	if err := db.db.Model(&models.Tweet{}).
+		Where("user_id = ? and writer = ?", userID, writer).
+		Count(&totalTweets).Error; err != nil {
+		return err
+	}
+
+	if totalTweets <= int64(maxTweets) {
+		return nil
+	}
+
+	tweetsToDel := []models.Tweet{}
+	// We have more than minTweets
+	// Get the Tweets that don't belong to the most recent minTweets
+	// and delete them. Hard Delete.
+	if err := db.db.Model(&models.Tweet{}).
+		Where("user_id = ? and writer = ?", userID, writer).
+		Order("tweets.created_at DESC").
+		Offset(maxTweets).Find(&tweetsToDel).Error; err != nil {
+		return err
+	}
+
+	seenTweet := map[string]bool{}
+	tweetIDs := []string{}
+	for _, tweet := range tweetsToDel {
+		if v, ok := seenTweet[tweet.ID]; ok && v {
+			continue
+		}
+		tweetIDs = append(tweetIDs, tweet.ID)
+		seenTweet[tweet.ID] = true
+	}
+
+	return db.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("tweet_id IN ?", tweetIDs).Delete(&models.TweetTag{}).Error; err != nil && err != gorm.ErrRecordNotFound {
+			return err
+		}
+
+		if err := tx.Where("id IN ?", tweetIDs).Delete(&models.Tweet{}).Error; err != nil && err != gorm.ErrRecordNotFound {
+			return err
+		}
+		return nil
+	})
+}
