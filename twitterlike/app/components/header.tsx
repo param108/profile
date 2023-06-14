@@ -87,6 +87,11 @@ export default function Header() {
                 {twitterLogin()}
                 </div>
                 <span><i>Your username will be your twitter handle.</i></span>
+                <span>Or login as <b>guest</b> to play around.</span>
+                <span>
+                    <a
+                        href={`${process.env.NEXT_PUBLIC_BE_URL}/users/login?source=guest&redirect_url=${path}&guest=true`}>
+                    Login as Guest</a></span>
             </div>
         )
     };
@@ -130,6 +135,8 @@ export default function Header() {
                     onClick={menuClick("login")}>{"Login/Signup"}</button>
                 <button className="text-white float-right p-[5px] mr-[50px]"
                     onClick={menuClick("about")}>{"About"}</button>
+                <button className="text-white float-right p-[5px] mr-[50px]"
+                    onClick={()=>{location.href=`${process.env.NEXT_PUBLIC_BE_URL}/users/login?source=guest&redirect_url=${path}&guest=true`}}>{"Guest Login"}</button>
             </div>
             <div className="flex flex-col overflow-y-visible md:hidden ">
             <div className="h-[50px] flex items-center">
@@ -149,6 +156,8 @@ export default function Header() {
                                 onClick={menuClick("login")}>{"Login/Signup"}</li>
                             <li className="bg-black hover:bg-slate-500 w-full pl-[5px] py-[5px] block"
                                 onClick={menuClick("about")}>{"About"}</li>
+                            <li className="bg-black hover:bg-slate-500 w-full pl-[5px] py-[5px] block"
+                                onClick={()=>{location.href=`${process.env.NEXT_PUBLIC_BE_URL}/users/login?source=guest&redirect_url=${path}&guest=true`}}>{"Guest Login"}</li>
                     </ul>
                 </div>
                     )
