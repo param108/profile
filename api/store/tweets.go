@@ -61,6 +61,9 @@ func (s *StoreImpl) UpdateTweet(userID, tweetID,
 
 	tags := []*models.Tag{}
 	for _, tagStr := range tagStrs {
+		if len(strings.TrimSpace(tagStr)) == 0 {
+			continue
+		}
 		tag := &models.Tag{
 			UserID: userID,
 			Tag:    strings.ToLower(tagStr),
@@ -69,7 +72,7 @@ func (s *StoreImpl) UpdateTweet(userID, tweetID,
 		tags = append(tags, tag)
 	}
 
-	twD, tags, err := s.db.UpdateTweet(tw, tags)
+	twD, tags, err := s.db.UpdateTweet(tw, tags, writer)
 	if err != nil {
 		return nil, nil, err
 	}

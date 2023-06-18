@@ -107,6 +107,8 @@ export default function Home() {
         onSendClicked={()=>{}}
         showLoading={false}
         value={""}
+        hideable={false}
+        hideClicked={()=>{}}
         defaultMessage={`
 This is a blog. A **blog** of _tweets_.
 Used to be called **micro-blogging** until twitter
@@ -115,8 +117,10 @@ Used to be called **micro-blogging** until twitter
       </div>
       {
         welcomeTweets.map((k,idx)=>{
-          return (<Tweet router={router} tweet_id={idx.toString()} key={idx} tweet={k.tweet}
-                  date={k.created_at} onClick={()=>{}}></Tweet>)
+          return (<Tweet tweet_id={idx.toString()} key={idx} tweet={k.tweet}
+                  date={k.created_at} onClick={()=>{}}
+                  deleteClicked={()=>{}} editClicked={()=>{}}
+                  showMenu={false}></Tweet>)
         })
       }
     </main>

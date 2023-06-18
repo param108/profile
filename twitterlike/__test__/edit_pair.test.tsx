@@ -24,10 +24,10 @@ Used to be called **micro-blogging** until twitter
   "baseElement": <body>
     <div>
       <div
-        class="flex flex-col w-full items-center"
+        class="w-full flex flex-col items-center"
       >
         <div
-          class="bg-sky-200 w-[96%] md:w-[510px] rounded mt-[60px] mb-[10px]"
+          class="bg-sky-200 w-[96%] mt-[60px] md:w-[510px] rounded mb-[10px]"
         >
           <textarea
             class="block w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black"
@@ -115,35 +115,39 @@ Used to be called **micro-blogging** until twitter
           </div>
         </div>
         <div
-          class="border border-t-slate-100  bg-white hover:bg-cyan-50 w-[90%] md:w-[510px] min-h-[100px] pl-[15px] pr-[5px] pt-[5px] pb-[40px] overflow-x-auto"
+          class="flex flex-col items-center w-full"
         >
-          <i
-            class="text-gray-300"
-          />
-          <br />
-          <span
-            class="text-gray-600"
+          <div
+            class="border border-t-slate-100  bg-white hover:bg-cyan-50 w-[90%] md:w-[510px] min-h-[100px] pl-[15px] pr-[5px] pt-[5px] pb-[40px] overflow-x-auto"
           >
-            <div>
-              <div
-                class=""
-              >
-                <p>
-                  Hello World
-                </p>
+            <i
+              class="text-gray-300"
+            />
+            <br />
+            <span
+              class="text-gray-600"
+            >
+              <div>
+                <div
+                  class=""
+                >
+                  <p>
+                    Hello World
+                  </p>
+                </div>
               </div>
-            </div>
-          </span>
+            </span>
+          </div>
         </div>
       </div>
     </div>
   </body>,
   "container": <div>
     <div
-      class="flex flex-col w-full items-center"
+      class="w-full flex flex-col items-center"
     >
       <div
-        class="bg-sky-200 w-[96%] md:w-[510px] rounded mt-[60px] mb-[10px]"
+        class="bg-sky-200 w-[96%] mt-[60px] md:w-[510px] rounded mb-[10px]"
       >
         <textarea
           class="block w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black"
@@ -231,25 +235,29 @@ Used to be called **micro-blogging** until twitter
         </div>
       </div>
       <div
-        class="border border-t-slate-100  bg-white hover:bg-cyan-50 w-[90%] md:w-[510px] min-h-[100px] pl-[15px] pr-[5px] pt-[5px] pb-[40px] overflow-x-auto"
+        class="flex flex-col items-center w-full"
       >
-        <i
-          class="text-gray-300"
-        />
-        <br />
-        <span
-          class="text-gray-600"
+        <div
+          class="border border-t-slate-100  bg-white hover:bg-cyan-50 w-[90%] md:w-[510px] min-h-[100px] pl-[15px] pr-[5px] pt-[5px] pb-[40px] overflow-x-auto"
         >
-          <div>
-            <div
-              class=""
-            >
-              <p>
-                Hello World
-              </p>
+          <i
+            class="text-gray-300"
+          />
+          <br />
+          <span
+            class="text-gray-600"
+          >
+            <div>
+              <div
+                class=""
+              >
+                <p>
+                  Hello World
+                </p>
+              </div>
             </div>
-          </div>
-        </span>
+          </span>
+        </div>
       </div>
     </div>
   </div>,

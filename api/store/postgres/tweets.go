@@ -93,25 +93,30 @@ func (db *PostgresDB) InsertTweet(
 
 func (db *PostgresDB) UpdateTweet(
 	tweet *models.Tweet,
-	tags []*models.Tag) (*models.Tweet, []*models.Tag, error) {
+	tags []*models.Tag,
+	writer string,
+) (*models.Tweet, []*models.Tag, error) {
 	err := db.db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Save(tweet).Error; err != nil {
+		if err := tx.Model(&models.Tweet{}).
+			Where("id = ? and user_id = ? and writer = ?", tweet.ID, tweet.UserID, writer).
+			Update("tweet", tweet.Tweet).Error; err != nil {
 			return err
 		}
 
 		if err := tx.Where(
-			"tweet_id = ?", tweet.ID).Delete(
+			"tweet_id = ? AND user_id = ? AND writer = ?", tweet.ID, tweet.UserID,
+			writer).Delete(
 			&models.TweetTag{}).Error; err != nil {
 			return err
 		}
 
-		if err := tx.Clauses(clause.OnConflict{
-			DoNothing: true,
-		}).Create(tags).Error; err != nil {
-			return err
-		}
-
 		if len(tags) > 0 {
+			if err := tx.Clauses(clause.OnConflict{
+				DoNothing: true,
+			}).Create(tags).Error; err != nil {
+				return err
+			}
+
 			query := ""
 			tagArray := []interface{}{}
 
@@ -154,29 +159,31 @@ func (db *PostgresDB) UpdateTweet(
 				}
 			}
 
-		}
+			// Finally connect tags to tweets using tweet_tags
+			tweetTags := []*models.TweetTag{}
+			for _, tag := range tags {
+				tweetTag := &models.TweetTag{
+					Tag:     tag.Tag,
+					TweetID: tweet.ID,
+					Writer:  tweet.Writer,
+					UserID:  tweet.UserID,
+				}
 
-		// Finally connect tags to tweets using tweet_tags
-		tweetTags := []*models.TweetTag{}
-		for _, tag := range tags {
-			tweetTag := &models.TweetTag{
-				Tag:     tag.Tag,
-				TweetID: tweet.ID,
-				Writer:  tweet.Writer,
-				UserID:  tweet.UserID,
+				tweetTags = append(tweetTags, tweetTag)
 			}
 
-			tweetTags = append(tweetTags, tweetTag)
+			if err := tx.Create(tweetTags).Error; err != nil {
+				return err
+			}
 		}
-
-		if err := tx.Create(tweetTags).Error; err != nil {
-			return err
-		}
-
 		return nil
 	})
 
-	return tweet, tags, err
+	ret, err := db.GetRawTweet(tweet.UserID, tweet.ID, writer)
+	if err != nil {
+		return nil, tags, err
+	}
+	return ret, tags, err
 
 }
 

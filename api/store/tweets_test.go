@@ -37,6 +37,7 @@ func TestInsertTweet(t *testing.T) {
 
 	oldTweetID := ""
 	secondTweetID := ""
+	noTagTweetID := ""
 
 	t.Run("Insert a tweet with no tags", func(t *testing.T) {
 		tw, tags, err := testDB.(*StoreImpl).InsertTweet(userID,
@@ -47,6 +48,19 @@ notags.`, "", tweetWriter)
 		assert.NotNil(t, tw.CreatedAt, "empty created_at")
 		assert.NotEmpty(t, tw.ID, "ID is empty")
 		assert.Equal(t, 0, len(tags), "incorrect number of tags")
+		noTagTweetID = tw.ID
+		fmt.Println("INSERT", tw.CreatedAt, tw.Tweet, tw.ID)
+
+	})
+
+	t.Run("Update tweet with no tags", func(t *testing.T) {
+		tw, tags, err := testDB.UpdateTweet(userID, noTagTweetID, `
+No tweet tag anywhere`, "", tweetWriter)
+		assert.Nil(t, err, "failed to update tweet")
+		assert.Equal(t, `
+No tweet tag anywhere`, tw.Tweet, "invalid updated tweet")
+		assert.Zero(t, len(tags), "returned some spurious tags")
+		fmt.Println("UPDATED", tw.CreatedAt, tw.Tweet, tw.ID)
 	})
 
 	t.Run("Insert a tweet and a few tags", func(t *testing.T) {
@@ -221,12 +235,13 @@ The first is a short
 		assert.Equal(t, 3, len(tweets))
 	})
 
-	t.Run("get tweets after the first one", func(t *testing.T) {
+	t.Run("get tweets after the latest one", func(t *testing.T) {
 		tweets, err := testDB.GetTweets(userID, 1, 10, tweetWriter)
+		fmt.Println(tweets)
 		assert.Nil(t, err, "failed to get tweets")
 		assert.Equal(t, 2, len(tweets))
 		// Make sure its the earliest one
-		assert.Equal(t, oldTweetID, tweets[1].ID)
+		assert.Equal(t, oldTweetID, tweets[0].ID)
 	})
 
 	t.Run("delete the first tweet", func(t *testing.T) {

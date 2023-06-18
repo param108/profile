@@ -112,3 +112,65 @@ func CreatePostTweetsHandler(db store.Store) http.HandlerFunc {
 		utils.WriteData(rw, http.StatusOK, tweet)
 	}
 }
+
+func CreateUpdateTweetHandler(db store.Store) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		data, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "couldnt read:"+err.Error())
+			return
+		}
+
+		req := models.PutTweetRequest{}
+		if err := json.Unmarshal(data, &req); err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "couldnt parse:"+err.Error())
+			return
+		}
+
+		userID := r.Header.Get("TRIBIST_USERID")
+		if len(userID) == 0 {
+			utils.WriteError(rw, http.StatusForbidden, "unknown user")
+			return
+		}
+
+		tweet, _, err := db.UpdateTweet(
+			userID, req.TweetID, req.Tweet, req.Flags, os.Getenv("WRITER"))
+		if err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		utils.WriteData(rw, http.StatusOK, tweet)
+	}
+}
+
+func CreateDeleteTweetHandler(db store.Store) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		data, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "couldnt read:"+err.Error())
+			return
+		}
+
+		req := models.DeleteTweetRequest{}
+		if err := json.Unmarshal(data, &req); err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "couldnt parse:"+err.Error())
+			return
+		}
+
+		userID := r.Header.Get("TRIBIST_USERID")
+		if len(userID) == 0 {
+			utils.WriteError(rw, http.StatusForbidden, "unknown user")
+			return
+		}
+
+		tweet, err := db.DeleteTweet(
+			userID, req.TweetID, os.Getenv("WRITER"))
+		if err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		utils.WriteData(rw, http.StatusOK, tweet)
+	}
+}

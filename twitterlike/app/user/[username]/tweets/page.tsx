@@ -1,14 +1,65 @@
 "use client";
 import { getProfile } from "@/app/apis/login";
-import { getTweetsForUser, sendTweet, TweetType } from "@/app/apis/tweets";
+import { deleteTweet, getTweetsForUser, sendTweet, TweetType, updateTweet } from "@/app/apis/tweets";
 import Editor from "@/app/components/editor";
 import EditPair from "@/app/components/edit_tweet_pair";
 import Header from "@/app/components/header";
 import Tweet from "@/app/components/tweet";
 import { AxiosResponse } from "axios";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
+import { FiZap } from "react-icons/fi";
+import ReactModal from "react-modal";
+import { RingLoader } from "react-spinners";
 import _ from "underscore";
+
+const largeEditModalStyle = {
+    content: {
+        left: "25%",
+        right: "25%",
+        top: "100px"
+    }
+};
+
+const bigEditModalStyle = {
+    content: {
+        left: "10%",
+        right: "10%",
+        top: "100px"
+    }
+};
+
+const smallEditModalStyle = {
+    content: {
+        left: "2%",
+        right: "2%",
+        top: "100px"
+    }
+};
+
+const largeDelModalStyle = {
+    content: {
+        left: "25%",
+        right: "25%",
+        top: "100px"
+    }
+};
+
+const bigDelModalStyle = {
+    content: {
+        left: "10%",
+        right: "10%",
+        top: "100px"
+    }
+};
+
+const smallDelModalStyle = {
+    content: {
+        left: "2%",
+        right: "2%",
+        top: "100px"
+    }
+};
 
 export default function ShowTweet() {
     const params = useParams();
@@ -23,17 +74,107 @@ export default function ShowTweet() {
     var [ showError, setShowError ] = useState(false);
     // should we show the tweet for the editor?
     var [ showEditorTweet, setShowEditorTweet ] = useState(false)
+    var [ edittableTweet, setEdittableTweet ] = useState("")
+    var [ editTweetValue, setEditTweetValue ] = useState("")
+    var [ editTweetLoading, setEditTweetLoading ] = useState(false)
+    var [ editTweetErrorMessage, setEditTweetErrorMessage ] = useState("")
+    var [ editTweetShowError, setEditTweetShowError ] = useState(false)
+    var [ delTweetLoading, setDelTweetLoading ] = useState(false)
+    var [ delTweetErrorMessage, setDelTweetErrorMessage ] = useState("")
+    var [ delTweetShowError, setDelTweetShowError ] = useState(false)
 
-    // this has the tweet_id of the tweet which is being editted
-    // if any
-    var [ showTweetEditor, setShowTweetEditor ] = useState("")
     console.log("rerendering user-tweet-page");
+
+    // Which modal is open
+    var [openModal, setOpenModal] = useState("")
+
+    // holds the tweet id of the tweet that is to be editted or deleted.
+    var [chosenTweet, setChosenTweet]:[TweetType, Dispatch<SetStateAction<TweetType>>] = useState({
+        tweet:"",
+        id:"",
+        created_at:""
+    })
+
+    const editTweetDiv = ()=>{
+        return (
+            <div className="flex flex-col items-center w-full">
+            { editTweetShowError?(
+                <div
+                    className="p-[5px] bg-red-200 rounded mb-[5px]"
+                    onClick={()=>setEditTweetShowError(false)}>
+                    {editTweetErrorMessage}
+                </div>):null
+            }
+            <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
+            onSendClicked={onEditTweetSendClicked} value={editTweetValue}
+            viewing={true}
+            onChange={onEditTweetChanged} key={1} tweet={chosenTweet}
+            showMenu={false}
+            defaultMessage={`
+Unknown Tweet`}
+            editClicked={onEditTweetSendClicked}
+            deleteClicked={()=>{}}
+            editorHideable={false}
+            hideClicked={()=>{}}/>
+            </div>)
+
+    }
+
+    const deleteTweetDiv = ()=>{
+        return (
+            <div className="flex flex-col items-center w-full">
+                { delTweetShowError?(
+                    <div
+                    className="p-[5px] bg-red-200 rounded mb-[5px]"
+                    onClick={()=>setEditTweetShowError(false)}>
+                        {editTweetErrorMessage}
+                    </div>):null
+                }
+
+                <span className="mb-[10px]">Are you sure you want to delete this tweet ?</span>
+                <Tweet
+                tweet_id={chosenTweet?.id}
+                tweet={chosenTweet?.tweet}
+                date={chosenTweet?.created_at}
+                deleteClicked={()=>{}}
+                editClicked={()=>{}}
+                showMenu={false}
+                onClick={()=>{}}
+                />
+                <div className="w-[90%] md:w-[510px] mt-[10px]">
+                <div className="inline-block float-right pr-[10px]">
+                    <RingLoader className="inline-block" color="#EC4899"
+                        loading={delTweetLoading} size={30}/>
+                </div>
+
+                <button onClick={delTweetClicked} className="rounded p-[5px] bg-red-800 text-white float-left">Delete</button>
+                </div>
+            </div>
+        )
+    }
+
+    const [largeScreen, setLargeScreen] = useState(
+        (typeof window === "undefined")?true:window.matchMedia("(min-width: 1024px)").matches
+    )
+    const [bigScreen, setBigScreen] = useState(
+        (typeof window === "undefined")?true:window.matchMedia("(min-width: 768px)").matches
+    )
+
+    useEffect(() => {
+        (typeof window === "undefined")?true:window.matchMedia("(min-width: 768px)").addEventListener('change', (e) => {
+            setBigScreen( e.matches );
+        });
+        (typeof window === "undefined")?true:window.matchMedia("(min-width: 1024px)").addEventListener('change', (e) => {
+            setLargeScreen( e.matches );
+        });
+    }, []);
 
     useEffect(()=>{
         const token = localStorage.getItem('api_token');
         if (token && token.length > 0) {
             setAPIToken(token)
         }
+        ReactModal.setAppElement('body')
     }, [])
 
     // merge the retrieved tweets with the existing.
@@ -75,10 +216,10 @@ export default function ShowTweet() {
         return final;
     }
 
-    const infiniteScroll = useCallback(() => {
+    const infiniteScroll = () => {
         // End of the document reached?
         if (window.innerHeight + document.documentElement.scrollTop
-            === document.documentElement.offsetHeight){
+            >= document.documentElement.offsetHeight){
             getTweetsForUser([params.username], [], tweets.length).
                 then((res:AxiosResponse)=>{
                     setTweets(mergeTweets(tweets, res.data.data))
@@ -89,7 +230,7 @@ export default function ShowTweet() {
                     setShowError(true)
                 });
         }
-    }, [params.username, tweets])
+    }
 
     // Once in the beginning
     useEffect(()=>{
@@ -108,7 +249,8 @@ export default function ShowTweet() {
     // Add infinite scroll!
     useEffect(()=> {
         window.addEventListener('scroll', infiniteScroll)
-    }, [infiniteScroll])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     useEffect(()=>{
         if (APIToken.length == 0) {
@@ -163,8 +305,58 @@ export default function ShowTweet() {
         setEditorValue(newValue)
     }
 
+    const onEditTweetChanged=(newValue: string) => {
+        setEditTweetValue(newValue)
+    }
+
+    const onEditTweetClicked=(tweet: TweetType)=> {
+        return () => {
+            setOpenModal("edit_tweet")
+            setChosenTweet(tweet)
+            setEditTweetValue(tweet.tweet)
+        }
+    }
+
+    const onEditTweetSendClicked=()=>{
+        setEditTweetShowError(false)
+        setEditTweetLoading(true)
+        updateTweet(APIToken, editTweetValue, chosenTweet.id).
+        then((res)=>{
+            setEditTweetLoading(false)
+            console.log(res.data)
+            setTweets(mergeTweets(tweets,[res.data.data]))
+            setOpenModal("closed")
+        }).catch(()=>{
+            setEditTweetErrorMessage("Something went wrong")
+            setEditTweetShowError(true)
+            setEditTweetLoading(false)
+        })
+    }
+
+    const onDeleteTweetClicked=(tweet: TweetType) => {
+        return () => {
+            setChosenTweet(tweet)
+            setOpenModal("del_tweet")
+        }
+    }
+
+    const delTweetClicked=() => {
+        setDelTweetLoading(true)
+        deleteTweet(APIToken, chosenTweet.id).
+            then((res)=>{
+                setTweets(tweets.filter((x)=>(x.id != res.data.data.id)))
+                setOpenModal("closed")
+                setDelTweetLoading(false)
+            }).
+            catch(()=>{
+                setDelTweetErrorMessage("Something went wrong")
+                setDelTweetShowError(true)
+                setDelTweetLoading(false)
+            })
+    }
+
     return (
-        <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
+        <main className="flex bg-white min-h-screen w-full flex-col items-center justify-stretch">
             <Header></Header>
             {loggedIn?(
                 <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
@@ -174,11 +366,17 @@ export default function ShowTweet() {
                         id: 'new',
                         tweet: ''
                     }}
+                    showMenu={false}
                     defaultMessage={`
 This is a blog. A **blog** of _tweets_.
 Used to be called **micro-blogging** until twitter
 **Hijacked** the space.
-`           }></EditPair>):(
+`}
+                    editClicked={()=>{}}
+                    deleteClicked={()=>{}}
+                    editorHideable={false}
+                    hideClicked={()=>{}}
+                                   ></EditPair>):(
                 <div className="mt-[60px] mb-[10px]">
                     <span className="text-pink-600">{username}</span>
                 </div>
@@ -193,14 +391,48 @@ Used to be called **micro-blogging** until twitter
             { tweets.length > 0 ?
                 tweets.map((k: TweetType ,idx : number)=>{
                     return (
-                        <Tweet router={router} tweet_id={k.id} key={idx} tweet={k?.tweet}
-                        date={k?.created_at} onClick={()=>{}}></Tweet>
+                        <Tweet
+                        key={idx}
+                        tweet_id={k.id}
+                        tweet={k.tweet}
+                        date={k.created_at}
+                        showMenu={loggedIn}
+                        onClick={()=>{}}
+                        editClicked={()=>{onEditTweetClicked(k)()}}
+                        deleteClicked={()=>{onDeleteTweetClicked(k)()}}
+                        ></Tweet>
                     )
                 }) : (
-                    <Tweet router={router} tweet_id={"1"}  tweet={`
-Nothing here **yet**!`} key={1} date="Start of time" onClick={()=>{}}/>
+                    <Tweet tweet_id={"1"}  tweet={`
+Nothing here **yet**!`} key={1} date="Start of time"
+                    onClick={()=>{}}
+                    editClicked={()=>{}}
+                    deleteClicked={()=>{}}
+                    showMenu={false}
+                        />
                 )
             }
+            { /* editTweetModal */ }
+            <ReactModal
+                style={largeScreen?largeEditModalStyle:(bigScreen)?bigEditModalStyle:smallEditModalStyle}
+                isOpen={openModal=="edit_tweet"}>
+                <FiZap
+                    size={30}
+                    className="text-pink-600 float-right"
+                    onClick={()=>{setOpenModal("closed")}}/>
+                    {editTweetDiv()}
+            </ReactModal>
+            { /* deleteTweetModal */ }
+            <ReactModal
+                style={largeScreen?largeDelModalStyle:(bigScreen)?bigDelModalStyle:smallDelModalStyle}
+                isOpen={openModal=="del_tweet"}>
+                <FiZap
+                    size={30}
+                    className="text-pink-600 float-right"
+                    onClick={()=>{setOpenModal("closed")}}/>
+                    {deleteTweetDiv()}
+            </ReactModal>
+
         </main>
     )
 }
