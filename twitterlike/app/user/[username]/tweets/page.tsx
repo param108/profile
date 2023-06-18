@@ -131,7 +131,7 @@ Unknown Tweet`}
                     </div>):null
                 }
 
-                <span className="mb-[10px]">Are you sure you want to delete this tweet ?</span>
+                <span className="text-black mb-[10px]">Are you sure you want to delete this tweet ?</span>
                 <Tweet
                 tweet_id={chosenTweet?.id}
                 tweet={chosenTweet?.tweet}
