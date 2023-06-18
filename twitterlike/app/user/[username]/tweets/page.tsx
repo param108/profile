@@ -216,21 +216,6 @@ Unknown Tweet`}
         return final;
     }
 
-    const infiniteScroll = () => {
-        // End of the document reached?
-        if (window.innerHeight + document.documentElement.scrollTop
-            >= document.documentElement.offsetHeight){
-            getTweetsForUser([params.username], [], tweets.length).
-                then((res:AxiosResponse)=>{
-                    setTweets(mergeTweets(tweets, res.data.data))
-                    setUsername(params.username)
-                }).
-                catch(()=>{
-                    setErrorMessage("Failed to get tweets.")
-                    setShowError(true)
-                });
-        }
-    }
 
     // Once in the beginning
     useEffect(()=>{
@@ -248,9 +233,26 @@ Unknown Tweet`}
 
     // Add infinite scroll!
     useEffect(()=> {
-        window.addEventListener('scroll', infiniteScroll)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+        const infiniteScroll = () => {
+            // End of the document reached?
+            if (window.innerHeight + document.documentElement.scrollTop
+                >= document.documentElement.offsetHeight){
+                getTweetsForUser([params.username], [], tweets.length).
+                    then((res:AxiosResponse)=>{
+                        setTweets(mergeTweets(tweets, res.data.data))
+                        setUsername(params.username)
+                    }).
+                    catch(()=>{
+                        setErrorMessage("Failed to get tweets.")
+                        setShowError(true)
+                    });
+            }
+        }
+
+        window.removeEventListener('scroll', infiniteScroll);
+        window.addEventListener('scroll', infiniteScroll, { passive: true });
+        return () => window.removeEventListener('scroll', infiniteScroll);
+    }, [params.username, tweets])
 
     useEffect(()=>{
         if (APIToken.length == 0) {
