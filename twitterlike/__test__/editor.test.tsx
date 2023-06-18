@@ -17,7 +17,7 @@ Used to be called **micro-blogging** until twitter
   "baseElement": <body>
     <div>
       <div
-        class="bg-sky-200 w-[96%] md:w-[510px] rounded mt-[60px] mb-[10px]"
+        class="bg-sky-200 w-[96%] mt-[60px] md:w-[510px] rounded mb-[10px]"
       >
         <div
           class="w-[96%] md:w-[500px] h-[150px] bg-white mt-[5px] mx-[2%] md:mx-[5px] p-[5px] rounded focus:outline-none overflow-x-auto text-gray-600"
@@ -58,7 +58,7 @@ Used to be called
   </body>,
   "container": <div>
     <div
-      class="bg-sky-200 w-[96%] md:w-[510px] rounded mt-[60px] mb-[10px]"
+      class="bg-sky-200 w-[96%] mt-[60px] md:w-[510px] rounded mb-[10px]"
     >
       <div
         class="w-[96%] md:w-[500px] h-[150px] bg-white mt-[5px] mx-[2%] md:mx-[5px] p-[5px] rounded focus:outline-none overflow-x-auto text-gray-600"
@@ -166,7 +166,7 @@ Used to be called **micro-blogging** until twitter
   "baseElement": <body>
     <div>
       <div
-        class="bg-sky-200 w-[96%] md:w-[510px] rounded mt-[60px] mb-[10px]"
+        class="bg-sky-200 w-[96%] mt-[60px] md:w-[510px] rounded mb-[10px]"
       >
         <textarea
           class="block w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black"
@@ -255,7 +255,7 @@ Used to be called **micro-blogging** until twitter
   </body>,
   "container": <div>
     <div
-      class="bg-sky-200 w-[96%] md:w-[510px] rounded mt-[60px] mb-[10px]"
+      class="bg-sky-200 w-[96%] mt-[60px] md:w-[510px] rounded mb-[10px]"
     >
       <textarea
         class="block w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black"

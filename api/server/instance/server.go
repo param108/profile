@@ -133,4 +133,11 @@ func (s *Server) RegisterHandlers() {
 		).ServeHTTP).
 		Methods(http.MethodPost)
 
+	s.r.HandleFunc("/tweets", utils.AuthM(
+		tweets.CreateUpdateTweetHandler(s.DB)).ServeHTTP).
+		Methods(http.MethodPut)
+
+	s.r.HandleFunc("/tweets/delete", utils.AuthM(
+		tweets.CreateDeleteTweetHandler(s.DB)).ServeHTTP).
+		Methods(http.MethodPost)
 }

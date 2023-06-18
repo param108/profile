@@ -2,6 +2,7 @@ import { useState } from "react"
 import { TweetType } from "../apis/tweets"
 import Editor  from "./editor"
 import Tweet from "./tweet"
+import { GiBoltBomb, GiChemicalDrop } from "react-icons/gi"
 type EditPairProps = {
     editting: boolean,
     viewing: boolean,
@@ -11,13 +12,18 @@ type EditPairProps = {
     onChange: Function,
     onSendClicked: Function,
     showLoading: boolean,
-    value: string
-    key: number
+    value: string,
+    showMenu: boolean,
+    editClicked: Function,
+    deleteClicked: Function,
+    hideClicked: Function,
+    editorHideable: boolean
 }
 
 export default function EditPair( props: EditPairProps) {
+
     return (
-        <div className="flex flex-col w-full items-center">
+        <div className="w-full flex flex-col items-center">
         {(props.editting)?(
             <Editor
             isLoggedIn={props.isLoggedIn}
@@ -25,16 +31,22 @@ export default function EditPair( props: EditPairProps) {
             showLoading={props.showLoading}
             value={props.value}
             onSendClicked={props.onSendClicked}
-            onChange={props.onChange}/>
+            onChange={props.onChange}
+            hideable={props.editorHideable}
+            hideClicked={props.hideClicked}/>
         ):null}
         {(props.viewing?(
+            <div
+            className="flex flex-col items-center w-full">
             <Tweet
             tweet_id={props.tweet?.id?props.tweet.id:""}
             tweet={props.value}
-            key={props.key}
             date={props.tweet?.created_at?props.tweet.created_at:""}
-            onClick={()=>{}}
-            router={null}/>
+            deleteClicked={()=>{props.deleteClicked()}}
+            editClicked={()=>{props.editClicked()}}
+            showMenu={props.showMenu}
+            onClick={()=>{}}/>
+            </div>
         ):null)}
         </div>
     )
