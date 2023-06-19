@@ -17,7 +17,8 @@ type EditPairProps = {
     editClicked: Function,
     deleteClicked: Function,
     hideClicked: Function,
-    editorHideable: boolean
+    editorHideable: boolean,
+    url: string
 }
 
 export default function EditPair( props: EditPairProps) {
@@ -33,12 +34,14 @@ export default function EditPair( props: EditPairProps) {
             onSendClicked={props.onSendClicked}
             onChange={props.onChange}
             hideable={props.editorHideable}
+            url={props.url}
             hideClicked={props.hideClicked}/>
         ):null}
         {(props.viewing?(
             <div
             className="flex flex-col items-center w-full">
             <Tweet
+            url={props.url}
             tweet_id={props.tweet?.id?props.tweet.id:""}
             tweet={props.value}
             date={props.tweet?.created_at?props.tweet.created_at:""}

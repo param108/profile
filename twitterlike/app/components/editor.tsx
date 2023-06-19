@@ -10,7 +10,8 @@ type EditorProps = {
     showLoading: boolean,
     hideClicked: Function,
     hideable: boolean,
-    value: string
+    value: string,
+    url: string
 }
 
 export default function Editor(props: EditorProps) {
@@ -28,7 +29,7 @@ export default function Editor(props: EditorProps) {
             ):(
                 <div className="w-[96%] md:w-[500px] h-[150px] bg-white
 mt-[5px] mx-[2%] md:mx-[5px] p-[5px] rounded focus:outline-none overflow-x-auto text-gray-600">
-                {formatTweet(props.defaultMessage)}
+                {formatTweet(props.defaultMessage, props.url)}
                 </div>    
             )}
             {props.isLoggedIn ? (

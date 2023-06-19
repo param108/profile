@@ -5,19 +5,26 @@ describe('Editpair snapshot.', () => {
   it('renders the editting and view view', () => {
     expect(true).toBeTruthy()
     const tree = render(<EditPair
-			  editting={true}
-			  viewing={true}
-                          isLoggedIn={true}
-			  tweet={null}
-                          onChange={()=>{}}
-			  onSendClicked={()=>{}}
-			  value={"Hello World"}
-			  showLoading={true}
-                          defaultMessage={`
+			                  editting={true}
+			                  viewing={true}
+                        isLoggedIn={true}
+			                  tweet={null}
+                        onChange={()=>{}}
+			                  onSendClicked={()=>{}}
+			                  value={"Hello World"}
+			                  showLoading={true}
+                        defaultMessage={`
 This is a blog. A **blog** of _tweets_.
 Used to be called **micro-blogging** until twitter
 **Hijacked** the space.
-`}/>)
+`}
+                        editClicked={()=>{}}
+                        deleteClicked={()=>{}}
+                        hideClicked={()=>{}}
+                        editorHideable={false}
+                        url="https://ui.tribist.com"
+                        showMenu={false}
+      />)
     expect(tree).toMatchInlineSnapshot(`
 {
   "asFragment": [Function],

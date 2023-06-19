@@ -2,6 +2,7 @@
 import Tweet from './components/tweet'
 import Header from './components/header'
 import { useRouter } from 'next/navigation';
+import { useRouter as useNextRouter } from 'next/router'
 import Editor from './components/editor';
 import { MouseEventHandler, useEffect, useState } from 'react';
 import { getProfile } from './apis/login';
@@ -67,7 +68,8 @@ Then [**signup**](${process.env.NEXT_PUBLIC_BE_URL}/users/login?source=twitter&r
 ];
 
 export default function Home() {
-  const router = useRouter();
+  const router = useRouter()
+  //const nextRouter = useNextRouter()
   var [ APIToken, setAPIToken ] = useState("")
   var [ loggedIn, setLoggedIn ] = useState(false)
   var [ username, setUsername ] = useState("")
@@ -113,14 +115,18 @@ export default function Home() {
 This is a blog. A **blog** of _tweets_.
 Used to be called **micro-blogging** until twitter
 **Hijacked** the space.
-`}></Editor>
+`}
+        url={`${process.env.NEXT_PUBLIC_HOST}/`}
+      ></Editor>
       </div>
       {
         welcomeTweets.map((k,idx)=>{
           return (<Tweet tweet_id={idx.toString()} key={idx} tweet={k.tweet}
                   date={k.created_at} onClick={()=>{}}
                   deleteClicked={()=>{}} editClicked={()=>{}}
-                  showMenu={false}></Tweet>)
+                  showMenu={false}
+                  url={`${process.env.NEXT_PUBLIC_HOST}/`}
+            ></Tweet>)
         })
       }
     </main>

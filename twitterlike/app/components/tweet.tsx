@@ -10,7 +10,8 @@ type TweetProps = {
     onClick: Function,
     deleteClicked: Function,
     editClicked: Function,
-    showMenu: boolean
+    showMenu: boolean,
+    url: string
 }
 
 export default function Tweet(props: TweetProps) {
@@ -48,7 +49,7 @@ export default function Tweet(props: TweetProps) {
             ):null}
 
             <i className="text-gray-300">{formatDate(props.date)}</i><br/>
-            <span className="text-gray-600">{formatTweet(props.tweet)}</span>
+            <span className="text-gray-600">{formatTweet(props.tweet, props.url)}</span>
             </div>
     );
 }

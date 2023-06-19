@@ -6,7 +6,7 @@ import EditPair from "@/app/components/edit_tweet_pair";
 import Header from "@/app/components/header";
 import Tweet from "@/app/components/tweet";
 import { AxiosResponse } from "axios";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 import { FiZap } from "react-icons/fi";
 import ReactModal from "react-modal";
@@ -63,7 +63,7 @@ const smallDelModalStyle = {
 
 export default function ShowTweet() {
     const params = useParams();
-    const router = useRouter();
+    const searchParams = useSearchParams();
     var [ APIToken, setAPIToken ] = useState("")
     var [ loggedIn, setLoggedIn ] = useState(false)
     var [ editorLoading, setEditorLoading ] = useState(false)
@@ -82,9 +82,8 @@ export default function ShowTweet() {
     var [ delTweetLoading, setDelTweetLoading ] = useState(false)
     var [ delTweetErrorMessage, setDelTweetErrorMessage ] = useState("")
     var [ delTweetShowError, setDelTweetShowError ] = useState(false)
-
+    var [ queryTags, setQueryTags ] :[ string[], Function ] = useState([])
     console.log("rerendering user-tweet-page");
-
     // Which modal is open
     var [openModal, setOpenModal] = useState("")
 
@@ -105,7 +104,7 @@ export default function ShowTweet() {
                     {editTweetErrorMessage}
                 </div>):null
             }
-            <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
+            <EditPair editting={true} isLoggedIn={true} showLoading={editTweetLoading}
             onSendClicked={onEditTweetSendClicked} value={editTweetValue}
             viewing={true}
             onChange={onEditTweetChanged} key={1} tweet={chosenTweet}
@@ -115,7 +114,9 @@ Unknown Tweet`}
             editClicked={onEditTweetSendClicked}
             deleteClicked={()=>{}}
             editorHideable={false}
-            hideClicked={()=>{}}/>
+            hideClicked={()=>{}}
+            url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
+                />
             </div>)
 
     }
@@ -140,6 +141,7 @@ Unknown Tweet`}
                 editClicked={()=>{}}
                 showMenu={false}
                 onClick={()=>{}}
+                url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                 />
                 <div className="w-[90%] md:w-[510px] mt-[10px]">
                 <div className="inline-block float-right pr-[10px]">
@@ -219,8 +221,19 @@ Unknown Tweet`}
 
     // Once in the beginning
     useEffect(()=>{
-        getTweetsForUser([params.username], [], 0).
+        const tagStr = searchParams.get("tags")?.trim()
+        let tags:string[] = []
+
+        if (tagStr && tagStr.length > 0) {
+            let newTags = tagStr.split(",")
+            newTags.forEach((x)=>tags.push(x.trim()))
+        }
+
+        setQueryTags(tags)
+
+        getTweetsForUser([params.username], tags, 0).
             then((res:AxiosResponse)=>{
+                console.log(res.data.data)
                 setTweets(mergeTweets(tweets, res.data.data))
                 setUsername(params.username)
             }).
@@ -237,7 +250,7 @@ Unknown Tweet`}
             // End of the document reached?
             if (window.innerHeight + document.documentElement.scrollTop
                 >= document.documentElement.offsetHeight){
-                getTweetsForUser([params.username], [], tweets.length).
+                getTweetsForUser([params.username], queryTags, tweets.length).
                     then((res:AxiosResponse)=>{
                         setTweets(mergeTweets(tweets, res.data.data))
                         setUsername(params.username)
@@ -252,7 +265,7 @@ Unknown Tweet`}
         window.removeEventListener('scroll', infiniteScroll);
         window.addEventListener('scroll', infiniteScroll, { passive: true });
         return () => window.removeEventListener('scroll', infiniteScroll);
-    }, [params.username, tweets])
+    }, [params.username, tweets, queryTags])
 
     useEffect(()=>{
         if (APIToken.length == 0) {
@@ -363,7 +376,7 @@ Unknown Tweet`}
             {loggedIn?(
                 <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
                     onSendClicked={onSendClicked} value={editorValue} viewing={showEditorTweet}
-                    onChange={onChanged} key={1} tweet={{
+                    onChange={onChanged} key={10000} tweet={{
                         created_at: "Preview",
                         id: 'new',
                         tweet: ''
@@ -378,6 +391,7 @@ Used to be called **micro-blogging** until twitter
                     deleteClicked={()=>{}}
                     editorHideable={false}
                     hideClicked={()=>{}}
+                    url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                                    ></EditPair>):(
                 <div className="mt-[60px] mb-[10px]">
                     <span className="text-pink-600">{username}</span>
@@ -402,6 +416,7 @@ Used to be called **micro-blogging** until twitter
                         onClick={()=>{}}
                         editClicked={()=>{onEditTweetClicked(k)()}}
                         deleteClicked={()=>{onDeleteTweetClicked(k)()}}
+                        url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                         ></Tweet>
                     )
                 }) : (
@@ -411,6 +426,7 @@ Nothing here **yet**!`} key={1} date="Start of time"
                     editClicked={()=>{}}
                     deleteClicked={()=>{}}
                     showMenu={false}
+                    url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                         />
                 )
             }

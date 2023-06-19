@@ -22,7 +22,12 @@ Then [**signup**](https://google.com)!
 `}
                         key={1}
                         date={"13/03/2022"}
-                        router={null}/>)
+                        onClick={()=>{}}
+                        deleteClicked={()=>{}}
+                        editClicked={()=>{}}
+                        showMenu={false}
+                        url="https://ui.tribist.com"
+                        />)
       expect(tree).toMatchInlineSnapshot(`
 {
   "asFragment": [Function],
