@@ -15,7 +15,7 @@ this is a great tweet with no tags`;
         let tweet = `
 this is an even better #tweet`
         let expected = `
-this is an even better [#tweet](https://ui.tribist.com/user/param108/tweets?tags=param%2Ctweet)`
+this is an even better [#tweet](https://ui.tribist.com/user/param108/tweets?tags=tweet)`
         expect(
             tagsToHyperlinks(
                 tweet,
@@ -28,7 +28,7 @@ this is an even better [#tweet](https://ui.tribist.com/user/param108/tweets?tags
         let tweet = `
 this is an even better #tweet`
         let expected = `
-this is an even better [#tweet](https://ui.tribist.com/user/param108/tweets?tags=tweet%2Cparam)`
+this is an even better [#tweet](https://ui.tribist.com/user/param108/tweets?tags=tweet)`
         expect(
             tagsToHyperlinks(
                 tweet,
@@ -41,7 +41,7 @@ this is an even better [#tweet](https://ui.tribist.com/user/param108/tweets?tags
         let tweet = `
 this is an even better #tweet2`
         let expected = `
-this is an even better [#tweet2](https://ui.tribist.com/user/param108/tweets?tags=tweet%2Cparam%2Ctweet2)`
+this is an even better [#tweet2](https://ui.tribist.com/user/param108/tweets?tags=tweet2)`
         expect(
             tagsToHyperlinks(
                 tweet,
@@ -57,8 +57,25 @@ this is an even better #tweet
 #tent`
         let expected = `
 this is an even better [#tweet](https://ui.tribist.com/user/param108/tweets?tags=tweet)
-[#param](https://ui.tribist.com/user/param108/tweets?tags=tweet%2Cparam)
-[#tent](https://ui.tribist.com/user/param108/tweets?tags=tweet%2Ctent)`
+[#param](https://ui.tribist.com/user/param108/tweets?tags=param)
+[#tent](https://ui.tribist.com/user/param108/tweets?tags=tent)`
+        expect(
+            tagsToHyperlinks(
+                tweet,
+                "https://ui.tribist.com/user/param108/tweets?tags=tweet",
+                true
+            )).toEqual(expected)
+    })
+
+    it('renders tags correctly with repeats', ()=> {
+        let tweet = `
+this is an even better #tweet
+#param
+#tweet`
+        let expected = `
+this is an even better [#tweet](https://ui.tribist.com/user/param108/tweets?tags=tweet)
+[#param](https://ui.tribist.com/user/param108/tweets?tags=param)
+[#tweet](https://ui.tribist.com/user/param108/tweets?tags=tweet)`
         expect(
             tagsToHyperlinks(
                 tweet,

@@ -1,6 +1,8 @@
 package postgres
 
 import (
+	"strings"
+
 	"github.com/param108/profile/api/models"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
@@ -289,7 +291,7 @@ func (db *PostgresDB) SearchTweetsByTags(userID string,
 			query = query + " OR"
 		}
 		query = query + " tag = ?"
-		args = append(args, tag)
+		args = append(args, strings.ToLower(tag))
 	}
 
 	if len(query) > 0 {

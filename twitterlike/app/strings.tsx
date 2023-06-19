@@ -36,13 +36,8 @@ export function tagsToHyperlinks(tweet: string, baseURL: string, commandLineExis
         [index: string]: boolean
     }
 
-    let tagSeen : FoundDict = {}
     let tagReplaced : FoundDict = {}
 
-    // add all the existing tags (if any) to the foundDict
-    tagQuery.forEach((tag)=>{
-        tagSeen[tag] = true
-    })
 
     let fulltagObj
     while (fulltagObj = tags.next()) {
@@ -51,10 +46,8 @@ export function tagsToHyperlinks(tweet: string, baseURL: string, commandLineExis
         }
         let fulltag = fulltagObj.value[0]
         let tag = fulltag.slice(1)
-        let tagQCopy = [...tagQuery]
-        if (!tagSeen[tag]) {
-            tagQCopy.push(tag)
-        }
+        let tagQCopy: string[] = []
+        tagQCopy.push(tag)
 
         let newURL= new URL(baseURL)
         newURL.searchParams.set("tags", tagQCopy.join(","))
