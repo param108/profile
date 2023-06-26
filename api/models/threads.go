@@ -19,3 +19,12 @@ type ThreadTweet struct {
 	Deleted   bool      `json:"deleted"`
 	Writer    string    `json:"writer"`
 }
+
+type ThreadData struct {
+	Thread
+	Tweets	[]Tweet `json:"tweets"`
+}
+
+type DeleteThreadRequest struct {
+	ThreadID string `json:"thread_id"`
+}

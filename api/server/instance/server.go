@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/param108/profile/api/common"
 	"github.com/param108/profile/api/store"
+	"github.com/param108/profile/api/threads"
 	"github.com/param108/profile/api/tweets"
 	"github.com/param108/profile/api/users"
 	"github.com/param108/profile/api/users/login/twitter"
@@ -139,5 +140,17 @@ func (s *Server) RegisterHandlers() {
 
 	s.r.HandleFunc("/tweets/delete", utils.AuthM(
 		tweets.CreateDeleteTweetHandler(s.DB)).ServeHTTP).
+		Methods(http.MethodPost)
+
+	s.r.HandleFunc("/threads/{thread_id}", utils.AuthM(
+		threads.CreateGetThreadHandler(s.DB)).ServeHTTP).
+		Methods(http.MethodGet)
+
+	s.r.HandleFunc("/threads", utils.AuthM(
+		threads.CreateMakeThreadHandler(s.DB)).ServeHTTP).
+		Methods(http.MethodPost)
+
+	s.r.HandleFunc("/threads/{thread_id}/delete", utils.AuthM(
+		threads.CreateDeleteThreadHandler(s.DB)).ServeHTTP).
 		Methods(http.MethodPost)
 }

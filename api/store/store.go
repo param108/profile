@@ -72,6 +72,21 @@ type Store interface {
 
 	// DeleteGuestData If number of tweets > 40 delete older tweets
 	DeleteGuestData(userID string, maxTweets int, writer string) error
+
+	// CreateThread Create a thread for a user
+	CreateThread(userID string, writer string) (*models.Thread, error)
+
+	// DeleteThread Create a thread for a user
+	DeleteThread(userID string, threadID string, writer string) (*models.Thread, error)
+
+	// AddTweetToThread Add tweet to a thread
+	AddTweetToThread(userID, tweetID, threadID, writer string) error
+
+	// DelTweetFromThread Del tweet from a thread
+	DelTweetFromThread(userID, tweetID, threadID, writer string) error
+
+	// GetThread Get thread details and all the tweets attached to it
+	GetThread(userID, threadID, writer string) (*models.ThreadData, error)
 }
 
 func Periodic(s Store, writer string) {

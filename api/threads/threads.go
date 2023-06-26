@@ -1,36 +1,88 @@
 package threads
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
+	"os"
+	"strings"
 
+	"github.com/gorilla/mux"
+	"github.com/param108/profile/api/models"
 	"github.com/param108/profile/api/store"
+	"github.com/param108/profile/api/utils"
 )
-
-func CreateGetThreadHandler(db store.Store) http.HandlerFunc {
-	return func(rw http.ResponseWriter, r *http.Request) {
-
-	}
-}
 
 func CreateMakeThreadHandler(db store.Store) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
+		userID := r.Header.Get("TRIBIST_USERID")
+		if len(userID) == 0 {
+			utils.WriteError(rw, http.StatusForbidden, "unknown user")
+			return
+		}
 
+		thread, err := db.CreateThread(userID, os.Getenv("WRITER"))
+		if err != nil {
+			utils.WriteError(rw, http.StatusInternalServerError, "failed to create:"+err.Error())
+			return
+		}
+
+		utils.WriteData(rw, http.StatusOK, thread)
 	}
 }
 
-func CreateAddToThreadHandler(db store.Store) http.HandlerFunc {
+func CreateGetThreadHandler(db store.Store) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
+		userID := r.Header.Get("TRIBIST_USERID")
+		if len(userID) == 0 {
+			utils.WriteError(rw, http.StatusForbidden, "unknown user")
+			return
+		}
 
-	}
-}
+		v := mux.Vars(r)
 
-func CreateDeleteFromThreadHandler(db store.Store) http.HandlerFunc {
-	return func(rw http.ResponseWriter, r *http.Request) {
+		threadID := strings.TrimSpace(v["thread_id"])
 
+		if len(threadID) == 0 {
+			utils.WriteError(rw, http.StatusBadRequest, "invalid thread")
+		}
+
+		threadData, err := db.GetThread(userID, threadID, os.Getenv("WRITER"))
+		if err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "failed to get:"+err.Error())
+			return
+		}
+
+		utils.WriteData(rw, http.StatusOK, threadData)
 	}
 }
 
 func CreateDeleteThreadHandler(db store.Store) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
+		userID := r.Header.Get("TRIBIST_USERID")
+		if len(userID) == 0 {
+			utils.WriteError(rw, http.StatusForbidden, "unknown user")
+			return
+		}
+
+		data, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "couldnt read:"+err.Error())
+			return
+		}
+
+		req := models.DeleteThreadRequest{}
+		if err := json.Unmarshal(data, &req); err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "couldnt parse:"+err.Error())
+			return
+		}
+
+		thread, err := db.DeleteThread(userID, req.ThreadID, os.Getenv("WRITER"))
+		if err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "failed to delete:"+err.Error())
+			return
+		}
+
+		utils.WriteData(rw, http.StatusOK, thread)
 	}
 }
