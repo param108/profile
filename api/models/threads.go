@@ -3,7 +3,7 @@ package models
 import "time"
 
 type Thread struct {
-	ID        string    `json:"id"`
+	ID        string    `gorm:"default:uuid_generate_v4()" json:"id"`
 	UserID    string    `json:"user_id"`
 	CreatedAt time.Time `json:"created_at"`
 	Deleted   bool      `json:"deleted"`
@@ -11,7 +11,7 @@ type Thread struct {
 }
 
 type ThreadTweet struct {
-	ID        string    `json:"id"`
+	ID        string    `gorm:"default:uuid_generate_v4()" json:"id"`
 	UserID    string    `json:"user_id"`
 	TweetID   string    `json:"tweet_id"`
 	ThreadID  string    `json:"thread_id"`
@@ -22,7 +22,21 @@ type ThreadTweet struct {
 
 type ThreadData struct {
 	Thread
-	Tweets	[]Tweet `json:"tweets"`
+	Tweets []*Tweet `json:"tweets"`
+}
+
+type ThreadRawData struct {
+	ID             string    `json:"id"`
+	UserID         string    `json:"user_id"`
+	CreatedAt      time.Time `json:"created_at"`
+	Deleted        bool      `json:"deleted"`
+	Writer         string    `json:"writer"`
+	TweetID        string    `json:"tweet_id"`
+	TweetUserID    string    `json:"tweet_user_id"`
+	TweetTweet     string    `json:"tweet_tweet"`
+	TweetFlags     string    `json:"tweet_flags"`
+	TweetWriter    string    `json:"tweet_writer"`
+	TweetCreatedAt time.Time `json:"tweet_created_at"`
 }
 
 type DeleteThreadRequest struct {

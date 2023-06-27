@@ -101,6 +101,34 @@ ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
 
 
 --
+-- Name: thread_tweets; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.thread_tweets (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    user_id uuid NOT NULL,
+    tweet_id uuid NOT NULL,
+    thread_id uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT (now() AT TIME ZONE 'utc'::text) NOT NULL,
+    deleted boolean DEFAULT false NOT NULL,
+    writer uuid NOT NULL
+);
+
+
+--
+-- Name: threads; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.threads (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    user_id uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT (now() AT TIME ZONE 'utc'::text) NOT NULL,
+    deleted boolean DEFAULT false NOT NULL,
+    writer uuid NOT NULL
+);
+
+
+--
 -- Name: tweet_tags; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -139,7 +167,7 @@ ALTER SEQUENCE public.tweet_tags_id_seq OWNED BY public.tweet_tags.id;
 CREATE TABLE public.tweets (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     user_id uuid NOT NULL,
-    tweet character varying(300) NOT NULL,
+    tweet character varying(500) NOT NULL,
     flags character varying(100) DEFAULT ''::character varying NOT NULL,
     created_at timestamp with time zone DEFAULT (now() AT TIME ZONE 'utc'::text) NOT NULL,
     writer uuid NOT NULL,
@@ -220,6 +248,22 @@ ALTER TABLE ONLY public.tags
 
 
 --
+-- Name: thread_tweets thread_tweets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.thread_tweets
+    ADD CONSTRAINT thread_tweets_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: threads threads_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.threads
+    ADD CONSTRAINT threads_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: tweet_tags tweet_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -286,6 +330,20 @@ CREATE INDEX idx_tags_tag ON public.tags USING btree (tag);
 --
 
 CREATE INDEX idx_tags_writer ON public.tags USING btree (writer);
+
+
+--
+-- Name: idx_thread_tweets_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_thread_tweets_user_id ON public.thread_tweets USING btree (user_id, thread_id, writer);
+
+
+--
+-- Name: idx_threads_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_threads_user_id ON public.threads USING btree (user_id, writer);
 
 
 --
