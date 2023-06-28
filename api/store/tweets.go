@@ -20,6 +20,11 @@ func (s *StoreImpl) InsertTweet(userID string, tweet string,
 		Flags:  flags,
 	}
 
+	threads, err := utils.ExtractThreads(tweet)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	tagStrs, err := utils.ExtractTags(tweet)
 	if err != nil {
 		return nil, nil, err
@@ -35,7 +40,7 @@ func (s *StoreImpl) InsertTweet(userID string, tweet string,
 		tags = append(tags, tag)
 	}
 
-	twD, tags, err := s.db.InsertTweet(tw, tags)
+	twD, tags, err := s.db.InsertTweet(tw, tags, threads)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -52,6 +57,11 @@ func (s *StoreImpl) UpdateTweet(userID, tweetID,
 		Tweet:  tweet,
 		Writer: writer,
 		Flags:  flags,
+	}
+
+	threads, err := utils.ExtractThreads(tweet)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	tagStrs, err := utils.ExtractTags(tweet)
@@ -72,7 +82,7 @@ func (s *StoreImpl) UpdateTweet(userID, tweetID,
 		tags = append(tags, tag)
 	}
 
-	twD, tags, err := s.db.UpdateTweet(tw, tags, writer)
+	twD, tags, err := s.db.UpdateTweet(tw, tags, threads, writer)
 	if err != nil {
 		return nil, nil, err
 	}

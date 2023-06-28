@@ -2,8 +2,10 @@ package postgres
 
 import (
 	"strings"
+	"time"
 
 	"github.com/param108/profile/api/models"
+	"github.com/param108/profile/api/utils"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -14,6 +16,7 @@ import (
 func (db *PostgresDB) InsertTweet(
 	tweet *models.Tweet,
 	tags []*models.Tag,
+	threads []*utils.ThreadDetails,
 ) (*models.Tweet, []*models.Tag, error) {
 
 	err := db.db.Transaction(func(tx *gorm.DB) error {
@@ -87,6 +90,25 @@ func (db *PostgresDB) InsertTweet(
 				return err
 			}
 		}
+
+		if len(threads) > 0 {
+			ts := []*models.ThreadTweet{}
+			for _, thread := range threads {
+				ts = append(ts, &models.ThreadTweet{
+					ThreadID:  thread.ID,
+					TweetID:   tweet.ID,
+					UserID:    tweet.UserID,
+					Writer:    tweet.Writer,
+					CreatedAt: time.Now().UTC(),
+					Deleted:   false,
+				})
+			}
+
+			if err := tx.Create(ts).Error; err != nil {
+				return err
+			}
+		}
+
 		return nil
 	})
 
@@ -96,6 +118,7 @@ func (db *PostgresDB) InsertTweet(
 func (db *PostgresDB) UpdateTweet(
 	tweet *models.Tweet,
 	tags []*models.Tag,
+	threads []*utils.ThreadDetails,
 	writer string,
 ) (*models.Tweet, []*models.Tag, error) {
 	err := db.db.Transaction(func(tx *gorm.DB) error {
@@ -109,6 +132,14 @@ func (db *PostgresDB) UpdateTweet(
 			"tweet_id = ? AND user_id = ? AND writer = ?", tweet.ID, tweet.UserID,
 			writer).Delete(
 			&models.TweetTag{}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where(
+			"user_id = ? AND tweet_id = ? AND writer = ?",
+			tweet.UserID, tweet.ID, writer,
+		).Delete(
+			&models.ThreadTweet{}).Error; err != nil {
 			return err
 		}
 
@@ -175,6 +206,24 @@ func (db *PostgresDB) UpdateTweet(
 			}
 
 			if err := tx.Create(tweetTags).Error; err != nil {
+				return err
+			}
+		}
+
+		if len(threads) > 0 {
+			ts := []*models.ThreadTweet{}
+			for _, thread := range threads {
+				ts = append(ts, &models.ThreadTweet{
+					ThreadID:  thread.ID,
+					TweetID:   tweet.ID,
+					UserID:    tweet.UserID,
+					Writer:    tweet.Writer,
+					CreatedAt: time.Now().UTC(),
+					Deleted:   false,
+				})
+			}
+
+			if err := tx.Create(ts).Error; err != nil {
 				return err
 			}
 		}

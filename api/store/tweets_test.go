@@ -28,6 +28,16 @@ func tweetTeardown(writer string) {
 		log.Fatalf("failed delete tags: %s", err.Error())
 	}
 
+	err = testDB.(*StoreImpl).db.Delete("thread_tweets", writer)
+	if err != nil {
+		log.Fatalf("failed delete thread_tweets: %s", err.Error())
+	}
+
+	err = testDB.(*StoreImpl).db.Delete("threads", writer)
+	if err != nil {
+		log.Fatalf("failed delete threads: %s", err.Error())
+	}
+
 }
 
 func TestInsertTweet(t *testing.T) {
@@ -303,6 +313,48 @@ The first tweet is #tweet_%d
 		assert.Equal(t, 0, len(tweets))
 
 	})
+	tweetTeardown(tweetWriter)
+
+	var threadTweet *models.Tweet
+	var threadID string
+	t.Run("insert tweet with thread", func(t *testing.T) {
+		thread, err := testDB.CreateThread(userID, tweetWriter)
+		threadID = thread.ID
+		assert.Nil(t, err, "failed to create thread")
+		tweetStr := fmt.Sprintf(`#thread:%s:%d
+This tweet is part of thread %s`, thread.ID, 0, thread.ID)
+		tweet, _, err := testDB.InsertTweet(userID, tweetStr, "", tweetWriter)
+		assert.Nil(t, err, "failed insert tweet")
+		threadTweet = tweet
+		threadData, err := testDB.GetThread(userID, thread.ID, tweetWriter)
+		assert.Nil(t, err, "invalid thread")
+		assert.Equal(t, 1, len(threadData.Tweets))
+		assert.Equal(t, tweet.ID, threadData.Tweets[0].ID, "check tweet returned properly")
+		assert.Equal(t, tweetStr, threadData.Tweets[0].Tweet, "invalid saved tweet")
+	})
+
+	t.Run("update tweet remove thread", func(t *testing.T) {
+		tweetStr := fmt.Sprintf(`
+This tweet is not part of thread`)
+		_, _, err := testDB.UpdateTweet(userID, threadTweet.ID, tweetStr, "", tweetWriter)
+		assert.Nil(t, err, "failed to update tweet")
+		threadData, err := testDB.GetThread(userID, threadID, tweetWriter)
+		assert.Nil(t, err, "invalid thread")
+		assert.Equal(t, 0, len(threadData.Tweets))
+	})
+
+	t.Run("update tweet add thread again", func(t *testing.T) {
+		tweetStr := fmt.Sprintf(`#thread:%s:%d
+This tweet is part of thread %s`, threadID, 0, threadID)
+		_, _, err := testDB.UpdateTweet(userID, threadTweet.ID, tweetStr, "", tweetWriter)
+		assert.Nil(t, err, "failed to update tweet")
+		threadData, err := testDB.GetThread(userID, threadID, tweetWriter)
+		assert.Nil(t, err, "invalid thread")
+		assert.Equal(t, 1, len(threadData.Tweets))
+		assert.Equal(t, threadTweet.ID, threadData.Tweets[0].ID, "check tweet returned properly")
+		assert.Equal(t, tweetStr, threadData.Tweets[0].Tweet, "invalid saved tweet")
+	})
+
 }
 
 func TestDeleteGuestData(t *testing.T) {
