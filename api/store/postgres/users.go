@@ -10,7 +10,12 @@ func (db *PostgresDB) CreateUser(u *models.User) error {
 }
 
 func (db *PostgresDB) FindOrCreateUser(u *models.User) (*models.User, error) {
-	ret := &models.User{}
+	ret := &models.User{
+		Handle:  u.Handle,
+		Profile: u.Profile,
+		Role:    u.Role,
+		Writer:  u.Writer,
+	}
 	if err := db.db.Where(
 		"handle = ? and profile = ?",
 		u.Handle,
