@@ -77,4 +77,14 @@ This is the start of a tweet`
 
 		})
 
+	t.Run("threads inside a tweet are ignored",
+		func(t *testing.T) {
+			tweet := `#display
+#thread:c6340c54-da8e-4c8f-b1e4-4840be4d4dfc:abc #thread:f11e386f-ae1a-4927-9dfd-146f12498b0c:5
+This is the start of a tweet`
+			details, err := ExtractThreads(tweet)
+			assert.Nil(t, err, "failed extract")
+			assert.Equal(t, 0, len(details))
+		})
+
 }
