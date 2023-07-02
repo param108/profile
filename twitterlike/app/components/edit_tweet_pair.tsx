@@ -46,6 +46,7 @@ export default function EditPair( props: EditPairProps) {
             className="flex flex-col items-center w-full">
             <Tweet
             url={props.url}
+            visible={props.visible}
             tweet_id={props.tweet?.id?props.tweet.id:""}
             tweet={props.value}
             date={props.tweet?.created_at?props.tweet.created_at:""}

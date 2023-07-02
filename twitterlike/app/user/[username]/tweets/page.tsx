@@ -61,6 +61,62 @@ const smallDelModalStyle = {
     }
 };
 
+    const welcomeTweets = [
+  {
+    created_at: `At the beginning.`,
+    tweet: `
+I think in tweets.
+
+*Short paragraphs of thought*
+
+**Shorter the Better**
+`},
+  {
+    created_at: `A little later.`,
+    tweet: `
+These thoughts could be **independent**
+
+OR
+
+They could be *connected* as **threads** or
+*related* through **#tags**
+`},
+  {
+    created_at: `Even later.`,
+    tweet: `
+I re-read my tweets a lot. Over & Over.
+
+Sometimes **Narcissism** & sometimes to **remind** me
+
+of things I already know.
+`},
+  {
+    created_at: `Even later....er.`,
+    tweet: `
+At times I want to **explore** them and **discover** new connections,
+or new **insights** or wallow in old ones.
+
+I like **high-lighting** and _italics_.
+Did I mention, we support **Markdown!**"
+`},
+  {
+    created_at: `Right Here, Right Now.`,
+    tweet: `
+You can do all this here and you own your data,
+download as you wish.
+
+Unlike twitter this is not a **performance**,
+
+this is **recreation**. This is **expression**.
+
+This is **Freedom**!
+
+_Interested ?_
+
+Then [**signup**](${process.env.NEXT_PUBLIC_BE_URL}/users/login?source=twitter&redirect_url=/)!
+`}
+];
+
 export default function ShowTweet() {
     const params = useParams();
     const searchParams = useSearchParams();
@@ -83,9 +139,13 @@ export default function ShowTweet() {
     var [ delTweetErrorMessage, setDelTweetErrorMessage ] = useState("")
     var [ delTweetShowError, setDelTweetShowError ] = useState(false)
     var [ queryTags, setQueryTags ] :[ string[], Function ] = useState([])
+    // thread control
+    var [ threadVisible, setThreadVisible ] = useState(false)
+    var [ threadData, setThreadData ] = useState([])
     console.log("rerendering user-tweet-page");
     // Which modal is open
     var [openModal, setOpenModal] = useState("")
+
 
     // holds the tweet id of the tweet that is to be editted or deleted.
     var [chosenTweet, setChosenTweet]:[TweetType, Dispatch<SetStateAction<TweetType>>] = useState({
@@ -115,6 +175,7 @@ Unknown Tweet`}
             deleteClicked={()=>{}}
             editorHideable={false}
             hideClicked={()=>{}}
+            visible={true}
             url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                 />
             </div>)
@@ -134,6 +195,7 @@ Unknown Tweet`}
 
                 <span className="text-black mb-[10px]">Are you sure you want to delete this tweet ?</span>
                 <Tweet
+                visible={true}
                 tweet_id={chosenTweet?.id}
                 tweet={chosenTweet?.tweet}
                 date={chosenTweet?.created_at}
@@ -374,7 +436,7 @@ Unknown Tweet`}
         <main className="flex bg-white min-h-screen max-h-screen  w-full overflow-y-hidden flex-col items-center justify-stretch">
             <Header></Header>
             <div className="flex flex-row max-h-full overflow-y-clip">
-            <div className="max-h-full overflow-y-scroll">
+            <div className="max-h-full overflow-y-scroll  ">
             {loggedIn?(
                 <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
                     onSendClicked={onSendClicked} value={editorValue} viewing={showEditorTweet}
@@ -417,7 +479,10 @@ Used to be called **micro-blogging** until twitter
                         tweet={k.tweet}
                         date={k.created_at}
                         showMenu={loggedIn}
-                        onClick={()=>{}}
+                        onClick={()=>{
+                            setThreadVisible(!threadVisible);
+                            setThreadData(welcomeTweets);
+                        }}
                         editClicked={()=>{onEditTweetClicked(k)()}}
                         deleteClicked={()=>{onDeleteTweetClicked(k)()}}
                         url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
@@ -436,39 +501,8 @@ Nothing here **yet**!`} key={1} date="Start of time"
                 )
             }
             </div>
+            {(threadVisible && threadData.length > 0)?(
             <div className="max-h-full float-right overflow-y-scroll">
-            {loggedIn?(
-                <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
-                    onSendClicked={onSendClicked} value={editorValue} viewing={showEditorTweet}
-                    onChange={onChanged} key={10000} tweet={{
-                        created_at: "Preview",
-                        id: 'new',
-                        tweet: ''
-                    }}
-                    showMenu={false}
-                    defaultMessage={`
-This is a blog. A **blog** of _tweets_.
-Used to be called **micro-blogging** until twitter
-**Hijacked** the space.
-`}
-                    editClicked={()=>{}}
-                    deleteClicked={()=>{}}
-                    editorHideable={false}
-                    hideClicked={()=>{}}
-                    visible={false}
-                    url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
-                                   ></EditPair>):(
-                <div className="mt-[60px] mb-[10px]">
-                    <span className="text-pink-600">{username}</span>
-                </div>
-            )}
-            { showError?(
-                <div
-                    className="p-[5px] bg-red-200 rounded mb-[5px]"
-                    onClick={()=>setShowError(false)}>
-                    {errorMessage}
-                </div>):null
-            }
             { tweets.length > 0 ?
                 tweets.map((k: TweetType ,idx : number)=>{
                     return (
@@ -498,6 +532,7 @@ Nothing here **yet**!`} key={1} date="Start of time"
                 )
             }
             </div>
+            ):null }
             </div>
         { /* editTweetModal */ }
             <ReactModal
