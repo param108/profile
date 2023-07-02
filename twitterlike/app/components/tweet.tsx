@@ -12,6 +12,7 @@ type TweetProps = {
     editClicked: Function,
     showMenu: boolean,
     url: string
+    visible: boolean,
 }
 
 export default function Tweet(props: TweetProps) {
@@ -24,11 +25,16 @@ export default function Tweet(props: TweetProps) {
 
         return date;
     }
-    return (
-            <div className="border border-t-slate-100 
+
+    var toplayerStyle = `border border-t-slate-100
             bg-white hover:bg-cyan-50 w-[90%] md:w-[510px]
             min-h-[100px] pl-[15px] pr-[5px] pt-[5px]
-            pb-[40px] overflow-x-auto"
+            pb-[40px] overflow-x-auto`;
+    if (!props.visible) {
+        toplayerStyle += " invisible"
+    }
+    return (
+            <div className={toplayerStyle}
             onMouseLeave={()=>setMenuVisible(false)}
             onMouseEnter={()=>setMenuVisible(true)}
 

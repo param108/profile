@@ -18,13 +18,17 @@ type EditPairProps = {
     deleteClicked: Function,
     hideClicked: Function,
     editorHideable: boolean,
-    url: string
+    url: string,
+    visible: boolean,
 }
 
 export default function EditPair( props: EditPairProps) {
-
+    var toplayerStyle = "w-full flex flex-col items-center";
+    if (!props.visible) {
+        toplayerStyle += " invisible"
+    }
     return (
-        <div className="w-full flex flex-col items-center">
+        <div className={toplayerStyle}>
         {(props.editting)?(
             <Editor
             isLoggedIn={props.isLoggedIn}

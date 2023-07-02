@@ -371,8 +371,10 @@ Unknown Tweet`}
     }
 
     return (
-        <main className="flex bg-white min-h-screen w-full flex-col items-center justify-stretch">
+        <main className="flex bg-white min-h-screen max-h-screen  w-full overflow-y-hidden flex-col items-center justify-stretch">
             <Header></Header>
+            <div className="flex flex-row max-h-full overflow-y-clip">
+            <div className="max-h-full overflow-y-scroll">
             {loggedIn?(
                 <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
                     onSendClicked={onSendClicked} value={editorValue} viewing={showEditorTweet}
@@ -391,6 +393,7 @@ Used to be called **micro-blogging** until twitter
                     deleteClicked={()=>{}}
                     editorHideable={false}
                     hideClicked={()=>{}}
+                    visible={true}
                     url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                                    ></EditPair>):(
                 <div className="mt-[60px] mb-[10px]">
@@ -408,6 +411,69 @@ Used to be called **micro-blogging** until twitter
                 tweets.map((k: TweetType ,idx : number)=>{
                     return (
                         <Tweet
+                        visible={true}
+                        key={idx}
+                        tweet_id={k.id}
+                        tweet={k.tweet}
+                        date={k.created_at}
+                        showMenu={loggedIn}
+                        onClick={()=>{}}
+                        editClicked={()=>{onEditTweetClicked(k)()}}
+                        deleteClicked={()=>{onDeleteTweetClicked(k)()}}
+                        url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
+                        ></Tweet>
+                    )
+                }) : (
+                    <Tweet tweet_id={"1"}  tweet={`
+Nothing here **yet**!`} key={1} date="Start of time"
+                    onClick={()=>{}}
+                    editClicked={()=>{}}
+                    deleteClicked={()=>{}}
+                    visible={true}
+                    showMenu={false}
+                    url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
+                        />
+                )
+            }
+            </div>
+            <div className="max-h-full float-right overflow-y-scroll">
+            {loggedIn?(
+                <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
+                    onSendClicked={onSendClicked} value={editorValue} viewing={showEditorTweet}
+                    onChange={onChanged} key={10000} tweet={{
+                        created_at: "Preview",
+                        id: 'new',
+                        tweet: ''
+                    }}
+                    showMenu={false}
+                    defaultMessage={`
+This is a blog. A **blog** of _tweets_.
+Used to be called **micro-blogging** until twitter
+**Hijacked** the space.
+`}
+                    editClicked={()=>{}}
+                    deleteClicked={()=>{}}
+                    editorHideable={false}
+                    hideClicked={()=>{}}
+                    visible={false}
+                    url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
+                                   ></EditPair>):(
+                <div className="mt-[60px] mb-[10px]">
+                    <span className="text-pink-600">{username}</span>
+                </div>
+            )}
+            { showError?(
+                <div
+                    className="p-[5px] bg-red-200 rounded mb-[5px]"
+                    onClick={()=>setShowError(false)}>
+                    {errorMessage}
+                </div>):null
+            }
+            { tweets.length > 0 ?
+                tweets.map((k: TweetType ,idx : number)=>{
+                    return (
+                        <Tweet
+                        visible={true}
                         key={idx}
                         tweet_id={k.id}
                         tweet={k.tweet}
@@ -426,11 +492,14 @@ Nothing here **yet**!`} key={1} date="Start of time"
                     editClicked={()=>{}}
                     deleteClicked={()=>{}}
                     showMenu={false}
+                    visible={true}
                     url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                         />
                 )
             }
-            { /* editTweetModal */ }
+            </div>
+            </div>
+        { /* editTweetModal */ }
             <ReactModal
                 style={largeScreen?largeEditModalStyle:(bigScreen)?bigEditModalStyle:smallEditModalStyle}
                 isOpen={openModal=="edit_tweet"}>
