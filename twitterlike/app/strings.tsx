@@ -96,3 +96,30 @@ export function formatTweet(tweet: string, baseURL: string):ReactElement {
         </div>
     )
 }
+
+export type ThreadInfo = {
+    id: string
+    seq: number
+    name: string
+}
+
+export function hasThread(tweet: string): ThreadInfo[] {
+    var threadRegexp=/#thread:([a-z0-9-]{36}):([0-9]{1,})/g;
+
+    const firstLine=tweet.split("\n")[0];
+    var data: ThreadInfo[] = []
+
+    var matches = firstLine.matchAll(threadRegexp)
+    var match = matches.next();
+
+    while (!match.done) {
+        var d = {
+            id: match.value[1],
+            seq: parseInt(match.value[2]),
+            name: "" // this will be filled when the api returns
+        };
+        data.push(d);
+        match = matches.next();
+    }
+    return data;
+}
