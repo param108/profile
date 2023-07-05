@@ -8,12 +8,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func (db *PostgresDB) CreateThread(userID, writer string) (*models.Thread, error) {
+func (db *PostgresDB) CreateThread(userID, name, writer string) (*models.Thread, error) {
 	ret := &models.Thread{
 		UserID:    userID,
 		Writer:    writer,
 		CreatedAt: time.Now().UTC(),
 		Deleted:   false,
+		Name:      name,
 	}
 	if err := db.db.Create(ret).Error; err != nil {
 		return nil, err
@@ -111,7 +112,7 @@ func (db *PostgresDB) GetThread(userID, threadID, writer string) (*models.Thread
 			"AND thread_tweets.writer = ? "+
 			"AND thread_tweets.deleted = FALSE AND tweets.deleted = FALSE "+
 			"AND threads.deleted = FALSE",
-		userID, threadID, writer).Select("threads.id as id, threads.user_id as user_id," +
+		userID, threadID, writer).Select("threads.name as name, threads.id as id, threads.user_id as user_id," +
 		"threads.created_at as created_at, threads.deleted as deleted, threads.writer as writer," +
 		"tweets.id as tweet_id, tweets.user_id as tweet_user_id, " +
 		"tweets.tweet as tweet_tweet, tweets.flags as tweet_flags, " +
@@ -129,6 +130,7 @@ func (db *PostgresDB) GetThread(userID, threadID, writer string) (*models.Thread
 			CreatedAt: threads[0].CreatedAt,
 			Deleted:   threads[0].Deleted,
 			Writer:    threads[0].Writer,
+			Name:      threads[0].Name,
 		},
 		Tweets: []*models.Tweet{},
 	}

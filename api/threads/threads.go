@@ -21,7 +21,19 @@ func CreateMakeThreadHandler(db store.Store) http.HandlerFunc {
 			return
 		}
 
-		thread, err := db.CreateThread(userID, os.Getenv("WRITER"))
+		data, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "couldnt read:"+err.Error())
+			return
+		}
+
+		req := models.CreateThreadRequest{}
+		if err := json.Unmarshal(data, &req); err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "couldnt parse:"+err.Error())
+			return
+		}
+
+		thread, err := db.CreateThread(userID, req.Name, os.Getenv("WRITER"))
 		if err != nil {
 			utils.WriteError(rw, http.StatusInternalServerError, "failed to create:"+err.Error())
 			return

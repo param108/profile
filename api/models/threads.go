@@ -8,6 +8,7 @@ type Thread struct {
 	CreatedAt time.Time `json:"created_at"`
 	Deleted   bool      `json:"deleted"`
 	Writer    string    `json:"writer"`
+	Name      string    `json:"name"`
 }
 
 type ThreadTweet struct {
@@ -29,6 +30,7 @@ type ThreadRawData struct {
 	ID             string    `json:"id"`
 	UserID         string    `json:"user_id"`
 	CreatedAt      time.Time `json:"created_at"`
+	Name           string    `json:"name"`
 	Deleted        bool      `json:"deleted"`
 	Writer         string    `json:"writer"`
 	TweetID        string    `json:"tweet_id"`
@@ -41,4 +43,8 @@ type ThreadRawData struct {
 
 type DeleteThreadRequest struct {
 	ThreadID string `json:"thread_id"`
+}
+
+type CreateThreadRequest struct {
+	Name string `json:"name"`
 }

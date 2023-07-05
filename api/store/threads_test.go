@@ -47,17 +47,19 @@ func TestThreadCRUD(t *testing.T) {
 	var secondThread *models.Thread
 
 	t.Run("Can create a thread", func(t *testing.T) {
-		thread, err := testDB.CreateThread(userID, threadWriter)
+		thread, err := testDB.CreateThread(userID, "junk", threadWriter)
 		assert.Nil(t, err, "failed create thread")
 		assert.Equal(t, userID, thread.UserID, "invalid user id")
 		assert.NotEmpty(t, thread.CreatedAt, "invalid created at")
+		assert.Equal(t, "junk", thread.Name)
 		assert.NotEmpty(t, thread.ID, "invalid thread id")
 		firstThread = thread
 	})
 
 	t.Run("Can create second thread", func(t *testing.T) {
-		thread, err := testDB.CreateThread(userID, threadWriter)
+		thread, err := testDB.CreateThread(userID, "junk2", threadWriter)
 		assert.Nil(t, err, "failed create thread")
+		assert.Equal(t, "junk2", thread.Name)
 		assert.Equal(t, userID, thread.UserID, "invalid user id")
 		assert.NotEmpty(t, thread.CreatedAt, "invalid created at")
 		assert.NotEmpty(t, thread.ID, "invalid thread id")
