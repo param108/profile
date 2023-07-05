@@ -23,6 +23,8 @@ export default function Tweet(props: TweetProps) {
     var [ threadList, setThreadList ] = useState<ThreadData[]>([])
     var [ threadData, setThreadData ] = useState<{[name:string]:ThreadData}>({})
     var [ visibleThreadList, setVisibleThreadList ] = useState<ThreadData[]>([])
+    var [ expanded, setExpanded ] = useState(false);
+
     useEffect(()=>{
         setThreadList(hasThread(props.tweet).sort((x,y)=>{
             if (x.seq >= y.seq) {
@@ -123,15 +125,22 @@ export default function Tweet(props: TweetProps) {
 
             <i className="text-gray-300">{formatDate(props.date)}</i><br/>
             <span className="text-gray-600">{formatTweet(props.tweet, props.url)}</span>
-            <ul>
-            {
-                visibleThreadList.map((v) => {
-                    return (
-                        <li>{v.name}</li>
-                    );
-                })
-            }
-            </ul>
+            {visibleThreadList.length > 0?(
+             (!expanded)?(
+                <span onClick={()=>setExpanded(true)}>{">>"}</span>
+            ):(
+                <ul>
+                    <li onClick={()=>{setExpanded(false)}}>"v"</li>
+                    {
+                        visibleThreadList.map((v) => {
+                            return (
+                                <li>{v.name}</li>
+                            );
+                        })
+                    }
+                </ul>
+            )
+            ):null}
             </div>
     );
 }
