@@ -2,7 +2,7 @@ import { formatTweet, hasThread, ThreadData, ThreadInfo } from "../strings";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { GiBoltBomb, GiChemicalDrop, GiSewingNeedle } from "react-icons/gi"
+import { GiBoltBomb, GiChemicalDrop, GiScrollUnfurled, GiSewingNeedle, GiTiedScroll } from "react-icons/gi"
 import { getThread } from "../apis/threads";
 import { object } from "underscore";
 type TweetProps = {
@@ -60,12 +60,12 @@ export default function Tweet(props: TweetProps) {
                 })
         })
 
-    setThreadData({
-        ...threadData,
-        ...newThreadData
-    })
+        setThreadData({
+            ...threadData,
+            ...newThreadData
+        })
 
-    setVisibleThreadList([...threadList])
+        setVisibleThreadList([...threadList])
 
     },[threadList])
 
@@ -92,14 +92,15 @@ export default function Tweet(props: TweetProps) {
         return date;
     }
 
-    var toplayerStyle = `border border-t-slate-100
-            bg-white hover:bg-cyan-50 w-[90%] md:w-[510px]
+    var toplayerStyle = `
+            w-full bg-white hover:bg-cyan-50
             min-h-[100px] pl-[15px] pr-[5px] pt-[5px]
             pb-[40px] overflow-x-auto`;
     if (!props.visible) {
         toplayerStyle += " invisible"
     }
     return (
+        <div className="border w-[90%] md:w-[510px]">
             <div className={toplayerStyle}
             onMouseLeave={()=>setMenuVisible(false)}
             onMouseEnter={()=>setMenuVisible(true)}
@@ -110,7 +111,7 @@ export default function Tweet(props: TweetProps) {
                 // props.router?.push('/tweets/'+props.tweet_id+"/show");
             }}>
             {(menuVisible && props.showMenu)?(
-            <span className="border-x-1 bg-sky-200 mt-[5px] w-[90%] md:w-[510px] rounded-t">
+            <span className="bg-sky-200 mt-[5px] w-[90%] md:w-[510px] rounded-t">
                 <GiBoltBomb onClick={()=>{
                         props.deleteClicked()}}
                         size={35} className="bg-sky-200 rounded my-[5px] text-red-600 p-[5px] mx-[5px] float-right"/>
@@ -125,22 +126,26 @@ export default function Tweet(props: TweetProps) {
 
             <i className="text-gray-300">{formatDate(props.date)}</i><br/>
             <span className="text-gray-600">{formatTweet(props.tweet, props.url)}</span>
+            </div>
             {visibleThreadList.length > 0?(
-             (!expanded)?(
-                <span onClick={()=>setExpanded(true)}>{">>"}</span>
+            <div className="w-full  overflow-auto">
+             {(!expanded)?(
+                 <span className="float-right" onClick={()=>setExpanded(true)}><GiScrollUnfurled className="m-[5px] p-[2px] rounded text-gray-500 bg-gray-200" size={30}/></span>
             ):(
                 <ul>
-                    <li onClick={()=>{setExpanded(false)}}>"v"</li>
+                     <li className="overflow-auto" onClick={()=>{setExpanded(false)}}><GiTiedScroll className="float-right p-[2px] rounded text-gray-500 bg-gray-200 m-[5px]" size={30}/></li>
                     {
                         visibleThreadList.map((v) => {
                             return (
-                                <li>{v.name}</li>
+                                <li className="text-blue-700 px-[15px] mb-[2px]"><GiSewingNeedle className="text-gray-500 inline mx-[5px]"/><i>{v.name}</i></li>
                             );
                         })
                     }
                 </ul>
-            )
-            ):null}
+             )}
+
             </div>
+            ):null}
+        </div>
     );
 }

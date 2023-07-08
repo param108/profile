@@ -8,6 +8,18 @@ function isFlagOn(tweet: string, flag: string): Boolean {
     return tweet.includes(flag);
 }
 
+const threadRegexp=/#thread:([a-z0-9-]{36}):([0-9]{1,})/g;
+
+function hasAThread(tweet: string):boolean {
+    let newTweet = tweet.split('\n');
+    let firstline = newTweet[0]
+
+    if (firstline.match(threadRegexp)) {
+        return true;
+    }
+    return false;
+}
+
 // searches for hyperlinks in second lines and converts them
 // for display as links
 export function tagsToHyperlinks(tweet: string, baseURL: string, commandLineExists: boolean): string {
@@ -75,6 +87,10 @@ export function formatTweet(tweet: string, baseURL: string):ReactElement {
         kamalFont = true;
     }
 
+    if (hasAThread(tweet)) {
+        commandLineExists = true;
+    }
+
     tweet = tagsToHyperlinks(tweet, baseURL, commandLineExists)
     // If the command Line Exists we need to remove it after processing.
     if (commandLineExists) {
@@ -103,8 +119,8 @@ export type ThreadInfo = {
     name: string
 }
 
+
 export function hasThread(tweet: string): ThreadInfo[] {
-    var threadRegexp=/#thread:([a-z0-9-]{36}):([0-9]{1,})/g;
 
     const firstLine=tweet.split("\n")[0];
     var data: ThreadInfo[] = []

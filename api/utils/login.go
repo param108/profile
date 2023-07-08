@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -21,7 +22,7 @@ func parseToken(jwtStr string) (*Claims, error) {
 	claims := &Claims{}
 
 	t, err := jwt.ParseWithClaims(
-		jwtStr,
+		strings.TrimSpace(jwtStr),
 		claims,
 		func(token *jwt.Token) (interface{}, error) {
 			// Signing Key will come from env
@@ -35,6 +36,11 @@ func parseToken(jwtStr string) (*Claims, error) {
 
 	if errors.Is(err, jwt.ErrTokenExpired) {
 		return nil, errors.New("unauthorized")
+	}
+
+	if err != nil {
+		fmt.Println("Error:", err.Error())
+		return nil, err
 	}
 
 	validErr := t.Claims.Valid()

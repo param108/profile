@@ -204,13 +204,13 @@ Unknown Tweet`}
                 showMenu={false}
                 onClick={()=>{}}
                 url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
+                token={APIToken}
                 />
                 <div className="w-[90%] md:w-[510px] mt-[10px]">
                 <div className="inline-block float-right pr-[10px]">
                     <RingLoader className="inline-block" color="#EC4899"
                         loading={delTweetLoading} size={30}/>
                 </div>
-
                 <button onClick={delTweetClicked} className="rounded p-[5px] bg-red-800 text-white float-left">Delete</button>
                 </div>
             </div>
@@ -480,12 +480,13 @@ Used to be called **micro-blogging** until twitter
                         date={k.created_at}
                         showMenu={loggedIn}
                         onClick={()=>{
-                            setThreadVisible(!threadVisible);
-                            setThreadData(welcomeTweets);
+                            //setThreadVisible(!threadVisible);
+                            //setThreadData(welcomeTweets);
                         }}
                         editClicked={()=>{onEditTweetClicked(k)()}}
                         deleteClicked={()=>{onDeleteTweetClicked(k)()}}
                         url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
+                        token={APIToken}
                         ></Tweet>
                     )
                 }) : (
