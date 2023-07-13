@@ -117,7 +117,7 @@ export default function Header() {
                 In time, I hope you will be able to sell your organized tweets to your readers. I am not a fan of ad-revenue and want this
                 place to be where you find your tribe of real people who you will inspire and gather inspiration from.</p><br/>
                 <p>You can follow me on twitter <a className="text-indigo-600" href="https://twitter.com/param108">{"@param108"}</a><br/>
-                My microblog on tribist is <a className="text-indigo-600" href="https://ui.tribist.com/param108">{"@param108"}</a></p><br/>
+                My microblog on tribist is <a className="text-indigo-600" href="https://ui.tribist.com/user/param108/tweets">{"@param108"}</a></p><br/>
                 <p>This <b>microblog</b> is work in progress and is <b>Open Source.</b> If you would like to contribute,
                 send me a pull request or create an issue at <a href="https://github.com/param108/profile">github.com/param108/profile</a>.</p>
             </div>
