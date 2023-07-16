@@ -125,12 +125,13 @@ export default function Header() {
     };
 
     const router = useRouter()
+
     return (
         <div className="fixed bg-black h-[50px] md:p-[5px] mb-[5px] w-full md:items-center">
             <div className="hidden md:block w-full">
             {(loggedInUser && loggedInUser.length > 0)?(
                 <button className="text-pink-600 float-left p-[5px] mr-[50px]"
-                onClick={() =>(router.push(`/user/${loggedInUser}/tweets`))}>{"@"+loggedInUser}</button>): null}
+                onClick={()=>(location.href=`/user/${loggedInUser}/tweets`)}>{"@"+loggedInUser}</button>): null}
                 <button className="text-white float-right p-[5px] mr-[50px]"
                     onClick={menuClick("login")}>{"Login/Signup"}</button>
                 <button className="text-white float-right p-[5px] mr-[50px]"
@@ -153,7 +154,7 @@ export default function Header() {
                     <ul className="">
                             {(loggedInUser && loggedInUser.length > 0)?(
                                 <li className="bg-black hover:bg-slate-500 w-full pl-[5px] py-[5px] block"
-                                    onClick={() =>(router.push(`/user/${loggedInUser}/tweets`))}>{"@"+loggedInUser}</li>): null}
+                                    onClick={() =>(location.href=`/user/${loggedInUser}/tweets`)}>{"@"+loggedInUser}</li>): null}
                             <li className="bg-black hover:bg-slate-500 w-full pl-[5px] py-[5px] block"
                                 onClick={menuClick("login")}>{"Login/Signup"}</li>
                             <li className="bg-black hover:bg-slate-500 w-full pl-[5px] py-[5px] block"

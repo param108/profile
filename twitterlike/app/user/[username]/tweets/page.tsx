@@ -394,7 +394,7 @@ Used to be called **micro-blogging** until twitter
                     url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                                    ></EditPair>):(
                 <div className="mt-[60px] mb-[10px]">
-                    <span className="text-pink-600">{username}</span>
+                    <span className="text-pink-600 cursor-pointer" onClick={()=>(location.href=`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets`)}>{username}</span>
                 </div>
             )}
             { showError?(
