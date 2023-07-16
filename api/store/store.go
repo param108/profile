@@ -58,7 +58,7 @@ type Store interface {
 	// SearchTweetsByTags return all tweets for user
 	// by tag. Return in Chronologically descending order.
 	// writer is optional. Empty value is all writers.
-	SearchTweetsByTags(userID string, tags []string, limit int, writer string) ([]*models.Tweet, error)
+	SearchTweetsByTags(userID string, tags []string, offset, limit int, writer string) ([]*models.Tweet, error)
 
 	// OneTime APIs
 	SetOneTime(val, writer string) (*models.Onetime, error)

@@ -71,7 +71,7 @@ func CreateGetTweetsHandler(db store.Store) http.HandlerFunc {
 			}
 			tweets = t
 		} else {
-			t, err := db.SearchTweetsByTags(user.ID, tags,
+			t, err := db.SearchTweetsByTags(user.ID, tags, offset,
 				MAX_TWEETS_PER_QUERY, os.Getenv("WRITER"))
 			if err != nil {
 				utils.WriteError(rw, http.StatusInternalServerError, err.Error())

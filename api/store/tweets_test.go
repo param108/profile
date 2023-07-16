@@ -291,7 +291,7 @@ The first tweet is #tweet_%d
 		}
 		tweets, err := testDB.SearchTweetsByTags(
 			userID,
-			[]string{"tweet_1", "tweet_3", "tweet_5", "tweet_7"}, 20, tweetWriter)
+			[]string{"tweet_1", "tweet_3", "tweet_5", "tweet_7"}, 0, 20, tweetWriter)
 		assert.Nil(t, err, "failed to get tweets")
 		assert.Equal(t, 4, len(tweets))
 
@@ -308,9 +308,22 @@ The first tweet is #tweet_%d
 
 		tweets, err = testDB.SearchTweetsByTags(
 			userID,
-			[]string{"tweet_199"}, 20, tweetWriter)
+			[]string{"tweet_199"}, 0, 20, tweetWriter)
 		assert.Nil(t, err, "failed to get tweets")
 		assert.Equal(t, 0, len(tweets))
+
+		tweets, err = testDB.SearchTweetsByTags(
+			userID,
+			[]string{"hello"}, 5, 15, tweetWriter)
+		assert.Nil(t, err, "failed to get tweets")
+		assert.Equal(t, 15, len(tweets))
+
+		for _, tweet := range tweets {
+			fmt.Println(tweet.Tweet)
+		}
+
+		assert.Contains(t, tweets[0].Tweet, "tweet_14", "wrong tweets returned")
+		assert.Contains(t, tweets[14].Tweet, "tweet_0", "wrong tweets returned")
 
 	})
 	tweetTeardown(tweetWriter)
