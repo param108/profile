@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { MouseEventHandler, ReactElement, useEffect, useReducer, useState } from "react";
 import { FiCloudRain, FiZap } from "react-icons/fi";
 import ReactModal from "react-modal";
+import RingLoader from "react-spinners/RingLoader"
 
 const largeModalStyle = {
     content: {
@@ -30,7 +31,11 @@ const smallModalStyle = {
     }
 };
 
-export default function Header() {
+type HeaderProps = {
+    showSpinner: boolean
+}
+
+export default function Header(props:HeaderProps) {
     var [showVMenu, setShowVMenu] = useState(false)
 
     const path = usePathname();
@@ -124,14 +129,14 @@ export default function Header() {
         )
     };
 
-    const router = useRouter()
-
     return (
         <div className="fixed bg-black h-[50px] md:p-[5px] mb-[5px] w-full md:items-center">
             <div className="hidden md:block w-full">
             {(loggedInUser && loggedInUser.length > 0)?(
-                <button className="text-pink-600 float-left p-[5px] mr-[50px]"
+                <button className="text-pink-600 float-left p-[5px] mr-[5px]"
                 onClick={()=>(location.href=`/user/${loggedInUser}/tweets`)}>{"@"+loggedInUser}</button>): null}
+                <RingLoader className="inline-block float-left" color="#EC4899"
+                        loading={props.showSpinner} size={30}/>
                 <button className="text-white float-right p-[5px] mr-[50px]"
                     onClick={menuClick("login")}>{"Login/Signup"}</button>
                 <button className="text-white float-right p-[5px] mr-[50px]"
@@ -143,8 +148,10 @@ export default function Header() {
             </div>
             <div className="flex flex-col overflow-y-visible md:hidden ">
             <div className="h-[50px] flex items-center">
-                <div className="mx-[15px] text-white">
+                <div className="mx-[15px] flex flex-row text-white">
             <FiCloudRain size={30} onClick={()=>{setShowVMenu(!showVMenu)}}/>
+            <RingLoader className="ml-[5px]" color="#EC4899"
+                        loading={props.showSpinner} size={30}/>
                 </div>
             </div>
             {((show: Boolean)=> {

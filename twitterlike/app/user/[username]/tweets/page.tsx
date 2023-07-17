@@ -83,6 +83,7 @@ export default function ShowTweet() {
     var [ delTweetErrorMessage, setDelTweetErrorMessage ] = useState("")
     var [ delTweetShowError, setDelTweetShowError ] = useState(false)
     var [ queryTags, setQueryTags ] :[ string[], Function ] = useState([])
+    var [ pageLoading, setPageLoading ] = useState(false)
     console.log("rerendering user-tweet-page");
     // Which modal is open
     var [openModal, setOpenModal] = useState("")
@@ -231,15 +232,18 @@ Unknown Tweet`}
 
         setQueryTags(tags)
 
+        setPageLoading(true);
         getTweetsForUser([params.username], tags, 0).
             then((res:AxiosResponse)=>{
                 console.log(res.data.data)
                 setTweets(mergeTweets(tweets, res.data.data))
                 setUsername(params.username)
+                setPageLoading(false)
             }).
             catch(()=>{
                 setErrorMessage("Failed to get tweets.")
                 setShowError(true)
+                setPageLoading(false)
             });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params.username])
@@ -250,14 +254,17 @@ Unknown Tweet`}
             // End of the document reached?
             if (window.innerHeight + document.documentElement.scrollTop
                 >= document.documentElement.offsetHeight){
+                setPageLoading(true)
                 getTweetsForUser([params.username], queryTags, tweets.length).
                     then((res:AxiosResponse)=>{
                         setTweets(mergeTweets(tweets, res.data.data))
                         setUsername(params.username)
+                        setPageLoading(false)
                     }).
                     catch(()=>{
                         setErrorMessage("Failed to get tweets.")
                         setShowError(true)
+                        setPageLoading(false)
                     });
             }
         }
@@ -271,17 +278,20 @@ Unknown Tweet`}
         if (APIToken.length == 0) {
             return
         }
+        setPageLoading(true);
         getProfile(APIToken).
             then((res: AxiosResponse)=>{
                 setLoggedIn(res.data.data.username === params.username)
                 localStorage.setItem('username', res.data.data.username)
                 localStorage.setItem('user_id', res.data.data.user_id)
+                setPageLoading(false)
             }).
             catch(()=>{
                 // clear out the api_token
                 localStorage.removeItem('api_token')
                 setErrorMessage("Login Failure. Please login again.")
                 setShowError(true)
+                setPageLoading(false)
             });
                 }, [APIToken, params.username])
 
@@ -372,7 +382,7 @@ Unknown Tweet`}
 
     return (
         <main className="flex bg-white min-h-screen w-full flex-col items-center justify-stretch">
-            <Header></Header>
+            <Header showSpinner={pageLoading}></Header>
             {loggedIn?(
                 <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
                     onSendClicked={onSendClicked} value={editorValue} viewing={showEditorTweet}
