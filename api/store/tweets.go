@@ -104,8 +104,8 @@ func (s *StoreImpl) GetTags(userID, writer string) ([]*models.Tag, error) {
 // by tag. Return in Chronologically descending order.
 // writer is optional. Empty value is all writers.
 func (s *StoreImpl) SearchTweetsByTags(userID string,
-	tags []string, offset, limit int, writer string) ([]*models.Tweet, error) {
-	return s.db.SearchTweetsByTags(userID, tags, offset, limit, writer)
+	tags []string, offset, limit int, reverse bool, writer string) ([]*models.Tweet, error) {
+	return s.db.SearchTweetsByTags(userID, tags, offset, limit, reverse, writer)
 }
 
 // GetTweetTags return all tags for a user
@@ -117,8 +117,8 @@ func (s *StoreImpl) GetTweetTags(userID, tweetID, writer string) ([]*models.Tag,
 	return s.db.GetTweetTags(userID, tweetID, writer)
 }
 
-func (s *StoreImpl) GetTweets(userID string, offset, limit int, writer string) ([]*models.Tweet, error) {
-	return s.db.GetTweets(userID, offset, limit, writer)
+func (s *StoreImpl) GetTweets(userID string, offset, limit int, reverse bool, writer string) ([]*models.Tweet, error) {
+	return s.db.GetTweets(userID, offset, limit, reverse, writer)
 }
 
 func (s *StoreImpl) GetTweet(userID string, tweetID string, writer string) (*models.Tweet, error) {

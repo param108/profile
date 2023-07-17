@@ -40,7 +40,7 @@ type Store interface {
 		writer string) (*models.Tweet, []*models.Tag, error)
 
 	// GetTweets get tweets between a offset and limit
-	GetTweets(userID string, offset, limit int, writer string) ([]*models.Tweet, error)
+	GetTweets(userID string, offset, limit int, reverse bool, writer string) ([]*models.Tweet, error)
 
 	// GetTweets get tweets between a offset and limit
 	GetTweet(userID string, tweetID string, writer string) (*models.Tweet, error)
@@ -58,7 +58,7 @@ type Store interface {
 	// SearchTweetsByTags return all tweets for user
 	// by tag. Return in Chronologically descending order.
 	// writer is optional. Empty value is all writers.
-	SearchTweetsByTags(userID string, tags []string, offset, limit int, writer string) ([]*models.Tweet, error)
+	SearchTweetsByTags(userID string, tags []string, offset, limit int, reverse bool, writer string) ([]*models.Tweet, error)
 
 	// OneTime APIs
 	SetOneTime(val, writer string) (*models.Onetime, error)

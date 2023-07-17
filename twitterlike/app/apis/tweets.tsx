@@ -23,12 +23,13 @@ export type Tweets = {
     success: boolean
 }
 
-export const getTweetsForUser = async (users:string[], tags:string[], offset:number) => {
+export const getTweetsForUser = async (users:string[], tags:string[], offset:number, reverse:boolean) => {
     const config = {
         params: {
             users: users.join(","),
             tags: tags.join(","),
             offset,
+            reverse
         },
         retry: 3
     };

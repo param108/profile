@@ -307,11 +307,18 @@ func (db *PostgresDB) GetRawTweet(userID, tweetID, writer string) (*models.Tweet
 
 func (db *PostgresDB) GetTweets(userID string,
 	offset, limit int,
-	writer string) ([]*models.Tweet, error) {
+	reverse bool,
+	writer string,
+) ([]*models.Tweet, error) {
 	tweets := []*models.Tweet{}
+	order := "desc"
+	if reverse {
+		order = "asc"
+	}
+
 	if err := db.db.Where(
 		"user_id = ? AND writer = ? AND deleted = false",
-		userID, writer).Order("created_at desc").Offset(offset).Limit(limit).Find(&tweets).Error; err != nil {
+		userID, writer).Order("created_at " + order).Offset(offset).Limit(limit).Find(&tweets).Error; err != nil {
 		return nil, err
 	}
 
@@ -329,7 +336,7 @@ func (db *PostgresDB) DeleteTweet(userID, tweetID, writer string) (*models.Tweet
 }
 
 func (db *PostgresDB) SearchTweetsByTags(userID string,
-	tags []string, offset, limit int, writer string) ([]*models.Tweet, error) {
+	tags []string, offset, limit int, reverse bool, writer string) ([]*models.Tweet, error) {
 
 	query := ""
 	// arguments to the query are
@@ -349,11 +356,16 @@ func (db *PostgresDB) SearchTweetsByTags(userID string,
 
 	query = "tweets.user_id = ? AND tweets.writer = ? AND tweets.deleted = FALSE " + query
 
+	order := "desc"
+	if reverse {
+		order = "asc"
+	}
+
 	tweets := []*models.Tweet{}
 
 	if err := db.db.Joins(
 		"Join tweet_tags on tweet_tags.tweet_id = tweets.id").Where(
-		query, args...).Order("tweets.created_at DESC").Offset(offset).Limit(limit).Find(&tweets).Error; err != nil {
+		query, args...).Order("tweets.created_at " + order).Offset(offset).Limit(limit).Find(&tweets).Error; err != nil {
 		return nil, err
 	}
 

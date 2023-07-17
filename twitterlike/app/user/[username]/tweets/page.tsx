@@ -84,6 +84,8 @@ export default function ShowTweet() {
     var [ delTweetShowError, setDelTweetShowError ] = useState(false)
     var [ queryTags, setQueryTags ] :[ string[], Function ] = useState([])
     var [ pageLoading, setPageLoading ] = useState(false)
+    var [ reverseFlag, setReverseFlag ] = useState(false)
+
     console.log("rerendering user-tweet-page");
     // Which modal is open
     var [openModal, setOpenModal] = useState("")
@@ -223,6 +225,7 @@ Unknown Tweet`}
     // Once in the beginning
     useEffect(()=>{
         const tagStr = searchParams.get("tags")?.trim()
+        const reverseStr = searchParams.get("reverse")?.trim()
         let tags:string[] = []
 
         if (tagStr && tagStr.length > 0) {
@@ -230,10 +233,16 @@ Unknown Tweet`}
             newTags.forEach((x)=>tags.push(x.trim()))
         }
 
+        let reverse = false;
+        if (reverseStr && reverseStr === "1") {
+            reverse = true;
+        }
+        setReverseFlag(reverse)
+
         setQueryTags(tags)
 
         setPageLoading(true);
-        getTweetsForUser([params.username], tags, 0).
+        getTweetsForUser([params.username], tags, 0, reverse).
             then((res:AxiosResponse)=>{
                 console.log(res.data.data)
                 setTweets(mergeTweets(tweets, res.data.data))
@@ -255,7 +264,7 @@ Unknown Tweet`}
             if (window.innerHeight + document.documentElement.scrollTop
                 >= document.documentElement.offsetHeight){
                 setPageLoading(true)
-                getTweetsForUser([params.username], queryTags, tweets.length).
+                getTweetsForUser([params.username], queryTags, tweets.length, reverseFlag).
                     then((res:AxiosResponse)=>{
                         setTweets(mergeTweets(tweets, res.data.data))
                         setUsername(params.username)
@@ -272,7 +281,7 @@ Unknown Tweet`}
         window.removeEventListener('scroll', infiniteScroll);
         window.addEventListener('scroll', infiniteScroll, { passive: true });
         return () => window.removeEventListener('scroll', infiniteScroll);
-    }, [params.username, tweets, queryTags])
+    }, [params.username, tweets, queryTags, reverseFlag])
 
     useEffect(()=>{
         if (APIToken.length == 0) {
@@ -307,7 +316,7 @@ Unknown Tweet`}
                     setEditorValue("")
                     setShowEditorTweet(false)
                     setEditorLoading(false)
-                    getTweetsForUser([params.username], [], 0).
+                    getTweetsForUser([params.username], [], 0, reverseFlag).
                         then((res:AxiosResponse)=>{
                             setTweets(mergeTweets(tweets, res.data.data))
                             setUsername(params.username)
