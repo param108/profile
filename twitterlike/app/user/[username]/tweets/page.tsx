@@ -217,7 +217,7 @@ Unknown Tweet`}
                 return -1;
             }
 
-            if (dy < dx) {
+            if (dx < dy) {
                 if (reverse) {
                     // reversed case
                     // x is later means x should be before in the list
