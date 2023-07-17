@@ -7,7 +7,7 @@ export default function ShowTweet() {
     const params = useParams();
     return (
         <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
-        <Header></Header>
+        <Header showSpinner={false}></Header>
         <div className=" mt-[60px] bg-white">
             <p>
                 {params['id']}

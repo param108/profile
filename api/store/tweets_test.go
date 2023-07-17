@@ -240,18 +240,26 @@ The first is a short
 	})
 
 	t.Run("get tweets", func(t *testing.T) {
-		tweets, err := testDB.GetTweets(userID, 0, 10, tweetWriter)
+		tweets, err := testDB.GetTweets(userID, 0, 10, false, tweetWriter)
 		assert.Nil(t, err, "failed to get tweets")
 		assert.Equal(t, 3, len(tweets))
 	})
 
 	t.Run("get tweets after the latest one", func(t *testing.T) {
-		tweets, err := testDB.GetTweets(userID, 1, 10, tweetWriter)
+		tweets, err := testDB.GetTweets(userID, 1, 10, false, tweetWriter)
 		fmt.Println(tweets)
 		assert.Nil(t, err, "failed to get tweets")
 		assert.Equal(t, 2, len(tweets))
 		// Make sure its the earliest one
 		assert.Equal(t, oldTweetID, tweets[0].ID)
+
+		tweets, err = testDB.GetTweets(userID, 0, 10, true, tweetWriter)
+		fmt.Println(tweets)
+		assert.Nil(t, err, "failed to get tweets")
+		assert.Equal(t, 3, len(tweets))
+		// Make sure its the earliest one
+		assert.Equal(t, noTagTweetID, tweets[0].ID)
+
 	})
 
 	t.Run("delete the first tweet", func(t *testing.T) {
@@ -261,7 +269,7 @@ The first is a short
 	})
 
 	t.Run("get tweets. Only two should be returned", func(t *testing.T) {
-		tweets, err := testDB.GetTweets(userID, 0, 10, tweetWriter)
+		tweets, err := testDB.GetTweets(userID, 0, 10, false, tweetWriter)
 		assert.Nil(t, err, "failed to get tweets")
 		assert.Equal(t, 2, len(tweets))
 		// Make sure its the second one
@@ -276,9 +284,14 @@ The first is a short
 The first #tweet is a short
 #Hello #World.`, "", tweetWriter)
 			}
-			tweets, err := testDB.GetTweets(userID, 0, 10, tweetWriter)
+			tweets, err := testDB.GetTweets(userID, 0, 10, false, tweetWriter)
 			assert.Nil(t, err, "failed to get tweets")
 			assert.Equal(t, 10, len(tweets))
+
+			tweets, err = testDB.GetTweets(userID, 0, 10, true, tweetWriter)
+			assert.Nil(t, err, "failed to get tweets")
+			assert.Equal(t, 10, len(tweets))
+
 		})
 
 	tweetTeardown(tweetWriter)
@@ -291,7 +304,7 @@ The first tweet is #tweet_%d
 		}
 		tweets, err := testDB.SearchTweetsByTags(
 			userID,
-			[]string{"tweet_1", "tweet_3", "tweet_5", "tweet_7"}, 20, tweetWriter)
+			[]string{"tweet_1", "tweet_3", "tweet_5", "tweet_7"}, 0, 20, false, tweetWriter)
 		assert.Nil(t, err, "failed to get tweets")
 		assert.Equal(t, 4, len(tweets))
 
@@ -308,9 +321,27 @@ The first tweet is #tweet_%d
 
 		tweets, err = testDB.SearchTweetsByTags(
 			userID,
-			[]string{"tweet_199"}, 20, tweetWriter)
+			[]string{"tweet_199"}, 0, 20, false, tweetWriter)
 		assert.Nil(t, err, "failed to get tweets")
 		assert.Equal(t, 0, len(tweets))
+
+		tweets, err = testDB.SearchTweetsByTags(
+			userID,
+			[]string{"hello"}, 5, 15, false, tweetWriter)
+		assert.Nil(t, err, "failed to get tweets")
+		assert.Equal(t, 15, len(tweets))
+
+		assert.Contains(t, tweets[0].Tweet, "tweet_14", "wrong tweets returned")
+		assert.Contains(t, tweets[14].Tweet, "tweet_0", "wrong tweets returned")
+
+		tweets, err = testDB.SearchTweetsByTags(
+			userID,
+			[]string{"hello"}, 5, 15, true, tweetWriter)
+		assert.Nil(t, err, "failed to get tweets")
+		assert.Equal(t, 15, len(tweets))
+
+		assert.Contains(t, tweets[0].Tweet, "tweet_5", "wrong tweets returned")
+		assert.Contains(t, tweets[14].Tweet, "tweet_19", "wrong tweets returned")
 
 	})
 	tweetTeardown(tweetWriter)
@@ -367,21 +398,21 @@ func TestDeleteGuestData(t *testing.T) {
 The first #tweet is a short
 #Hello #World%d.`, i), "", guestWriter)
 			}
-			tweets, err := testDB.GetTweets(models.GuestUserID, 0, 40, guestWriter)
+			tweets, err := testDB.GetTweets(models.GuestUserID, 0, 40, false, guestWriter)
 			assert.Nil(t, err, "failed to get tweets")
 			assert.Equal(t, 20, len(tweets))
 
 			err = testDB.DeleteGuestData(models.GuestUserID, 20, guestWriter)
 			assert.Nil(t, err, "couldnt delete")
 
-			tweets, err = testDB.GetTweets(models.GuestUserID, 0, 40, guestWriter)
+			tweets, err = testDB.GetTweets(models.GuestUserID, 0, 40, false, guestWriter)
 			assert.Nil(t, err, "failed to get tweets")
 			assert.Equal(t, 20, len(tweets))
 
 			err = testDB.DeleteGuestData(models.GuestUserID, 10, guestWriter)
 			assert.Nil(t, err, "couldnt delete")
 
-			tweets, err = testDB.GetTweets(models.GuestUserID, 0, 40, guestWriter)
+			tweets, err = testDB.GetTweets(models.GuestUserID, 0, 40, false, guestWriter)
 			assert.Nil(t, err, "failed to get tweets")
 			assert.Equal(t, 10, len(tweets))
 

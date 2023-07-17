@@ -142,6 +142,9 @@ export default function ShowTweet() {
     // thread control
     var [ threadVisible, setThreadVisible ] = useState(false)
     var [ threadData, setThreadData ] = useState([])
+    var [ pageLoading, setPageLoading ] = useState(false)
+    var [ reverseFlag, setReverseFlag ] = useState(false)
+
     console.log("rerendering user-tweet-page");
     // Which modal is open
     var [openModal, setOpenModal] = useState("")
@@ -242,7 +245,7 @@ Unknown Tweet`}
     }, [])
 
     // merge the retrieved tweets with the existing.
-    function mergeTweets(oldTweets: TweetType[],newTweets: TweetType[]): TweetType[] {
+    function mergeTweets(oldTweets: TweetType[],newTweets: TweetType[], reverse: boolean): TweetType[] {
         let found :{[k: string]: boolean} ={}
         let final: TweetType[]= [];
 
@@ -266,11 +269,22 @@ Unknown Tweet`}
             let dy = new Date(y.created_at);
 
             if (dx > dy) {
+
+                if (reverse) {
+                    // reversed case
+                    // x is later means x should be later in the list
+                    return 1;
+                }
                 // x is later means x should be before in the list
                 return -1;
             }
 
-            if (dy < dx) {
+            if (dx < dy) {
+                if (reverse) {
+                    // reversed case
+                    // x is later means x should be before in the list
+                    return -1;
+                }
                 // y is later so y should be before in the list
                 return 1;
             }
@@ -284,6 +298,7 @@ Unknown Tweet`}
     // Once in the beginning
     useEffect(()=>{
         const tagStr = searchParams.get("tags")?.trim()
+        const reverseStr = searchParams.get("reverse")?.trim()
         let tags:string[] = []
 
         if (tagStr && tagStr.length > 0) {
@@ -291,17 +306,26 @@ Unknown Tweet`}
             newTags.forEach((x)=>tags.push(x.trim()))
         }
 
+        let reverse = false;
+        if (reverseStr && reverseStr === "1") {
+            reverse = true;
+        }
+        setReverseFlag(reverse)
+
         setQueryTags(tags)
 
-        getTweetsForUser([params.username], tags, 0).
+        setPageLoading(true);
+        getTweetsForUser([params.username], tags, 0, reverse).
             then((res:AxiosResponse)=>{
                 console.log(res.data.data)
-                setTweets(mergeTweets(tweets, res.data.data))
+                setTweets(mergeTweets(tweets, res.data.data, reverse))
                 setUsername(params.username)
+                setPageLoading(false)
             }).
             catch(()=>{
                 setErrorMessage("Failed to get tweets.")
                 setShowError(true)
+                setPageLoading(false)
             });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params.username])
@@ -312,14 +336,17 @@ Unknown Tweet`}
             // End of the document reached?
             if (window.innerHeight + document.documentElement.scrollTop
                 >= document.documentElement.offsetHeight){
-                getTweetsForUser([params.username], queryTags, tweets.length).
+                setPageLoading(true)
+                getTweetsForUser([params.username], queryTags, tweets.length, reverseFlag).
                     then((res:AxiosResponse)=>{
-                        setTweets(mergeTweets(tweets, res.data.data))
+                        setTweets(mergeTweets(tweets, res.data.data, reverseFlag))
                         setUsername(params.username)
+                        setPageLoading(false)
                     }).
                     catch(()=>{
                         setErrorMessage("Failed to get tweets.")
                         setShowError(true)
+                        setPageLoading(false)
                     });
             }
         }
@@ -327,23 +354,26 @@ Unknown Tweet`}
         window.removeEventListener('scroll', infiniteScroll);
         window.addEventListener('scroll', infiniteScroll, { passive: true });
         return () => window.removeEventListener('scroll', infiniteScroll);
-    }, [params.username, tweets, queryTags])
+    }, [params.username, tweets, queryTags, reverseFlag])
 
     useEffect(()=>{
         if (APIToken.length == 0) {
             return
         }
+        setPageLoading(true);
         getProfile(APIToken).
             then((res: AxiosResponse)=>{
                 setLoggedIn(res.data.data.username === params.username)
                 localStorage.setItem('username', res.data.data.username)
                 localStorage.setItem('user_id', res.data.data.user_id)
+                setPageLoading(false)
             }).
             catch(()=>{
                 // clear out the api_token
                 localStorage.removeItem('api_token')
                 setErrorMessage("Login Failure. Please login again.")
                 setShowError(true)
+                setPageLoading(false)
             });
                 }, [APIToken, params.username])
 
@@ -359,9 +389,9 @@ Unknown Tweet`}
                     setEditorValue("")
                     setShowEditorTweet(false)
                     setEditorLoading(false)
-                    getTweetsForUser([params.username], [], 0).
+                    getTweetsForUser([params.username], [], 0, reverseFlag).
                         then((res:AxiosResponse)=>{
-                            setTweets(mergeTweets(tweets, res.data.data))
+                            setTweets(mergeTweets(tweets, res.data.data, reverseFlag))
                             setUsername(params.username)
                         }).
                         catch(()=>{
@@ -401,7 +431,7 @@ Unknown Tweet`}
         then((res)=>{
             setEditTweetLoading(false)
             console.log(res.data)
-            setTweets(mergeTweets(tweets,[res.data.data]))
+            setTweets(mergeTweets(tweets,[res.data.data], reverseFlag))
             setOpenModal("closed")
         }).catch(()=>{
             setEditTweetErrorMessage("Something went wrong")
@@ -434,7 +464,7 @@ Unknown Tweet`}
 
     return (
         <main className="flex bg-white min-h-screen max-h-screen  w-full overflow-y-hidden flex-col items-center justify-stretch">
-            <Header></Header>
+            <Header showSpinner={pageLoading}></Header>
             <div className="flex flex-row max-h-full overflow-y-clip">
             <div className="max-h-full overflow-y-scroll  ">
             {loggedIn?(
@@ -459,7 +489,7 @@ Used to be called **micro-blogging** until twitter
                     url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                                    ></EditPair>):(
                 <div className="mt-[60px] mb-[10px]">
-                    <span className="text-pink-600">{username}</span>
+                    <span className="text-pink-600 cursor-pointer" onClick={()=>(location.href=`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets`)}>{username}</span>
                 </div>
             )}
             { showError?(

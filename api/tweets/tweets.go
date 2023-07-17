@@ -19,6 +19,7 @@ func CreateGetTweetsHandler(db store.Store) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		usersStr := strings.TrimSpace(r.URL.Query().Get("users"))
 		tagsStr := strings.TrimSpace(r.URL.Query().Get("tags"))
+		reverseStr := strings.TrimSpace(r.URL.Query().Get("reverse"))
 
 		if len(usersStr) == 0 {
 			utils.WriteError(rw, http.StatusBadRequest, "need exactly one user")
@@ -62,17 +63,26 @@ func CreateGetTweetsHandler(db store.Store) http.HandlerFunc {
 			offset = o
 		}
 
+		reverse := false
+
+		if len(reverseStr) != 0 {
+			r, err := strconv.ParseBool(reverseStr)
+			if err == nil {
+				reverse = r
+			}
+		}
+
 		var tweets []*models.Tweet
 		if len(tags) == 0 {
-			t, err := db.GetTweets(user.ID, offset, MAX_TWEETS_PER_QUERY, os.Getenv("WRITER"))
+			t, err := db.GetTweets(user.ID, offset, MAX_TWEETS_PER_QUERY, reverse, os.Getenv("WRITER"))
 			if err != nil {
 				utils.WriteError(rw, http.StatusInternalServerError, err.Error())
 				return
 			}
 			tweets = t
 		} else {
-			t, err := db.SearchTweetsByTags(user.ID, tags,
-				MAX_TWEETS_PER_QUERY, os.Getenv("WRITER"))
+			t, err := db.SearchTweetsByTags(user.ID, tags, offset,
+				MAX_TWEETS_PER_QUERY, reverse, os.Getenv("WRITER"))
 			if err != nil {
 				utils.WriteError(rw, http.StatusInternalServerError, err.Error())
 				return
