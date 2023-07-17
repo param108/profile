@@ -183,7 +183,7 @@ Unknown Tweet`}
     }, [])
 
     // merge the retrieved tweets with the existing.
-    function mergeTweets(oldTweets: TweetType[],newTweets: TweetType[]): TweetType[] {
+    function mergeTweets(oldTweets: TweetType[],newTweets: TweetType[], reverse: boolean): TweetType[] {
         let found :{[k: string]: boolean} ={}
         let final: TweetType[]= [];
 
@@ -207,11 +207,22 @@ Unknown Tweet`}
             let dy = new Date(y.created_at);
 
             if (dx > dy) {
+
+                if (reverse) {
+                    // reversed case
+                    // x is later means x should be later in the list
+                    return 1;
+                }
                 // x is later means x should be before in the list
                 return -1;
             }
 
             if (dy < dx) {
+                if (reverse) {
+                    // reversed case
+                    // x is later means x should be before in the list
+                    return -1;
+                }
                 // y is later so y should be before in the list
                 return 1;
             }
@@ -245,7 +256,7 @@ Unknown Tweet`}
         getTweetsForUser([params.username], tags, 0, reverse).
             then((res:AxiosResponse)=>{
                 console.log(res.data.data)
-                setTweets(mergeTweets(tweets, res.data.data))
+                setTweets(mergeTweets(tweets, res.data.data, reverse))
                 setUsername(params.username)
                 setPageLoading(false)
             }).
@@ -266,7 +277,7 @@ Unknown Tweet`}
                 setPageLoading(true)
                 getTweetsForUser([params.username], queryTags, tweets.length, reverseFlag).
                     then((res:AxiosResponse)=>{
-                        setTweets(mergeTweets(tweets, res.data.data))
+                        setTweets(mergeTweets(tweets, res.data.data, reverseFlag))
                         setUsername(params.username)
                         setPageLoading(false)
                     }).
@@ -318,7 +329,7 @@ Unknown Tweet`}
                     setEditorLoading(false)
                     getTweetsForUser([params.username], [], 0, reverseFlag).
                         then((res:AxiosResponse)=>{
-                            setTweets(mergeTweets(tweets, res.data.data))
+                            setTweets(mergeTweets(tweets, res.data.data, reverseFlag))
                             setUsername(params.username)
                         }).
                         catch(()=>{
@@ -358,7 +369,7 @@ Unknown Tweet`}
         then((res)=>{
             setEditTweetLoading(false)
             console.log(res.data)
-            setTweets(mergeTweets(tweets,[res.data.data]))
+            setTweets(mergeTweets(tweets,[res.data.data], reverseFlag))
             setOpenModal("closed")
         }).catch(()=>{
             setEditTweetErrorMessage("Something went wrong")
