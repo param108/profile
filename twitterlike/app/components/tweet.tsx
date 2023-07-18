@@ -16,6 +16,7 @@ type TweetProps = {
     url: string
     visible: boolean,
     threadList: (ThreadData|null)[],
+    viewThread: Function|null
 }
 
 export default function Tweet(props: TweetProps) {
@@ -66,7 +67,7 @@ export default function Tweet(props: TweetProps) {
             <i className="text-gray-300">{formatDate(props.date)}</i><br/>
             <span className="text-gray-600">{formatTweet(props.tweet, props.url)}</span>
             </div>
-            {props.threadList.length > 0?(
+            {props.threadList && props.threadList.length > 0?(
             <div className="w-full  overflow-auto">
              {(!expanded)?(
                  <span className="float-right" onClick={()=>setExpanded(true)}><GiScrollUnfurled className="m-[5px] p-[2px] rounded text-gray-500 bg-gray-200" size={30}/></span>
@@ -77,7 +78,12 @@ export default function Tweet(props: TweetProps) {
                         props.threadList.map((v) => {
                             if (v) {
                                 return (
-                                    <li className="text-blue-700 px-[15px] mb-[2px]" key={v.id}><GiSewingNeedle className="text-gray-500 inline mx-[5px]"/><i>{v.name}</i></li>
+                                    <li
+                                    className="text-blue-700 px-[15px] mb-[2px]"
+                                    key={v.id}
+                                    onClick={()=>{ if(props.viewThread){
+                                        props.viewThread(v.id);
+                                    }}}><GiSewingNeedle className="text-gray-500 inline mx-[5px]"/><i>{v.name}</i></li>
                                 );
                             }
                         })

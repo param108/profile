@@ -9,7 +9,7 @@ import { hasThread, mergeTweets, ThreadInfo } from "@/app/strings";
 import { AxiosResponse } from "axios";
 import { useParams, useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
-import { FiZap } from "react-icons/fi";
+import { FiEdit3, FiExternalLink, FiZap } from "react-icons/fi";
 import ReactModal from "react-modal";
 import { RingLoader } from "react-spinners";
 import _ from "underscore";
@@ -144,7 +144,7 @@ export default function ShowTweet() {
     var [ queryTags, setQueryTags ] :[ string[], Function ] = useState([])
     // thread control
     var [ threadVisible, setThreadVisible ] = useState(false)
-    var [ threadData, setThreadData ] = useState([])
+    var [ threadData, setThreadData ] = useState<ThreadData|null>(null)
     var [ pageLoading, setPageLoading ] = useState(false)
     var [ reverseFlag, setReverseFlag ] = useState(false)
 
@@ -296,7 +296,7 @@ Unknown Tweet`}
 
                 if (!(t.id in threadCatalog)) {
                     // launch a request for a thread
-                    getThread(APIToken, t.id).then(
+                    getThread(username, t.id).then(
                         (res)=>{
                             let key = res.data.data.id;
                             let data = {...threadCatalog};
@@ -508,6 +508,10 @@ Used to be called **micro-blogging** until twitter
                         editClicked={()=>{onEditTweetClicked(k)()}}
                         deleteClicked={()=>{onDeleteTweetClicked(k)()}}
                         threadList={threads}
+                        viewThread={(threadID:string)=>{
+                            setThreadData(threadCatalog[threadID])
+                            setThreadVisible(true)
+                        }}
                         url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                         ></Tweet>
                     )
@@ -525,10 +529,24 @@ Nothing here **yet**!`} key={1} date="Start of time"
                 )
             }
             </div>
-            {(threadVisible && threadData.length > 0)?(
-            <div className="max-h-full float-right overflow-y-scroll">
-            { tweets.length > 0 ?
-                tweets.map((k: TweetType ,idx : number)=>{
+            {(threadVisible && threadData)?(
+            <div className="mt-[60px] max-h-full float-right overflow-y-scroll">
+            <div className="w-[90%] md:w-[510px]">
+                <span className="text-xl">{">> "}<b>{threadData.name}</b></span>
+                <FiZap
+                onClick={()=>{setThreadVisible(false)}}
+                className="ml-[10px] text-pink-600 float-right" size={20}/>
+                <FiExternalLink
+                onClick={()=>{setThreadVisible(false)}}
+                className="ml-[10px] text-pink-600 float-right" size={20}/>
+                {loggedIn?(
+                    <FiEdit3
+                    onClick={()=>{setThreadVisible(false)}}
+                    className="ml-[10px] text-pink-600 float-right" size={20}/>
+                ):null}
+            </div>
+            { threadData.tweets.length > 0 ?
+                threadData.tweets.map((k: TweetType ,idx : number)=>{
                     return (
                         <Tweet
                         visible={true}

@@ -142,8 +142,8 @@ func (s *Server) RegisterHandlers() {
 		tweets.CreateDeleteTweetHandler(s.DB)).ServeHTTP).
 		Methods(http.MethodPost)
 
-	s.r.HandleFunc("/threads/{thread_id}", utils.AuthM(
-		threads.CreateGetThreadHandler(s.DB)).ServeHTTP).
+	s.r.HandleFunc("/user/{username}/threads/{thread_id}",
+		(threads.CreateGetThreadHandler(s.DB)).ServeHTTP).
 		Methods(http.MethodGet)
 
 	s.r.HandleFunc("/threads", utils.AuthM(

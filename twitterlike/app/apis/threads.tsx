@@ -26,16 +26,14 @@ export type ThreadDataResponse = {
     success: boolean
 }
 
-export const getThread = async (token: string, thread_id: string) => {
+export const getThread = async (username: string, thread_id: string) => {
     const config = {
-        headers:{
-            "TRIBIST_JWT": token,
-        },
+        headers:{},
         retry: 3
     }
 
     const res = await axios.get<ThreadDataResponse>(
-        `${process.env.NEXT_PUBLIC_BE_URL}/threads/${thread_id}`,
+        `${process.env.NEXT_PUBLIC_BE_URL}/user/${username}/threads/${thread_id}`,
         config
     );
     return res;
