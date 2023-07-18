@@ -1,5 +1,6 @@
 "use client";
 import { ReactElement } from "react";
+import { TweetType } from "./apis/tweets";
 const showdown = require('showdown');
 import './strings.css';
 
@@ -19,6 +20,57 @@ function hasAThread(tweet: string):boolean {
     }
     return false;
 }
+
+// merge the retrieved tweets with the existing.
+export function mergeTweets(oldTweets: TweetType[],newTweets: TweetType[], reverse: boolean): TweetType[] {
+    let found :{[k: string]: boolean} ={}
+    let final: TweetType[]= [];
+
+    // newTweets first as they maybe updated
+    newTweets.forEach((x)=>{
+        found[x.id]=true;
+        final.push(x);
+    });
+
+    // merge
+    oldTweets.forEach((x)=>{
+        if (found[x.id]) {
+            return
+        }
+        final.push(x)
+    })
+
+    // finally sort
+    final.sort((x,y)=>{
+        let dx = new Date(x.created_at);
+        let dy = new Date(y.created_at);
+
+        if (dx > dy) {
+
+            if (reverse) {
+                // reversed case
+                // x is later means x should be later in the list
+                return 1;
+            }
+            // x is later means x should be before in the list
+            return -1;
+        }
+
+        if (dx < dy) {
+            if (reverse) {
+                // reversed case
+                // x is earlier means x should be before in the list
+                return -1;
+            }
+            // y is later so y should be before in the list
+            return 1;
+        }
+
+        return 0
+    })
+    return final;
+}
+
 
 // searches for hyperlinks in second lines and converts them
 // for display as links
@@ -119,9 +171,9 @@ export type ThreadInfo = {
     name: string
 }
 
-
+// hasThread: Returns the threadID and seq for each tweet in a thread
+// returns the tweets in seq order
 export function hasThread(tweet: string): ThreadInfo[] {
-
     const firstLine=tweet.split("\n")[0];
     var data: ThreadInfo[] = []
 
@@ -137,5 +189,10 @@ export function hasThread(tweet: string): ThreadInfo[] {
         data.push(d);
         match = matches.next();
     }
-    return data;
+    return data.sort((x,y)=>{
+            if (x.seq >= y.seq) {
+                return 1;
+            }
+            return -1
+        })
 }

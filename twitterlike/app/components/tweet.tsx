@@ -1,9 +1,9 @@
-import { formatTweet, hasThread, ThreadData, ThreadInfo } from "../strings";
+import { formatTweet, hasThread, ThreadInfo } from "../strings";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { GiBoltBomb, GiChemicalDrop, GiScrollUnfurled, GiSewingNeedle, GiTiedScroll } from "react-icons/gi"
-import { getThread } from "../apis/threads";
+import { getThread, ThreadData } from "../apis/threads";
 import { object } from "underscore";
 type TweetProps = {
     tweet_id: string,
@@ -15,73 +15,12 @@ type TweetProps = {
     showMenu: boolean,
     url: string
     visible: boolean,
-    token: string
+    threadList: (ThreadData|null)[],
 }
 
 export default function Tweet(props: TweetProps) {
     var [ menuVisible, setMenuVisible ] = useState(false)
-    var [ threadList, setThreadList ] = useState<ThreadData[]>([])
-    var [ threadData, setThreadData ] = useState<{[name:string]:ThreadData}>({})
-    var [ visibleThreadList, setVisibleThreadList ] = useState<ThreadData[]>([])
     var [ expanded, setExpanded ] = useState(false);
-
-    useEffect(()=>{
-        setThreadList(hasThread(props.tweet).sort((x,y)=>{
-            if (x.seq >= y.seq) {
-                return 1;
-            }
-            return -1
-        }));
-    },[]);
-
-    useEffect(()=>{
-        if (threadList.length == 0) {
-            return
-        }
-
-        let newThreadData:{[name:string]:ThreadData} = {};
-        threadList.forEach((thread : ThreadInfo)=> {
-
-            if (thread.id in threadData) {
-                return;
-            }
-
-            let key = thread.id;
-            newThreadData[key] = {
-                id: thread.id,
-            }
-
-            getThread(props.token, thread.id).
-                then((res)=>{
-                    let key = res.data.data.id;
-                    let data = {...threadData};
-                    data[key] = res.data.data;
-                    setThreadData(data);
-                })
-        })
-
-        setThreadData({
-            ...threadData,
-            ...newThreadData
-        })
-
-        setVisibleThreadList([...threadList])
-
-    },[threadList])
-
-    useEffect(()=>{
-        let newThreadList: ThreadInfo[] =[];
-        visibleThreadList.forEach((x) => {
-            if ( x.id in threadData ) {
-                if ("name" in threadData[x.id]) {
-                    x.name = threadData[x.id]['name']
-                }
-                newThreadList.push(x)
-            }
-        })
-
-        setVisibleThreadList([...threadList])
-    }, [threadData])
 
     function formatDate(date:string):String {
         if ((new Date(date)).getTime() > 0) {
@@ -127,7 +66,7 @@ export default function Tweet(props: TweetProps) {
             <i className="text-gray-300">{formatDate(props.date)}</i><br/>
             <span className="text-gray-600">{formatTweet(props.tweet, props.url)}</span>
             </div>
-            {visibleThreadList.length > 0?(
+            {props.threadList.length > 0?(
             <div className="w-full  overflow-auto">
              {(!expanded)?(
                  <span className="float-right" onClick={()=>setExpanded(true)}><GiScrollUnfurled className="m-[5px] p-[2px] rounded text-gray-500 bg-gray-200" size={30}/></span>
@@ -135,10 +74,12 @@ export default function Tweet(props: TweetProps) {
                 <ul>
                      <li className="overflow-auto" onClick={()=>{setExpanded(false)}}><GiTiedScroll className="float-right p-[2px] rounded text-gray-500 bg-gray-200 m-[5px]" size={30}/></li>
                     {
-                        visibleThreadList.map((v) => {
-                            return (
-                                <li className="text-blue-700 px-[15px] mb-[2px]"><GiSewingNeedle className="text-gray-500 inline mx-[5px]"/><i>{v.name}</i></li>
-                            );
+                        props.threadList.map((v) => {
+                            if (v) {
+                                return (
+                                    <li className="text-blue-700 px-[15px] mb-[2px]" key={v.id}><GiSewingNeedle className="text-gray-500 inline mx-[5px]"/><i>{v.name}</i></li>
+                                );
+                            }
                         })
                     }
                 </ul>

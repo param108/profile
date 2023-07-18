@@ -5,6 +5,7 @@ import Editor from "@/app/components/editor";
 import EditPair from "@/app/components/edit_tweet_pair";
 import Header from "@/app/components/header";
 import Tweet from "@/app/components/tweet";
+import { hasThread, mergeTweets, ThreadInfo } from "@/app/strings";
 import { AxiosResponse } from "axios";
 import { useParams, useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
@@ -12,6 +13,7 @@ import { FiZap } from "react-icons/fi";
 import ReactModal from "react-modal";
 import { RingLoader } from "react-spinners";
 import _ from "underscore";
+import { getThread, ThreadData } from "@/app/apis/threads";
 
 const largeEditModalStyle = {
     content: {
@@ -128,6 +130,7 @@ export default function ShowTweet() {
     var [ tweets, setTweets ] = useState<TweetType[]>([])
     var [ errorMessage, setErrorMessage ] = useState("");
     var [ showError, setShowError ] = useState(false);
+    var [ threadCatalog, setThreadCatalog ] = useState<{[name:string]:(ThreadData|null)}>({})
     // should we show the tweet for the editor?
     var [ showEditorTweet, setShowEditorTweet ] = useState(false)
     var [ edittableTweet, setEdittableTweet ] = useState("")
@@ -207,7 +210,6 @@ Unknown Tweet`}
                 showMenu={false}
                 onClick={()=>{}}
                 url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
-                token={APIToken}
                 />
                 <div className="w-[90%] md:w-[510px] mt-[10px]">
                 <div className="inline-block float-right pr-[10px]">
@@ -243,56 +245,6 @@ Unknown Tweet`}
         }
         ReactModal.setAppElement('body')
     }, [])
-
-    // merge the retrieved tweets with the existing.
-    function mergeTweets(oldTweets: TweetType[],newTweets: TweetType[], reverse: boolean): TweetType[] {
-        let found :{[k: string]: boolean} ={}
-        let final: TweetType[]= [];
-
-        // newTweets first as they maybe updated
-        newTweets.forEach((x)=>{
-            found[x.id]=true;
-            final.push(x);
-        });
-
-        // merge
-        oldTweets.forEach((x)=>{
-            if (found[x.id]) {
-                return
-            }
-            final.push(x)
-        })
-
-        // finally sort
-        final.sort((x,y)=>{
-            let dx = new Date(x.created_at);
-            let dy = new Date(y.created_at);
-
-            if (dx > dy) {
-
-                if (reverse) {
-                    // reversed case
-                    // x is later means x should be later in the list
-                    return 1;
-                }
-                // x is later means x should be before in the list
-                return -1;
-            }
-
-            if (dx < dy) {
-                if (reverse) {
-                    // reversed case
-                    // x is later means x should be before in the list
-                    return -1;
-                }
-                // y is later so y should be before in the list
-                return 1;
-            }
-
-            return 0
-        })
-        return final;
-    }
 
 
     // Once in the beginning
@@ -330,12 +282,45 @@ Unknown Tweet`}
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params.username])
 
+    useEffect(()=>{
+        var seen:{ [name:string]:boolean } = {}
+        var newThreads: { [name:string]:(ThreadData|null) } = {}
+
+        tweets.forEach((tweet: TweetType)=>{
+            let ts = hasThread(tweet.tweet);
+            ts.forEach((t: ThreadInfo)=>{
+                if (t.id in seen) {
+                    return
+                }
+                seen[t.id] = true;
+
+                if (!(t.id in threadCatalog)) {
+                    // launch a request for a thread
+                    getThread(APIToken, t.id).then(
+                        (res)=>{
+                            let key = res.data.data.id;
+                            let data = {...threadCatalog};
+                            data[key] = res.data.data;
+                            setThreadCatalog(data);
+                        }
+                    )
+                    newThreads[t.id] = null;
+                }
+            })
+        })
+
+        setThreadCatalog({
+            ...threadCatalog,
+            ...newThreads
+        })
+    }, [tweets])
     // Add infinite scroll!
     useEffect(()=> {
         const infiniteScroll = () => {
             // End of the document reached?
+            console.log(window.innerHeight, document.documentElement.scroll, document.documentElement.offsetHeight);
             if (window.innerHeight + document.documentElement.scrollTop
-                >= document.documentElement.offsetHeight){
+                >= (document.documentElement.offsetHeight)) {
                 setPageLoading(true)
                 getTweetsForUser([params.username], queryTags, tweets.length, reverseFlag).
                     then((res:AxiosResponse)=>{
@@ -501,6 +486,13 @@ Used to be called **micro-blogging** until twitter
             }
             { tweets.length > 0 ?
                 tweets.map((k: TweetType ,idx : number)=>{
+                    let threads = hasThread(k.tweet).map((x:ThreadInfo)=>{
+                        if (x.id in threadCatalog) {
+                            return threadCatalog[x.id];
+                        }
+                        return null
+                    })
+
                     return (
                         <Tweet
                         visible={true}
@@ -515,8 +507,8 @@ Used to be called **micro-blogging** until twitter
                         }}
                         editClicked={()=>{onEditTweetClicked(k)()}}
                         deleteClicked={()=>{onDeleteTweetClicked(k)()}}
+                        threadList={threads}
                         url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
-                        token={APIToken}
                         ></Tweet>
                     )
                 }) : (
@@ -527,6 +519,7 @@ Nothing here **yet**!`} key={1} date="Start of time"
                     deleteClicked={()=>{}}
                     visible={true}
                     showMenu={false}
+                    threadList={[]}
                     url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                         />
                 )
