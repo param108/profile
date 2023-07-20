@@ -128,6 +128,9 @@ func (s *Server) RegisterHandlers() {
 	s.r.HandleFunc("/tweets", tweets.CreateGetTweetsHandler(s.DB)).
 		Methods(http.MethodGet)
 
+	s.r.HandleFunc("/tweet/{tweet_id}", tweets.CreateGetATweetHandler(s.DB)).
+		Methods(http.MethodGet)
+
 	s.r.HandleFunc("/tweets",
 		utils.AuthM(
 			tweets.CreatePostTweetsHandler(s.DB),

@@ -283,7 +283,7 @@ func (db *PostgresDB) GetTweet(userID, tweetID, writer string) (*models.Tweet, e
 	tweets := []*models.Tweet{}
 	if err := db.db.Where(
 		"user_id = ? AND id = ? AND writer = ? AND deleted = false",
-		userID, tweetID, writer).Find(tweets).Error; err != nil {
+		userID, tweetID, writer).Find(&tweets).Error; err != nil {
 		return nil, err
 	}
 

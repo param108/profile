@@ -3,6 +3,7 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 import moment from "moment";
 import { useState } from "react";
 import { GiBoltBomb, GiChemicalDrop } from "react-icons/gi"
+import { FiExternalLink } from "react-icons/fi";
 type TweetProps = {
     tweet_id: string,
     tweet: string,
@@ -10,6 +11,7 @@ type TweetProps = {
     onClick: Function,
     deleteClicked: Function,
     editClicked: Function,
+    externalClicked: Function|null,
     showMenu: boolean,
     url: string
 }
@@ -48,7 +50,14 @@ export default function Tweet(props: TweetProps) {
             </span>
             ):null}
 
-            <i className="text-gray-300">{formatDate(props.date)}</i><br/>
+            <div className="flex flex-row">
+            <i className="text-gray-300">{formatDate(props.date)}</i>
+            {(menuVisible && props.showMenu)?
+                (<FiExternalLink className="ml-[10px] cursor-pointer text-sky-800"size={20} onClick={()=>{
+                    if (props.externalClicked) {
+                        props.externalClicked(props.tweet_id);
+                    }}}/>):null}<br/>
+            </div>
             <span className="text-gray-600">{formatTweet(props.tweet, props.url)}</span>
             </div>
     );
