@@ -44,7 +44,7 @@ func CreateGetATweetHandler(db store.Store) http.HandlerFunc {
 		tweetID := strings.TrimSpace(v["tweet_id"])
 
 		tweet, err := db.GetTweet(user.ID, tweetID, os.Getenv("WRITER"))
-		if (err != nil) {
+		if err != nil {
 			status := http.StatusInternalServerError
 			if err.Error() == "not found" {
 				status = http.StatusNotFound
