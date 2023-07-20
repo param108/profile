@@ -47,6 +47,7 @@ export default function EditPair( props: EditPairProps) {
             date={props.tweet?.created_at?props.tweet.created_at:""}
             deleteClicked={()=>{props.deleteClicked()}}
             editClicked={()=>{props.editClicked()}}
+            externalClicked={null}
             showMenu={props.showMenu}
             onClick={()=>{}}/>
             </div>

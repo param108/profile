@@ -125,6 +125,7 @@ Used to be called **micro-blogging** until twitter
                   date={k.created_at} onClick={()=>{}}
                   deleteClicked={()=>{}} editClicked={()=>{}}
                   showMenu={false}
+                  externalClicked={null}
                   url={`${process.env.NEXT_PUBLIC_HOST}/`}
             ></Tweet>)
         })
