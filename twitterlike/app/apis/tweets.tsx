@@ -41,6 +41,21 @@ export const getTweetsForUser = async (users:string[], tags:string[], offset:num
     return res;
 }
 
+export const getATweetForUser = async (user:string, tweet_id:string) => {
+    const config = {
+        params: {
+            user: user,
+        },
+        retry: 3
+    };
+
+    const res = await axios.get<Tweets>(
+       `${process.env.NEXT_PUBLIC_BE_URL}/tweet/${tweet_id}`,
+        config
+    );
+    return res;
+}
+
 export const sendTweet = async (token: string, tweet: string) => {
     const config = {
         headers:{

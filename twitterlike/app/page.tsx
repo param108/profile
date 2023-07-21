@@ -126,6 +126,7 @@ Used to be called **micro-blogging** until twitter
                   deleteClicked={()=>{}} editClicked={()=>{}}
                   showMenu={false}
                   visible={true}
+                  externalClicked={null}
                   url={`${process.env.NEXT_PUBLIC_HOST}/`}
             ></Tweet>)
         })

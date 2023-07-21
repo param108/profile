@@ -36,12 +36,16 @@ Then [**signup**](https://google.com)!
       <div
         class="border border-t-slate-100  bg-white hover:bg-cyan-50 w-[90%] md:w-[510px] min-h-[100px] pl-[15px] pr-[5px] pt-[5px] pb-[40px] overflow-x-auto"
       >
-        <i
-          class="text-gray-300"
+        <div
+          class="flex flex-row"
         >
-          13/03/2022
-        </i>
-        <br />
+          <i
+            class="text-gray-300"
+          >
+            13/03/2022
+          </i>
+          <br />
+        </div>
         <span
           class="text-gray-600"
         >
@@ -114,12 +118,16 @@ download as you wish.
     <div
       class="border border-t-slate-100  bg-white hover:bg-cyan-50 w-[90%] md:w-[510px] min-h-[100px] pl-[15px] pr-[5px] pt-[5px] pb-[40px] overflow-x-auto"
     >
-      <i
-        class="text-gray-300"
+      <div
+        class="flex flex-row"
       >
-        13/03/2022
-      </i>
-      <br />
+        <i
+          class="text-gray-300"
+        >
+          13/03/2022
+        </i>
+        <br />
+      </div>
       <span
         class="text-gray-600"
       >

@@ -114,6 +114,7 @@ export function tagsToHyperlinks(tweet: string, baseURL: string, commandLineExis
         tagQCopy.push(tag)
 
         let newURL= new URL(baseURL)
+        newURL.searchParams.delete("id")
         newURL.searchParams.set("tags", tagQCopy.join(","))
 
         let newURLStr = newURL.toString()

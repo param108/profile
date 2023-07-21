@@ -8,12 +8,54 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gorilla/mux"
 	"github.com/param108/profile/api/models"
 	"github.com/param108/profile/api/store"
 	"github.com/param108/profile/api/utils"
 )
 
 const MAX_TWEETS_PER_QUERY = 20
+
+func CreateGetATweetHandler(db store.Store) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		userStr := strings.TrimSpace(r.URL.Query().Get("user"))
+		if len(userStr) == 0 {
+			utils.WriteError(rw, http.StatusBadRequest, "need exactly one user")
+			return
+		}
+
+		if len(userStr) == 0 {
+			utils.WriteError(rw, http.StatusBadRequest, "need exactly one user")
+			return
+		}
+
+		user, err := db.GetUserByHandle(userStr, os.Getenv("WRITER"))
+		if err != nil {
+			status := http.StatusInternalServerError
+			if err.Error() == "not found" {
+				status = http.StatusNotFound
+			}
+			utils.WriteError(rw, status, err.Error())
+			return
+		}
+
+		v := mux.Vars(r)
+
+		tweetID := strings.TrimSpace(v["tweet_id"])
+
+		tweet, err := db.GetTweet(user.ID, tweetID, os.Getenv("WRITER"))
+		if err != nil {
+			status := http.StatusInternalServerError
+			if err.Error() == "not found" {
+				status = http.StatusNotFound
+			}
+			utils.WriteError(rw, status, err.Error())
+			return
+		}
+
+		utils.WriteData(rw, http.StatusOK, []*models.Tweet{tweet})
+	}
+}
 
 func CreateGetTweetsHandler(db store.Store) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {

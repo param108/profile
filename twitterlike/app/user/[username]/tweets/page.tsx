@@ -1,13 +1,13 @@
 "use client";
 import { getProfile } from "@/app/apis/login";
-import { deleteTweet, getTweetsForUser, sendTweet, TweetType, updateTweet } from "@/app/apis/tweets";
+import { deleteTweet, getATweetForUser, getTweetsForUser, sendTweet, TweetType, updateTweet } from "@/app/apis/tweets";
 import Editor from "@/app/components/editor";
 import EditPair from "@/app/components/edit_tweet_pair";
 import Header from "@/app/components/header";
 import Tweet from "@/app/components/tweet";
 import { hasThread, mergeTweets, ThreadInfo } from "@/app/strings";
 import { AxiosResponse } from "axios";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 import { FiEdit3, FiExternalLink, FiZap } from "react-icons/fi";
 import ReactModal from "react-modal";
@@ -147,11 +147,11 @@ export default function ShowTweet() {
     var [ threadData, setThreadData ] = useState<ThreadData|null>(null)
     var [ pageLoading, setPageLoading ] = useState(false)
     var [ reverseFlag, setReverseFlag ] = useState(false)
+    var [ selectedTweet, setSelectedTweet ] = useState("")
 
     console.log("rerendering user-tweet-page");
     // Which modal is open
     var [openModal, setOpenModal] = useState("")
-
 
     // holds the tweet id of the tweet that is to be editted or deleted.
     var [chosenTweet, setChosenTweet]:[TweetType, Dispatch<SetStateAction<TweetType>>] = useState({
@@ -209,6 +209,7 @@ Unknown Tweet`}
                 editClicked={()=>{}}
                 showMenu={false}
                 onClick={()=>{}}
+                externalClicked={null}
                 url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                 />
                 <div className="w-[90%] md:w-[510px] mt-[10px]">
@@ -251,6 +252,8 @@ Unknown Tweet`}
     useEffect(()=>{
         const tagStr = searchParams.get("tags")?.trim()
         const reverseStr = searchParams.get("reverse")?.trim()
+        const idStr = searchParams.get("id")?.trim()
+
         let tags:string[] = []
 
         if (tagStr && tagStr.length > 0) {
@@ -267,6 +270,22 @@ Unknown Tweet`}
         setQueryTags(tags)
 
         setPageLoading(true);
+
+        if (idStr) {
+            setSelectedTweet(idStr);
+            getATweetForUser(params.username, idStr).
+                then((res:AxiosResponse)=>{
+                console.log(res.data.data)
+                setTweets(mergeTweets(tweets, res.data.data, reverse))
+                setUsername(params.username)
+                setPageLoading(false)
+            }).
+            catch(()=>{
+                setErrorMessage("Failed to get tweets.")
+                setShowError(true)
+                setPageLoading(false)
+            });
+        } else {
         getTweetsForUser([params.username], tags, 0, reverse).
             then((res:AxiosResponse)=>{
                 console.log(res.data.data)
@@ -279,6 +298,7 @@ Unknown Tweet`}
                 setShowError(true)
                 setPageLoading(false)
             });
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params.username])
 
@@ -317,6 +337,9 @@ Unknown Tweet`}
     // Add infinite scroll!
     useEffect(()=> {
         const infiniteScroll = () => {
+            if (selectedTweet.length > 0) {
+                return;
+            }
             // End of the document reached?
             console.log(window.innerHeight, document.documentElement.scroll, document.documentElement.offsetHeight);
             if (window.innerHeight + document.documentElement.scrollTop
@@ -559,6 +582,9 @@ Nothing here **yet**!`} key={1} date="Start of time"
                         editClicked={()=>{onEditTweetClicked(k)()}}
                         deleteClicked={()=>{onDeleteTweetClicked(k)()}}
                         url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
+                        externalClicked={(tweet_id:string)=>{
+                            location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?id=${tweet_id}`;
+                        }}
                         ></Tweet>
                     )
                 }) : (
@@ -567,6 +593,7 @@ Nothing here **yet**!`} key={1} date="Start of time"
                     onClick={()=>{}}
                     editClicked={()=>{}}
                     deleteClicked={()=>{}}
+                    externalClicked={null}
                     showMenu={false}
                     visible={true}
                     url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
