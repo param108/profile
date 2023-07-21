@@ -41,6 +41,7 @@ export default function Tweet(props: TweetProps) {
     if (!props.visible) {
         toplayerStyle += " invisible"
     }
+
     return (
         <div className="border w-[90%] md:w-[510px]">
             <div className={toplayerStyle}
@@ -77,12 +78,12 @@ export default function Tweet(props: TweetProps) {
             <span className="text-gray-600">{formatTweet(props.tweet, props.url)}</span>
             </div>
             {props.threadList && props.threadList.length > 0?(
-            <div className="w-full  overflow-auto">
+            <div className={(menuVisible && props.showMenu)?"w-full overflow-auto bg-cyan-50":"w-full overflow-auto bg-gray-50"}>
              {(!expanded)?(
-                 <span className="float-right" onClick={()=>setExpanded(true)}><GiScrollUnfurled className="m-[5px] p-[2px] rounded text-gray-500 bg-gray-200" size={30}/></span>
+                 <span className="float-right" onClick={()=>setExpanded(true)}><GiScrollUnfurled className="m-[5px] p-[5px] rounded text-indigo-800 bg-sky-200" size={30}/></span>
             ):(
                 <ul>
-                     <li className="overflow-auto" onClick={()=>{setExpanded(false)}}><GiTiedScroll className="float-right p-[2px] rounded text-gray-500 bg-gray-200 m-[5px]" size={30}/></li>
+                     <li className="overflow-auto" onClick={()=>{setExpanded(false)}}><GiTiedScroll className="float-right p-[5px] rounded text-indigo-800 bg-sky-200 m-[5px]" size={30}/></li>
                     {
                         props.threadList.map((v) => {
                             if (v) {

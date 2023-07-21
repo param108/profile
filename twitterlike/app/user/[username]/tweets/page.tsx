@@ -535,6 +535,9 @@ Used to be called **micro-blogging** until twitter
                             setThreadData(threadCatalog[threadID])
                             setThreadVisible(true)
                         }}
+                        externalClicked={(tweet_id:string)=>{
+                            location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?id=${tweet_id}`;
+                        }}
                         url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                         ></Tweet>
                     )
@@ -547,6 +550,8 @@ Nothing here **yet**!`} key={1} date="Start of time"
                     visible={true}
                     showMenu={false}
                     threadList={[]}
+                    externalClicked={null}
+                    viewThread={null}
                     url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                         />
                 )
@@ -585,6 +590,8 @@ Nothing here **yet**!`} key={1} date="Start of time"
                         externalClicked={(tweet_id:string)=>{
                             location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?id=${tweet_id}`;
                         }}
+                        viewThread={null}
+                        threadList={[]}
                         ></Tweet>
                     )
                 }) : (
@@ -596,6 +603,8 @@ Nothing here **yet**!`} key={1} date="Start of time"
                     externalClicked={null}
                     showMenu={false}
                     visible={true}
+                    threadList={[]}
+                    viewThread={null}
                     url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                         />
                 )
