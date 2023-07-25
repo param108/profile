@@ -19,7 +19,8 @@ type TweetProps = {
     url: string
     visible: boolean,
     threadList: (ThreadData|null)[],
-    viewThread: Function|null
+    viewThread: Function|null,
+    shownThread?: string,
 }
 
 export default function Tweet(props: TweetProps) {
@@ -43,6 +44,21 @@ export default function Tweet(props: TweetProps) {
         toplayerStyle += " invisible"
     }
 
+    // if atleast one thread in the threadlist
+    // doesnt match the shownthread
+    // return true
+    const atleastOneThread= ()=>{
+        if (props.threadList && props.threadList.length) {
+            return props.threadList.some((v)=>{
+                if (props.shownThread !== undefined) {
+                    return v?.id != props.shownThread
+                }
+                return true
+            })
+        }
+        return false
+    }
+
     return (
         <div className="border w-[90%] md:w-[510px]">
             <div className={toplayerStyle}
@@ -58,15 +74,15 @@ export default function Tweet(props: TweetProps) {
             <span className="bg-sky-200 mt-[5px] w-[90%] md:w-[510px] rounded-t">
                 <GiBoltBomb onClick={()=>{
                         props.deleteClicked()}}
-                        size={35} className="bg-sky-200 rounded my-[5px] text-red-600 p-[5px] mx-[5px] float-right"/>
+                        size={35} className="cursor-pointer bg-sky-200 rounded my-[5px] text-red-600 p-[5px] mx-[5px] float-right"/>
                 <GiChemicalDrop onClick={()=>{
                         props.editClicked()}}
-                        size={35} className="bg-sky-200 rounded my-[5px] text-indigo-800 p-[5px] mx-[5px] float-right"/>
+                        size={35} className="cursor-pointer bg-sky-200 rounded my-[5px] text-indigo-800 p-[5px] mx-[5px] float-right"/>
                 <GiSewingNeedle onClick={()=>{
                     if (props.createThreadClicked) {
                         props.createThreadClicked()
                     }}}
-                        size={35} className="bg-sky-200 rounded my-[5px] text-indigo-800 p-[5px] mx-[5px] float-right"/>
+                        size={35} className="cursor-pointer bg-sky-200 rounded my-[5px] text-indigo-800 p-[5px] mx-[5px] float-right"/>
             </span>
             ):null}
 
@@ -80,23 +96,23 @@ export default function Tweet(props: TweetProps) {
             </div>
             <span className="text-gray-600">{formatTweet(props.tweet, props.url)}</span>
             </div>
-            {props.threadList && props.threadList.length > 0?(
+            {atleastOneThread()?(
             <div className={(menuVisible && props.showMenu)?"w-full overflow-auto bg-cyan-50":"w-full overflow-auto bg-gray-50"}>
              {(!expanded)?(
-                 <span className="float-right" onClick={()=>setExpanded(true)}><GiScrollUnfurled className="m-[5px] p-[5px] rounded text-indigo-800 bg-sky-200" size={30}/></span>
+                 <span className="float-right" onClick={()=>setExpanded(true)}><GiScrollUnfurled className="cursor-pointer m-[5px] p-[5px] rounded text-indigo-800 bg-sky-200" size={30}/></span>
             ):(
                 <ul>
-                     <li className="overflow-auto" onClick={()=>{setExpanded(false)}}><GiTiedScroll className="float-right p-[5px] rounded text-indigo-800 bg-sky-200 m-[5px]" size={30}/></li>
+                     <li className="overflow-auto" onClick={()=>{setExpanded(false)}}><GiTiedScroll className="cursor-pointer float-right p-[5px] rounded text-indigo-800 bg-sky-200 m-[5px]" size={30}/></li>
                     {
                         props.threadList.map((v) => {
-                            if (v) {
+                            if (v && (props.shownThread != v.id)) {
                                 return (
                                     <li
-                                    className="text-blue-700 px-[15px] mb-[2px]"
+                                    className="cursor-pointer text-blue-700 px-[15px] mb-[2px]"
                                     key={v.id}
                                     onClick={()=>{ if(props.viewThread){
                                         props.viewThread(v.id);
-                                    }}}><GiSewingNeedle className="text-gray-500 inline mx-[5px]"/><i>{v.name}</i></li>
+                                    }}}><GiSewingNeedle className="cursor-pointer text-gray-500 inline mx-[5px]"/><i>{v.name}</i></li>
                                 );
                             }
                         })

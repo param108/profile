@@ -12,16 +12,27 @@ type EditorProps = {
     hideable: boolean,
     value: string,
     url: string
+    headerMargin?: boolean,
 }
 
 export default function Editor(props: EditorProps) {
 
+    var topDivStyle = "bg-sky-200 w-[96%] md:w-[510px] rounded mb-[10px]";
+    if (props.headerMargin !== undefined) {
+        if (props.headerMargin) {
+            topDivStyle = "mt-[60px] " + topDivStyle;
+        } else {
+            topDivStyle = "mt-[5px] " + topDivStyle;
+        }
+    } else {
+        topDivStyle = "mt-[60px] " + topDivStyle;
+    }
     function onSendClick() {
         props.onSendClicked(props.value)
     }
 
     return (
-        <div className="bg-sky-200 w-[96%] mt-[60px] md:w-[510px] rounded mb-[10px]">
+        <div className={topDivStyle}>
             {props.isLoggedIn ? (
                 <textarea value={props.value} onChange={(e)=> (props.onChange(e.target.value))} placeholder={"What are you thinking about ?"}
                     className="block w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black">

@@ -54,7 +54,7 @@ export const getThread = async (username: string, thread_id: string) => {
     return res;
 }
 
-export const createThread = async (token: string, name: string) => {
+export const createThread = async (token: string, username: string, name: string) => {
     const config = {
         headers:{
             "TRIBIST_JWT": token,
@@ -63,7 +63,7 @@ export const createThread = async (token: string, name: string) => {
     }
 
     const res = await axios.post<ThreadDetailsResponse>(
-        `${process.env.NEXT_PUBLIC_BE_URL}/threads`,
+        `${process.env.NEXT_PUBLIC_BE_URL}/user/${username}/threads`,
         {
             name: name
         },

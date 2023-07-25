@@ -63,62 +63,6 @@ const smallDelModalStyle = {
     }
 };
 
-    const welcomeTweets = [
-  {
-    created_at: `At the beginning.`,
-    tweet: `
-I think in tweets.
-
-*Short paragraphs of thought*
-
-**Shorter the Better**
-`},
-  {
-    created_at: `A little later.`,
-    tweet: `
-These thoughts could be **independent**
-
-OR
-
-They could be *connected* as **threads** or
-*related* through **#tags**
-`},
-  {
-    created_at: `Even later.`,
-    tweet: `
-I re-read my tweets a lot. Over & Over.
-
-Sometimes **Narcissism** & sometimes to **remind** me
-
-of things I already know.
-`},
-  {
-    created_at: `Even later....er.`,
-    tweet: `
-At times I want to **explore** them and **discover** new connections,
-or new **insights** or wallow in old ones.
-
-I like **high-lighting** and _italics_.
-Did I mention, we support **Markdown!**"
-`},
-  {
-    created_at: `Right Here, Right Now.`,
-    tweet: `
-You can do all this here and you own your data,
-download as you wish.
-
-Unlike twitter this is not a **performance**,
-
-this is **recreation**. This is **expression**.
-
-This is **Freedom**!
-
-_Interested ?_
-
-Then [**signup**](${process.env.NEXT_PUBLIC_BE_URL}/users/login?source=twitter&redirect_url=/)!
-`}
-];
-
 export default function ShowTweet() {
     const params = useParams();
     const searchParams = useSearchParams();
@@ -148,6 +92,7 @@ export default function ShowTweet() {
     var [ pageLoading, setPageLoading ] = useState(false)
     var [ reverseFlag, setReverseFlag ] = useState(false)
     var [ selectedTweet, setSelectedTweet ] = useState("")
+    var [ threadName, setThreadName ] = useState("")
 
     console.log("rerendering user-tweet-page");
     // Which modal is open
@@ -223,7 +168,6 @@ Unknown Tweet`}
         )
     }
 
-    const router = useRouter();
     var [createThreadName, setCreateThreadName ] = useState("")
     var [createThreadLoading, setCreateThreadLoading] = useState(false)
     var [createThreadErrorMessage, setCreateThreadErrorMessage] = useState("")
@@ -324,46 +268,13 @@ Unknown Tweet`}
 
     // Once in the beginning
     useEffect(()=>{
-        const tagStr = searchParams.get("tags")?.trim()
-        const reverseStr = searchParams.get("reverse")?.trim()
-        const idStr = searchParams.get("id")?.trim()
-
-        let tags:string[] = []
-
-        if (tagStr && tagStr.length > 0) {
-            let newTags = tagStr.split(",")
-            newTags.forEach((x)=>tags.push(x.trim()))
-        }
-
-        let reverse = false;
-        if (reverseStr && reverseStr === "1") {
-            reverse = true;
-        }
-        setReverseFlag(reverse)
-
-        setQueryTags(tags)
-
         setPageLoading(true);
 
-        if (idStr) {
-            setSelectedTweet(idStr);
-            getATweetForUser(params.username, idStr).
-                then((res:AxiosResponse)=>{
-                console.log(res.data.data)
-                setTweets(mergeTweets(tweets, res.data.data, reverse))
-                setUsername(params.username)
-                setPageLoading(false)
-            }).
-            catch(()=>{
-                setErrorMessage("Failed to get tweets.")
-                setShowError(true)
-                setPageLoading(false)
-            });
-        } else {
-        getTweetsForUser([params.username], tags, 0, reverse).
+        getThread(params.username, params.thread_id).
             then((res:AxiosResponse)=>{
                 console.log(res.data.data)
-                setTweets(mergeTweets(tweets, res.data.data, reverse))
+                setTweets(res.data.data.tweets)
+                setThreadName(res.data.data.name)
                 setUsername(params.username)
                 setPageLoading(false)
             }).
@@ -372,13 +283,8 @@ Unknown Tweet`}
                 setShowError(true)
                 setPageLoading(false)
             });
-        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params.username])
-
-    const getThreadCatalog = () => {
-        return threadCatalog;
-    }
 
     useEffect(()=>{
         var seen:{ [name:string]:boolean } = {}
@@ -478,10 +384,9 @@ Unknown Tweet`}
                     setEditorValue("")
                     setShowEditorTweet(false)
                     setEditorLoading(false)
-                    getTweetsForUser([params.username], [], 0, reverseFlag).
+                    getThread(params.username, params.thread_id).
                         then((res:AxiosResponse)=>{
-                            setTweets(mergeTweets(tweets, res.data.data, reverseFlag))
-                            setUsername(params.username)
+                            setTweets(res.data.data.tweets)
                         }).
                         catch(()=>{
                             setErrorMessage("Failed to get tweets.")
@@ -554,33 +459,8 @@ Unknown Tweet`}
     return (
         <main className="flex bg-white min-h-screen max-h-screen  w-full overflow-y-hidden flex-col items-center justify-stretch">
             <Header showSpinner={pageLoading}></Header>
-            <div className="flex flex-row max-h-full overflow-y-clip">
+            <div className="mt-[60px] flex flex-row max-h-full overflow-y-clip">
             <div className="max-h-full overflow-y-scroll  ">
-            {loggedIn?(
-                <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
-                    onSendClicked={onSendClicked} value={editorValue} viewing={showEditorTweet}
-                    onChange={onChanged} key={10000} tweet={{
-                        created_at: "Preview",
-                        id: 'new',
-                        tweet: ''
-                    }}
-                    showMenu={false}
-                    defaultMessage={`
-This is a blog. A **blog** of _tweets_.
-Used to be called **micro-blogging** until twitter
-**Hijacked** the space.
-`}
-                    editClicked={()=>{}}
-                    deleteClicked={()=>{}}
-                    editorHideable={false}
-                    hideClicked={()=>{}}
-                    visible={true}
-                    url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
-                                   ></EditPair>):(
-                <div className="mt-[60px] mb-[10px]">
-                    <span className="text-pink-600 cursor-pointer" onClick={()=>(location.href=`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets`)}>{username}</span>
-                </div>
-            )}
             { showError?(
                 <div
                     className="p-[5px] bg-red-200 rounded mb-[5px]"
@@ -588,6 +468,7 @@ Used to be called **micro-blogging** until twitter
                     {errorMessage}
                 </div>):null
             }
+            <span className="text-xl">{">> "}<b>{threadName}</b></span>
             { tweets.length > 0 ?
                 tweets.map((k: TweetType ,idx : number)=>{
                     let threads = hasThread(k.tweet).map((x:ThreadInfo)=>{
@@ -616,6 +497,7 @@ Used to be called **micro-blogging** until twitter
                             setThreadData(threadCatalog[threadID])
                             setThreadVisible(true)
                         }}
+                        shownThread={params.thread_id}
                         externalClicked={(tweet_id:string)=>{
                             location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?id=${tweet_id}`;
                         }}
@@ -642,18 +524,42 @@ Nothing here **yet**!`} key={1} date="Start of time"
                         />
                 )
             }
+            {loggedIn?(
+                <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
+                    onSendClicked={onSendClicked} value={editorValue} viewing={showEditorTweet}
+                    onChange={onChanged} key={10000} tweet={{
+                        created_at: "Preview",
+                        id: 'new',
+                        tweet: ''
+                    }}
+                    showMenu={false}
+                    defaultMessage={`
+This is a blog. A **blog** of _tweets_.
+Used to be called **micro-blogging** until twitter
+**Hijacked** the space.
+`}
+                    editClicked={()=>{}}
+                    deleteClicked={()=>{}}
+                    editorHideable={false}
+                    hideClicked={()=>{}}
+                    visible={true}
+                    url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
+                    headerMargin={false}
+                                   ></EditPair>):(
+                <div className="mt-[60px] mb-[10px]">
+                    <span className="text-pink-600 cursor-pointer" onClick={()=>(location.href=`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets`)}>{username}</span>
+                </div>
+            )}
             </div>
             {(threadVisible && threadData)?(
             <div className="mt-[60px] max-h-full float-right overflow-y-scroll">
             <div className="w-[90%] md:w-[510px]">
                 <span className="text-xl">{">> "}<b>{threadData.name}</b></span>
                 <FiZap
-                onClick={()=>{router.push(
-                    `${process.env.NEXT_PUBLIC_HOST}/user/${username}/threads/${threadData?.id}/`)}}
+                onClick={()=>{setThreadVisible(false)}}
                 className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20}/>
                 <FiExternalLink
-                onClick={()=>{router.push(
-                    `${process.env.NEXT_PUBLIC_HOST}/user/${username}/threads/${threadData?.id}/`)}}
+                onClick={()=>{setThreadVisible(false)}}
                 className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20}/>
                 {loggedIn?(
                     <FiEdit3
@@ -680,6 +586,7 @@ Nothing here **yet**!`} key={1} date="Start of time"
                         }}
                         viewThread={null}
                         threadList={[]}
+                        shownThread={params.thread_id}
                         ></Tweet>
                     )
                 }) : (

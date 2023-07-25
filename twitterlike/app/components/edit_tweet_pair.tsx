@@ -20,10 +20,16 @@ type EditPairProps = {
     editorHideable: boolean,
     url: string,
     visible: boolean,
+    headerMargin?: boolean
 }
 
 export default function EditPair( props: EditPairProps) {
     var toplayerStyle = "w-full flex flex-col items-center";
+    var headerMargin = true;
+    if (props.headerMargin !== undefined) {
+        headerMargin = props.headerMargin;
+    }
+
     if (!props.visible) {
         toplayerStyle += " invisible"
     }
@@ -39,7 +45,8 @@ export default function EditPair( props: EditPairProps) {
             onChange={props.onChange}
             hideable={props.editorHideable}
             url={props.url}
-            hideClicked={props.hideClicked}/>
+            hideClicked={props.hideClicked}
+            headerMargin={headerMargin}/>
         ):null}
         {(props.viewing?(
             <div
