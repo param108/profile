@@ -5,7 +5,7 @@ import Editor from "@/app/components/editor";
 import EditPair from "@/app/components/edit_tweet_pair";
 import Header from "@/app/components/header";
 import Tweet from "@/app/components/tweet";
-import { hasThread, mergeTweets, ThreadInfo } from "@/app/strings";
+import { addThread, hasThread, mergeTweets, ThreadInfo } from "@/app/strings";
 import { AxiosResponse } from "axios";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
@@ -13,7 +13,7 @@ import { FiEdit3, FiExternalLink, FiZap } from "react-icons/fi";
 import ReactModal from "react-modal";
 import { RingLoader } from "react-spinners";
 import _ from "underscore";
-import { getThread, ThreadData } from "@/app/apis/threads";
+import { createThread, getThread, ThreadData } from "@/app/apis/threads";
 
 const largeEditModalStyle = {
     content: {
@@ -194,8 +194,8 @@ Unknown Tweet`}
                 { delTweetShowError?(
                     <div
                     className="p-[5px] bg-red-200 rounded mb-[5px]"
-                    onClick={()=>setEditTweetShowError(false)}>
-                        {editTweetErrorMessage}
+                    onClick={()=>setDelTweetShowError(false)}>
+                        {delTweetErrorMessage}
                     </div>):null
                 }
 
@@ -218,6 +218,79 @@ Unknown Tweet`}
                         loading={delTweetLoading} size={30}/>
                 </div>
                 <button onClick={delTweetClicked} className="rounded p-[5px] bg-red-800 text-white float-left">Delete</button>
+                </div>
+            </div>
+        )
+    }
+
+    var [createThreadName, setCreateThreadName ] = useState("")
+    var [createThreadLoading, setCreateThreadLoading] = useState(false)
+    var [createThreadErrorMessage, setCreateThreadErrorMessage] = useState("")
+    var [createThreadShowError, setCreateThreadShowError] = useState(false)
+    const createThreadClicked = () => {
+        setCreateThreadLoading(true)
+        createThread(APIToken, createThreadName).
+            then((res) => {
+                let thread_id = res.data.data.id
+
+                // update the tweet with the thread hash
+                chosenTweet.tweet = addThread(chosenTweet.tweet, thread_id);
+                updateTweet(APIToken, chosenTweet.tweet, chosenTweet.id).
+                    then((res)=>{
+                        setTweets(mergeTweets(tweets,[res.data.data], reverseFlag))
+                        setOpenModal("closed")
+                    }).catch(()=>{
+                        setCreateThreadErrorMessage("Something went wrong")
+                        setCreateThreadShowError(true)
+                    }).finally(()=>{
+                        setCreateThreadLoading(false)
+                    })
+            }).
+            catch(() => {
+                setCreateThreadErrorMessage("Something went wrong")
+                setCreateThreadShowError(true)
+            }).
+            finally(() => {
+                setCreateThreadLoading(false)
+            })
+    }
+
+    const createThreadDiv = ()=>{
+        return (
+            <div className="flex flex-col items-center w-full">
+                { createThreadShowError?(
+                    <div
+                    className="p-[5px] bg-red-200 rounded mb-[5px]"
+                    onClick={()=>setCreateThreadShowError(false)}>
+                        {createThreadErrorMessage}
+                    </div>):null
+                }
+                <span className="text-black mb-[10px]">Create a new thread</span>
+                <Tweet
+                visible={true}
+                tweet_id={chosenTweet?.id}
+                tweet={chosenTweet?.tweet}
+                date={chosenTweet?.created_at}
+                deleteClicked={()=>{}}
+                editClicked={()=>{}}
+                showMenu={false}
+                onClick={()=>{}}
+                externalClicked={null}
+                url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
+                />
+                <input type="text" className="rounded p-[5px] mt-[5px] border border-slate-200 w-[96%] md:w-[510px]"
+                    placeholder="New thread name..." value={createThreadName}
+                    onChange={(t)=>{setCreateThreadName(t.target.value)}}/>
+                <div className="w-[90%] md:w-[510px] mt-[10px]">
+                <div className="inline-block float-right pr-[10px]">
+                    <RingLoader className="inline-block" color="#EC4899"
+                        loading={createThreadLoading} size={30}/>
+                </div>
+                <button
+                    onClick={createThreadClicked}
+                    className={(createThreadName.length > 3)?
+                        "rounded p-[5px] bg-sky-600 text-white float-left":
+                        "rounded p-[5px] bg-sky-100 text-white float-left"}>Create</button>
                 </div>
             </div>
         )
@@ -302,10 +375,14 @@ Unknown Tweet`}
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params.username])
 
+    const getThreadCatalog = () => {
+        return threadCatalog;
+    }
+
     useEffect(()=>{
         var seen:{ [name:string]:boolean } = {}
         var newThreads: { [name:string]:(ThreadData|null) } = {}
-
+        var savedThreadCatalog = {...threadCatalog}
         tweets.forEach((tweet: TweetType)=>{
             let ts = hasThread(tweet.tweet);
             ts.forEach((t: ThreadInfo)=>{
@@ -319,9 +396,12 @@ Unknown Tweet`}
                     getThread(username, t.id).then(
                         (res)=>{
                             let key = res.data.data.id;
-                            let data = {...threadCatalog};
+                            let data = {...savedThreadCatalog};
                             data[key] = res.data.data;
-                            setThreadCatalog(data);
+                            savedThreadCatalog = data;
+                            console.log(savedThreadCatalog);
+
+                            setThreadCatalog(savedThreadCatalog);
                         }
                     )
                     newThreads[t.id] = null;
@@ -461,11 +541,11 @@ Unknown Tweet`}
             then((res)=>{
                 setTweets(tweets.filter((x)=>(x.id != res.data.data.id)))
                 setOpenModal("closed")
-                setDelTweetLoading(false)
             }).
             catch(()=>{
                 setDelTweetErrorMessage("Something went wrong")
                 setDelTweetShowError(true)
+            }).finally(()=>{
                 setDelTweetLoading(false)
             })
     }
@@ -537,6 +617,11 @@ Used to be called **micro-blogging** until twitter
                         }}
                         externalClicked={(tweet_id:string)=>{
                             location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?id=${tweet_id}`;
+                        }}
+                        createThreadClicked={()=>{
+                            setChosenTweet(k)
+                            setCreateThreadName("")
+                            setOpenModal("create_thread")
                         }}
                         url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                         ></Tweet>
@@ -631,6 +716,16 @@ Nothing here **yet**!`} key={1} date="Start of time"
                     className="text-pink-600 float-right"
                     onClick={()=>{setOpenModal("closed")}}/>
                     {deleteTweetDiv()}
+            </ReactModal>
+            { /* CreateThreadModal */ }
+            <ReactModal
+                style={largeScreen?largeDelModalStyle:(bigScreen)?bigDelModalStyle:smallDelModalStyle}
+                isOpen={openModal=="create_thread"}>
+                <FiZap
+                    size={30}
+                    className="text-pink-600 float-right"
+                    onClick={()=>{setOpenModal("closed")}}/>
+                    {createThreadDiv()}
             </ReactModal>
 
         </main>

@@ -1,4 +1,4 @@
-import { tagsToHyperlinks } from '../app/strings'
+import { addThread, tagsToHyperlinks } from '../app/strings'
 describe('tweets formatting', ()=>{
     it('renders no tags correctly', ()=>{
         let tweet = `
@@ -84,4 +84,24 @@ this is an even better [#tweet](https://ui.tribist.com/user/param108/tweets?tags
             )).toEqual(expected)
     })
 
+    it('adds the thread to tweet without commandline', ()=>{
+        let tweet = `Hello Hello Hello
+`;
+        expect(
+            addThread(tweet, "daedf35f-0ff8-4c23-86aa-98213dead4c4")).toEqual(
+                `#thread:daedf35f-0ff8-4c23-86aa-98213dead4c4:0
+Hello Hello Hello
+`
+            );
+    })
+
+    it('adds the thread to tweet with commandline', ()=>{
+        let tweet = `#thread:daedf35f-0ff8-4c23-86aa-98213dead4c4:0
+Hello Hello Hello`
+        expect(
+            addThread(tweet, "0a015aee-4922-4f1c-afef-b321ecd835f7")).toEqual(
+                `#thread:daedf35f-0ff8-4c23-86aa-98213dead4c4:0 #thread:0a015aee-4922-4f1c-afef-b321ecd835f7:0
+Hello Hello Hello`
+            )
+    })
 })

@@ -14,6 +14,7 @@ type TweetProps = {
     deleteClicked: Function,
     editClicked: Function,
     externalClicked: Function|null,
+    createThreadClicked?: Function,
     showMenu: boolean,
     url: string
     visible: boolean,
@@ -62,7 +63,9 @@ export default function Tweet(props: TweetProps) {
                         props.editClicked()}}
                         size={35} className="bg-sky-200 rounded my-[5px] text-indigo-800 p-[5px] mx-[5px] float-right"/>
                 <GiSewingNeedle onClick={()=>{
-                        props.editClicked()}}
+                    if (props.createThreadClicked) {
+                        props.createThreadClicked()
+                    }}}
                         size={35} className="bg-sky-200 rounded my-[5px] text-indigo-800 p-[5px] mx-[5px] float-right"/>
             </span>
             ):null}

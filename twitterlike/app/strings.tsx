@@ -127,26 +127,75 @@ export function tagsToHyperlinks(tweet: string, baseURL: string, commandLineExis
 
 }
 
+export type CommandLineData = {
+    exists: boolean,
+    fontKamal: boolean,
+    hasThread: boolean,
+    threads: ThreadInfo[]
+}
+
+export function parseCommandLine(tweet: string):CommandLineData {
+    // TODO Need to move this to a common place.
+    // The first line is the command line if it exists
+    // Default is for it not to exist.
+    let commandLineExists = false;
+
+    let ret: CommandLineData = {
+        exists: false,
+        fontKamal: false,
+        hasThread: false,
+        threads: []
+    }
+
+    if (isFlagOn(tweet, "#font:kamal")) {
+        commandLineExists = true;
+        ret.fontKamal = true;
+    }
+
+    ret.exists = false
+    let threads = hasThread(tweet)
+    if (threads.length > 0) {
+        commandLineExists = true;
+        ret.hasThread = true;
+        ret.threads = threads;
+    }
+
+
+    if (commandLineExists) {
+        ret.exists = true
+    }
+
+    return ret
+}
+
+// Add thread to the commandline of a tweet
+export function addThread(tweet: string, thread_id: string):string {
+    let cmdLine = parseCommandLine(tweet);
+
+    let cmd = "";
+    if (cmdLine.exists) {
+        let parts = tweet.split("\n");
+        cmd = parts[0];
+        parts.splice(0,1);
+        tweet = parts.join("\n");
+        cmd = cmd + ` #thread:${thread_id}:0\n`;
+    } else {
+        cmd = `#thread:${thread_id}:0\n`;
+    }
+
+    return cmd + tweet;
+}
+
 export function formatTweet(tweet: string, baseURL: string):ReactElement {
     const converter = new showdown.Converter();
     
     // The first line is the command line if it exists
     // Default is for it not to exist.
-    let commandLineExists = false;
-    let kamalFont = false;
+    let cmdLine = parseCommandLine(tweet);
 
-    if (isFlagOn(tweet, "#font:kamal")) {
-        commandLineExists = true;
-        kamalFont = true;
-    }
-
-    if (hasAThread(tweet)) {
-        commandLineExists = true;
-    }
-
-    tweet = tagsToHyperlinks(tweet, baseURL, commandLineExists)
+    tweet = tagsToHyperlinks(tweet, baseURL, cmdLine.exists)
     // If the command Line Exists we need to remove it after processing.
-    if (commandLineExists) {
+    if (cmdLine.exists) {
         let newTweet = tweet.split('\n');
         newTweet.splice(0,1);
         tweet=newTweet.join('\n');
@@ -154,7 +203,7 @@ export function formatTweet(tweet: string, baseURL: string):ReactElement {
 
     let hdata = converter.makeHtml(tweet);
     let classNames = "";
-    if (kamalFont) {
+    if (cmdLine.fontKamal) {
         classNames = classNames + " font-kamal"
     }
 
