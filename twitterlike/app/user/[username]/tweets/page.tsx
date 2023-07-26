@@ -648,8 +648,7 @@ Nothing here **yet**!`} key={1} date="Start of time"
             <div className="w-[90%] md:w-[510px]">
                 <span className="text-xl">{">> "}<b>{threadData.name}</b></span>
                 <FiZap
-                onClick={()=>{router.push(
-                    `${process.env.NEXT_PUBLIC_HOST}/user/${username}/threads/${threadData?.id}/`)}}
+                onClick={()=>{setThreadVisible(false)}}
                 className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20}/>
                 <FiExternalLink
                 onClick={()=>{router.push(
@@ -657,7 +656,8 @@ Nothing here **yet**!`} key={1} date="Start of time"
                 className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20}/>
                 {loggedIn?(
                     <FiEdit3
-                    onClick={()=>{setThreadVisible(false)}}
+                    onClick={()=>{router.push(
+                        `${process.env.NEXT_PUBLIC_HOST}/user/${username}/threads/${threadData?.id}/`)}}
                     className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20}/>
                 ):null}
             </div>
