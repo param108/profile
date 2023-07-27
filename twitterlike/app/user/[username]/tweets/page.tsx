@@ -554,6 +554,7 @@ Unknown Tweet`}
     return (
         <main className="flex bg-white min-h-screen max-h-screen  w-full overflow-y-hidden flex-col items-center justify-stretch">
             <Header showSpinner={pageLoading}></Header>
+            <div className="mt-[60px]"/>
             <div className="flex flex-row max-h-full overflow-y-clip">
             <div className="max-h-full overflow-y-scroll  ">
             {loggedIn?(
@@ -577,7 +578,7 @@ Used to be called **micro-blogging** until twitter
                     visible={true}
                     url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                                    ></EditPair>):(
-                <div className="mt-[60px] mb-[10px]">
+                <div className="mb-[10px]">
                     <span className="text-pink-600 cursor-pointer" onClick={()=>(location.href=`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets`)}>{username}</span>
                 </div>
             )}
@@ -644,7 +645,7 @@ Nothing here **yet**!`} key={1} date="Start of time"
             }
             </div>
             {(threadVisible && threadData)?(
-            <div className="mt-[60px] max-h-full float-right overflow-y-scroll">
+            <div className="max-h-full float-right overflow-y-scroll">
             <div className="w-[90%] md:w-[510px]">
                 <span className="text-xl">{">> "}<b>{threadData.name}</b></span>
                 <FiZap

@@ -18,15 +18,6 @@ type EditorProps = {
 export default function Editor(props: EditorProps) {
 
     var topDivStyle = "bg-sky-200 w-[96%] md:w-[510px] rounded mb-[10px]";
-    if (props.headerMargin !== undefined) {
-        if (props.headerMargin) {
-            topDivStyle = "mt-[60px] " + topDivStyle;
-        } else {
-            topDivStyle = "mt-[5px] " + topDivStyle;
-        }
-    } else {
-        topDivStyle = "mt-[60px] " + topDivStyle;
-    }
     function onSendClick() {
         props.onSendClicked(props.value)
     }

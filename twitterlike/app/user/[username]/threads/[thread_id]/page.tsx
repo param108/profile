@@ -457,9 +457,10 @@ Unknown Tweet`}
     }
 
     return (
-        <main className="flex bg-white min-h-screen max-h-screen  w-full overflow-y-hidden flex-col items-center justify-stretch">
+        <main className="flex bg-white min-h-screen max-h-screen w-full overflow-y-hidden flex-col items-center justify-stretch">
             <Header showSpinner={pageLoading}></Header>
-            <div className="mt-[60px] flex flex-row max-h-full overflow-y-clip">
+            <div className="mt-[60px]"/>
+            <div className="flex flex-row max-h-full overflow-y-clip">
             <div className="max-h-full overflow-y-scroll  ">
             { showError?(
                 <div
@@ -468,6 +469,10 @@ Unknown Tweet`}
                     {errorMessage}
                 </div>):null
             }
+            {!loggedIn?(
+            <div className="mb-[10px]">
+                <span className="text-pink-600 cursor-pointer" onClick={()=>(location.href=`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets`)}>{username}</span>
+                    </div>):null}
             <span className="text-xl">{">> "}<b>{threadName}</b></span>
             { tweets.length > 0 ?
                 tweets.map((k: TweetType ,idx : number)=>{
@@ -545,11 +550,8 @@ Used to be called **micro-blogging** until twitter
                     visible={true}
                     url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                     headerMargin={false}
-                                   ></EditPair>):(
-                <div className="mt-[60px] mb-[10px]">
-                    <span className="text-pink-600 cursor-pointer" onClick={()=>(location.href=`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets`)}>{username}</span>
-                </div>
-            )}
+                    ></EditPair>):(null)
+            }
             </div>
             {(threadVisible && threadData)?(
             <div className="mt-[60px] max-h-full float-right overflow-y-scroll">

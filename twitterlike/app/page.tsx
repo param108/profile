@@ -100,6 +100,7 @@ export default function Home() {
   return (
     <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
       <Header showSpinner={false}></Header>
+      <div className='mt-[60px]'/>
       <div className='flex flex-col w-full items-center' onClick={(e)=>{
         if (loggedIn) {
           location.href=`/user/${username}/tweets`;
