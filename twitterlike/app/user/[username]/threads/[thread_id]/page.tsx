@@ -63,62 +63,6 @@ const smallDelModalStyle = {
     }
 };
 
-    const welcomeTweets = [
-  {
-    created_at: `At the beginning.`,
-    tweet: `
-I think in tweets.
-
-*Short paragraphs of thought*
-
-**Shorter the Better**
-`},
-  {
-    created_at: `A little later.`,
-    tweet: `
-These thoughts could be **independent**
-
-OR
-
-They could be *connected* as **threads** or
-*related* through **#tags**
-`},
-  {
-    created_at: `Even later.`,
-    tweet: `
-I re-read my tweets a lot. Over & Over.
-
-Sometimes **Narcissism** & sometimes to **remind** me
-
-of things I already know.
-`},
-  {
-    created_at: `Even later....er.`,
-    tweet: `
-At times I want to **explore** them and **discover** new connections,
-or new **insights** or wallow in old ones.
-
-I like **high-lighting** and _italics_.
-Did I mention, we support **Markdown!**"
-`},
-  {
-    created_at: `Right Here, Right Now.`,
-    tweet: `
-You can do all this here and you own your data,
-download as you wish.
-
-Unlike twitter this is not a **performance**,
-
-this is **recreation**. This is **expression**.
-
-This is **Freedom**!
-
-_Interested ?_
-
-Then [**signup**](${process.env.NEXT_PUBLIC_BE_URL}/users/login?source=twitter&redirect_url=/)!
-`}
-];
-
 export default function ShowTweet() {
     const params = useParams();
     const searchParams = useSearchParams();
@@ -148,6 +92,7 @@ export default function ShowTweet() {
     var [ pageLoading, setPageLoading ] = useState(false)
     var [ reverseFlag, setReverseFlag ] = useState(false)
     var [ selectedTweet, setSelectedTweet ] = useState("")
+    var [ threadName, setThreadName ] = useState("")
 
     console.log("rerendering user-tweet-page");
     // Which modal is open
@@ -209,9 +154,9 @@ Unknown Tweet`}
                 editClicked={()=>{}}
                 showMenu={false}
                 onClick={()=>{}}
-                externalClicked={null}
                 threadList={[]}
                 viewThread={null}
+                externalClicked={null}
                 url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                 />
                 <div className="w-[90%] md:w-[510px] mt-[10px]">
@@ -225,7 +170,6 @@ Unknown Tweet`}
         )
     }
 
-    const router = useRouter();
     var [createThreadName, setCreateThreadName ] = useState("")
     var [createThreadLoading, setCreateThreadLoading] = useState(false)
     var [createThreadErrorMessage, setCreateThreadErrorMessage] = useState("")
@@ -328,46 +272,13 @@ Unknown Tweet`}
 
     // Once in the beginning
     useEffect(()=>{
-        const tagStr = searchParams.get("tags")?.trim()
-        const reverseStr = searchParams.get("reverse")?.trim()
-        const idStr = searchParams.get("id")?.trim()
-
-        let tags:string[] = []
-
-        if (tagStr && tagStr.length > 0) {
-            let newTags = tagStr.split(",")
-            newTags.forEach((x)=>tags.push(x.trim()))
-        }
-
-        let reverse = false;
-        if (reverseStr && reverseStr === "1") {
-            reverse = true;
-        }
-        setReverseFlag(reverse)
-
-        setQueryTags(tags)
-
         setPageLoading(true);
 
-        if (idStr) {
-            setSelectedTweet(idStr);
-            getATweetForUser(params.username, idStr).
-                then((res:AxiosResponse)=>{
-                console.log(res.data.data)
-                setTweets(mergeTweets(tweets, res.data.data, reverse))
-                setUsername(params.username)
-                setPageLoading(false)
-            }).
-            catch(()=>{
-                setErrorMessage("Failed to get tweets.")
-                setShowError(true)
-                setPageLoading(false)
-            });
-        } else {
-        getTweetsForUser([params.username], tags, 0, reverse).
+        getThread(params.username, params.thread_id).
             then((res:AxiosResponse)=>{
                 console.log(res.data.data)
-                setTweets(mergeTweets(tweets, res.data.data, reverse))
+                setTweets(res.data.data.tweets)
+                setThreadName(res.data.data.name)
                 setUsername(params.username)
                 setPageLoading(false)
             }).
@@ -376,13 +287,8 @@ Unknown Tweet`}
                 setShowError(true)
                 setPageLoading(false)
             });
-        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params.username])
-
-    const getThreadCatalog = () => {
-        return threadCatalog;
-    }
 
     useEffect(()=>{
         var seen:{ [name:string]:boolean } = {}
@@ -418,7 +324,7 @@ Unknown Tweet`}
             ...t,
             ...newThreads
         }))
-    }, [username, threadCatalog, tweets])
+    }, [threadCatalog, tweets, username])
     // Add infinite scroll!
     useEffect(()=> {
         const infiniteScroll = () => {
@@ -482,10 +388,9 @@ Unknown Tweet`}
                     setEditorValue("")
                     setShowEditorTweet(false)
                     setEditorLoading(false)
-                    getTweetsForUser([params.username], [], 0, reverseFlag).
+                    getThread(params.username, params.thread_id).
                         then((res:AxiosResponse)=>{
-                            setTweets(mergeTweets(tweets, res.data.data, reverseFlag))
-                            setUsername(params.username)
+                            setTweets(res.data.data.tweets)
                         }).
                         catch(()=>{
                             setErrorMessage("Failed to get tweets.")
@@ -556,168 +461,170 @@ Unknown Tweet`}
     }
 
     return (
-        <main className={"flex bg-white min-h-screen max-h-screen  w-full flex-col items-center justify-stretch" +
-            (threadVisible?"":" overflow-scroll")}>
+        <main className="flex bg-white min-h-screen max-h-screen w-full overflow-y-hidden flex-col items-center justify-stretch">
             <Header showSpinner={pageLoading}></Header>
             <div className="mt-[60px]"/>
-            <div className="flex flex-col items-center w-full">
-                {loggedIn ? (
-                    <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
-                        onSendClicked={onSendClicked} value={editorValue} viewing={showEditorTweet}
-                        onChange={onChanged} key={10000} tweet={{
-                            created_at: "Preview",
-                            id: 'new',
-                            tweet: ''
-                        }}
-                        showMenu={false}
-                        defaultMessage={`
+            <div className="flex flex-col items-center">
+                {showError ? (
+                    <div
+                    className="p-[5px] bg-red-200 rounded mb-[5px]"
+                    onClick={() => setShowError(false)}>
+                        {errorMessage}
+                    </div>) : null
+                }
+                {!loggedIn ? (
+                    <div className="mb-[10px]">
+                        <span className="text-pink-600 cursor-pointer" onClick={() => (location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets`)}>{username}</span>
+                        </div>) : null}
+            </div>
+
+            <div className={"flex flex-row w-full md:w-fit" +
+                (threadVisible?" overflow-hidden":"")}>
+            <div className={"max-h-full w-full md:w-fit" +
+                (threadVisible?" md:overflow-y-scroll":"")}>
+                    <div className="flex flex-col items-center">
+                    <span className="pl-[10px] text-xl w-[90%] md:w-[510px]">{">> "}<b>{threadName}</b></span>
+                        {tweets.length > 0 ?
+                            tweets.map((k: TweetType, idx: number) => {
+                                let threads = hasThread(k.tweet).map((x: ThreadInfo) => {
+                                    if (x.id in threadCatalog) {
+                                        return threadCatalog[x.id];
+                                    }
+                                    return null
+                                })
+
+                                return (
+                                    <Tweet
+                                        visible={true}
+                                        key={idx}
+                                        tweet_id={k.id}
+                                        tweet={k.tweet}
+                                        date={k.created_at}
+                                        showMenu={loggedIn}
+                                        onClick={() => {
+                                            //setThreadVisible(!threadVisible);
+                                            //setThreadData(welcomeTweets);
+                                        }}
+                                        editClicked={() => { onEditTweetClicked(k)() }}
+                                        deleteClicked={() => { onDeleteTweetClicked(k)() }}
+                                        threadList={threads}
+                                        viewThread={(threadID: string) => {
+                                            if (bigScreen || largeScreen) {
+                                                setThreadData(threadCatalog[threadID])
+                                                setThreadVisible(true)
+                                            } else {
+                                                location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/threads/${threadID}/`;
+                                            }
+                                        }}
+                                        shownThread={params.thread_id}
+                                        externalClicked={(tweet_id: string) => {
+                                            location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?id=${tweet_id}`;
+                                        }}
+                                        createThreadClicked={() => {
+                                            setChosenTweet(k)
+                                            setCreateThreadName("")
+                                            setOpenModal("create_thread")
+                                        }}
+                                        url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?` + searchParams.toString()}
+                                    ></Tweet>
+                                )
+                            }) : (
+                                <Tweet tweet_id={"1"} tweet={`
+Nothing here **yet**!`} key={1} date="Start of time"
+                                    onClick={() => { }}
+                                    editClicked={() => { }}
+                                    deleteClicked={() => { }}
+                                    visible={true}
+                                    showMenu={false}
+                                    threadList={[]}
+                                    externalClicked={null}
+                                    viewThread={null}
+                                    url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?` + searchParams.toString()}
+                                />
+                            )
+                        }
+                    </div>
+                    <div className="mt-[10px]">
+                        {loggedIn ? (
+                            <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
+                                onSendClicked={onSendClicked} value={editorValue} viewing={showEditorTweet}
+                                onChange={onChanged} key={10000} tweet={{
+                                    created_at: "Preview",
+                                    id: 'new',
+                                    tweet: ''
+                                }}
+                                showMenu={false}
+                                defaultMessage={`
 This is a blog. A **blog** of _tweets_.
 Used to be called **micro-blogging** until twitter
 **Hijacked** the space.
 `}
-                        editClicked={() => { }}
-                        deleteClicked={() => { }}
-                        editorHideable={false}
-                        hideClicked={() => { }}
-                        visible={true}
-                        url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?` + searchParams.toString()}
-                    ></EditPair>) : (
-                    <div className="mb-[10px]">
-                        <span className="text-pink-600 cursor-pointer" onClick={() => (location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets`)}>{username}</span>
-                    </div>
-                )}
-                {showError ? (
-                    <div
-                        className="p-[5px] bg-red-200 rounded mb-[5px]"
-                        onClick={() => setShowError(false)}>
-                        {errorMessage}
-                    </div>) : null
-                }
-            </div>
-
-            <div className={"flex flex-row" +
-                (threadVisible?" overflow-hidden":"")}>
-            <div className={"max-h-full" +
-                (threadVisible?" overflow-y-scroll": "")}>
-            <div className="flex flex-col items-center">
-            { tweets.length > 0 ?
-                tweets.map((k: TweetType ,idx : number)=>{
-                    let threads = hasThread(k.tweet).map((x:ThreadInfo)=>{
-                        if (x.id in threadCatalog) {
-                            return threadCatalog[x.id];
+                                editClicked={() => { }}
+                                deleteClicked={() => { }}
+                                editorHideable={false}
+                                hideClicked={() => { }}
+                                visible={true}
+                                url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?` + searchParams.toString()}
+                                headerMargin={false}
+                            ></EditPair>) : (null)
                         }
-                        return null
-                    })
-
-                    return (
-                        <Tweet
-                        visible={true}
-                        key={idx}
-                        tweet_id={k.id}
-                        tweet={k.tweet}
-                        date={k.created_at}
-                        showMenu={loggedIn}
-                        onClick={()=>{
-                            //setThreadVisible(!threadVisible);
-                            //setThreadData(welcomeTweets);
-                        }}
-                        editClicked={()=>{onEditTweetClicked(k)()}}
-                        deleteClicked={()=>{onDeleteTweetClicked(k)()}}
-                        threadList={threads}
-                        viewThread={(threadID:string)=>{
-                            if (bigScreen || largeScreen) {
-                                setThreadData(threadCatalog[threadID])
-                                setThreadVisible(true)
-                            } else {
-                                location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/threads/${threadID}/`;
-                            }
-                        }}
-                        externalClicked={(tweet_id:string)=>{
-                            location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?id=${tweet_id}`;
-                        }}
-                        createThreadClicked={()=>{
-                            setChosenTweet(k)
-                            setCreateThreadName("")
-                            setOpenModal("create_thread")
-                        }}
-                        url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
-                        ></Tweet>
-                    )
-                }) : (
-                    <Tweet tweet_id={"1"}  tweet={`
-Nothing here **yet**!`} key={1} date="Start of time"
-                    onClick={()=>{}}
-                    editClicked={()=>{}}
-                    deleteClicked={()=>{}}
-                    visible={true}
-                    showMenu={false}
-                    threadList={[]}
-                    externalClicked={null}
-                    viewThread={null}
-                    url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
-                        />
-                )
-            }
-            </div>
+                    </div>
             </div>
             {(threadVisible && threadData)?(
-            <div className="max-h-full ml-[10px] float-right overflow-y-scroll">
-            <div className="w-[90%] md:w-[510px]">
-                <span className="text-xl">{">> "}<b>{threadData.name}</b></span>
-                <FiZap
-                onClick={()=>{setThreadVisible(false)}}
-                className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20}/>
-                <FiExternalLink
-                onClick={()=>{router.push(
-                    `${process.env.NEXT_PUBLIC_HOST}/user/${username}/threads/${threadData?.id}/`)}}
-                className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20}/>
-                {loggedIn?(
-                    <FiEdit3
-                    onClick={()=>{router.push(
-                        `${process.env.NEXT_PUBLIC_HOST}/user/${username}/threads/${threadData?.id}/`)}}
-                    className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20}/>
-                ):null}
-            </div>
-            <div className="flex flex-col items-center">
-            { threadData.tweets.length > 0 ?
-                threadData.tweets.map((k: TweetType ,idx : number)=>{
-                    return (
-                        <Tweet
-                        visible={true}
-                        key={idx}
-                        tweet_id={k.id}
-                        tweet={k.tweet}
-                        date={k.created_at}
-                        showMenu={loggedIn}
-                        onClick={()=>{}}
-                        editClicked={()=>{onEditTweetClicked(k)()}}
-                        deleteClicked={()=>{onDeleteTweetClicked(k)()}}
-                        url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
-                        externalClicked={(tweet_id:string)=>{
-                            location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?id=${tweet_id}`;
-                        }}
-                        viewThread={null}
-                        threadList={[]}
-                        ></Tweet>
-                    )
-                }) : (
-                    <Tweet tweet_id={"1"}  tweet={`
+            <div className="ml-[10px] max-h-full float-right overflow-y-scroll">
+                        <div className="w-[90%] md:w-[510px]">
+                            <span className="text-xl">{">> "}<b>{threadData.name}</b></span>
+                            <FiZap
+                                onClick={() => { setThreadVisible(false) }}
+                                className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20} />
+                            <FiExternalLink
+                                onClick={() => { setThreadVisible(false) }}
+                                className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20} />
+                            {loggedIn ? (
+                                <FiEdit3
+                                    onClick={() => { setThreadVisible(false) }}
+                                    className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20} />
+                            ) : null}
+                        </div>
+                        {threadData.tweets.length > 0 ?
+                            threadData.tweets.map((k: TweetType, idx: number) => {
+                                return (
+                                    <Tweet
+                                        visible={true}
+                                        key={idx}
+                                        tweet_id={k.id}
+                                        tweet={k.tweet}
+                                        date={k.created_at}
+                                        showMenu={loggedIn}
+                                        onClick={() => { }}
+                                        editClicked={() => { onEditTweetClicked(k)() }}
+                                        deleteClicked={() => { onDeleteTweetClicked(k)() }}
+                                        url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?` + searchParams.toString()}
+                                        externalClicked={(tweet_id: string) => {
+                                            location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?id=${tweet_id}`;
+                                        }}
+                                        viewThread={null}
+                                        threadList={[]}
+                                        shownThread={params.thread_id}
+                                    ></Tweet>
+                                )
+                            }) : (
+                                <Tweet tweet_id={"1"} tweet={`
 Nothing here **yet**!`} key={1} date="Start of time"
-                    onClick={()=>{}}
-                    editClicked={()=>{}}
-                    deleteClicked={()=>{}}
-                    externalClicked={null}
-                    showMenu={false}
-                    visible={true}
-                    threadList={[]}
-                    viewThread={null}
-                    url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
-                        />
-                )
-            }
-            </div>
-            </div>
-            ):null }
+                                    onClick={() => { }}
+                                    editClicked={() => { }}
+                                    deleteClicked={() => { }}
+                                    externalClicked={null}
+                                    showMenu={false}
+                                    visible={true}
+                                    threadList={[]}
+                                    viewThread={null}
+                                    url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?` + searchParams.toString()}
+                                />
+                            )
+                        }
+                    </div>
+                ) : null}
             </div>
         { /* editTweetModal */ }
             <ReactModal

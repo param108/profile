@@ -74,7 +74,7 @@ type Store interface {
 	DeleteGuestData(userID string, maxTweets int, writer string) error
 
 	// CreateThread Create a thread for a user
-	CreateThread(userID string, writer string) (*models.Thread, error)
+	CreateThread(userID, name, writer string) (*models.Thread, error)
 
 	// DeleteThread Create a thread for a user
 	DeleteThread(userID string, threadID string, writer string) (*models.Thread, error)

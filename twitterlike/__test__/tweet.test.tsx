@@ -34,7 +34,102 @@ Then [**signup**](https://google.com)!
   "baseElement": <body>
     <div>
       <div
-        class="border border-t-slate-100  bg-white hover:bg-cyan-50 w-[90%] md:w-[510px] min-h-[100px] pl-[15px] pr-[5px] pt-[5px] pb-[40px] overflow-x-auto"
+        class="border w-[90%] md:w-[510px]"
+      >
+        <div
+          class="
+            w-full bg-white hover:bg-cyan-50
+            min-h-[100px] pl-[15px] pr-[5px] pt-[5px]
+            pb-[40px] overflow-x-auto m-auto invisible"
+        >
+          <div
+            class="flex flex-row"
+          >
+            <i
+              class="text-gray-300"
+            >
+              13/03/2022
+            </i>
+            <br />
+          </div>
+          <span
+            class="text-gray-600"
+          >
+            <div>
+              <div
+                class=""
+              >
+                <p>
+                  You can do all this here and you own your data,
+download as you wish.
+                </p>
+                
+
+                <p>
+                  Unlike twitter this is not a 
+                  <strong>
+                    performance
+                  </strong>
+                  ,
+                </p>
+                
+
+                <p>
+                  this is 
+                  <strong>
+                    recreation
+                  </strong>
+                  . This is 
+                  <strong>
+                    expression
+                  </strong>
+                  .
+                </p>
+                
+
+                <p>
+                  This is 
+                  <strong>
+                    Freedom
+                  </strong>
+                  !
+                </p>
+                
+
+                <p>
+                  <em>
+                    Interested ?
+                  </em>
+                </p>
+                
+
+                <p>
+                  Then 
+                  <a
+                    href="https://google.com"
+                  >
+                    <strong>
+                      signup
+                    </strong>
+                  </a>
+                  !
+                </p>
+              </div>
+            </div>
+          </span>
+        </div>
+      </div>
+    </div>
+  </body>,
+  "container": <div>
+    <div
+      class="border w-[90%] md:w-[510px]"
+    >
+      <div
+        class="
+            w-full bg-white hover:bg-cyan-50
+            min-h-[100px] pl-[15px] pr-[5px] pt-[5px]
+            pb-[40px] overflow-x-auto m-auto invisible"
       >
         <div
           class="flex flex-row"
@@ -112,87 +207,6 @@ download as you wish.
           </div>
         </span>
       </div>
-    </div>
-  </body>,
-  "container": <div>
-    <div
-      class="border border-t-slate-100  bg-white hover:bg-cyan-50 w-[90%] md:w-[510px] min-h-[100px] pl-[15px] pr-[5px] pt-[5px] pb-[40px] overflow-x-auto"
-    >
-      <div
-        class="flex flex-row"
-      >
-        <i
-          class="text-gray-300"
-        >
-          13/03/2022
-        </i>
-        <br />
-      </div>
-      <span
-        class="text-gray-600"
-      >
-        <div>
-          <div
-            class=""
-          >
-            <p>
-              You can do all this here and you own your data,
-download as you wish.
-            </p>
-            
-
-            <p>
-              Unlike twitter this is not a 
-              <strong>
-                performance
-              </strong>
-              ,
-            </p>
-            
-
-            <p>
-              this is 
-              <strong>
-                recreation
-              </strong>
-              . This is 
-              <strong>
-                expression
-              </strong>
-              .
-            </p>
-            
-
-            <p>
-              This is 
-              <strong>
-                Freedom
-              </strong>
-              !
-            </p>
-            
-
-            <p>
-              <em>
-                Interested ?
-              </em>
-            </p>
-            
-
-            <p>
-              Then 
-              <a
-                href="https://google.com"
-              >
-                <strong>
-                  signup
-                </strong>
-              </a>
-              !
-            </p>
-          </div>
-        </div>
-      </span>
     </div>
   </div>,
   "debug": [Function],

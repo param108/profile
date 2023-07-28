@@ -349,7 +349,7 @@ The first tweet is #tweet_%d
 	var threadTweet *models.Tweet
 	var threadID string
 	t.Run("insert tweet with thread", func(t *testing.T) {
-		thread, err := testDB.CreateThread(userID, tweetWriter)
+		thread, err := testDB.CreateThread(userID, "junk", tweetWriter)
 		threadID = thread.ID
 		assert.Nil(t, err, "failed to create thread")
 		tweetStr := fmt.Sprintf(`#thread:%s:%d

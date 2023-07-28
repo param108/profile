@@ -100,6 +100,7 @@ export default function Home() {
   return (
     <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
       <Header showSpinner={false}></Header>
+      <div className='mt-[60px]'/>
       <div className='flex flex-col w-full items-center' onClick={(e)=>{
         if (loggedIn) {
           location.href=`/user/${username}/tweets`;
@@ -125,7 +126,10 @@ Used to be called **micro-blogging** until twitter
                   date={k.created_at} onClick={()=>{}}
                   deleteClicked={()=>{}} editClicked={()=>{}}
                   showMenu={false}
+                  visible={true}
                   externalClicked={null}
+                  viewThread={null}
+                  threadList={[]}
                   url={`${process.env.NEXT_PUBLIC_HOST}/`}
             ></Tweet>)
         })

@@ -160,14 +160,14 @@ export default function Header(props:HeaderProps) {
                 <div className="bg-black text-white max-w-[70%]">
                     <ul className="">
                             {(loggedInUser && loggedInUser.length > 0)?(
-                                <li className="bg-black hover:bg-slate-500 w-full pl-[5px] py-[5px] block"
+                                <li className="select-none bg-black hover:bg-slate-500 w-full pl-[15px] py-[5px] block"
                                     onClick={() =>(location.href=`/user/${loggedInUser}/tweets`)}>{"@"+loggedInUser}</li>): null}
-                            <li className="bg-black hover:bg-slate-500 w-full pl-[5px] py-[5px] block"
+                            <li className="select-none bg-black hover:bg-slate-500 w-full pl-[15px] py-[5px] block"
                                 onClick={menuClick("login")}>{"Login/Signup"}</li>
-                            <li className="bg-black hover:bg-slate-500 w-full pl-[5px] py-[5px] block"
+                            <li className="select-none bg-black hover:bg-slate-500 w-full pl-[15px] py-[5px] block"
                                 onClick={menuClick("about")}>{"About"}</li>
                             {((!loggedInUser) || loggedInUser.length === 0)?(
-                            <li className="bg-black hover:bg-slate-500 w-full pl-[5px] py-[5px] block"
+                            <li className="select-none bg-black hover:bg-slate-500 w-full pl-[15px] py-[5px] block"
                                 onClick={()=>{location.href=`${process.env.NEXT_PUBLIC_BE_URL}/users/login?source=guest&redirect_url=${path}&guest=true`}}>{"Guest Login"}</li>
                             ):null}
                     </ul>

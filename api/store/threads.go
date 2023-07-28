@@ -2,8 +2,8 @@ package store
 
 import "github.com/param108/profile/api/models"
 
-func (s *StoreImpl) CreateThread(userID, writer string) (*models.Thread, error) {
-	return s.db.CreateThread(userID, writer)
+func (s *StoreImpl) CreateThread(userID, name, writer string) (*models.Thread, error) {
+	return s.db.CreateThread(userID, name, writer)
 }
 
 func (s *StoreImpl) DeleteThread(userID, threadID, writer string) (*models.Thread, error) {

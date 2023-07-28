@@ -3,6 +3,7 @@ package threads
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -21,7 +22,19 @@ func CreateMakeThreadHandler(db store.Store) http.HandlerFunc {
 			return
 		}
 
-		thread, err := db.CreateThread(userID, os.Getenv("WRITER"))
+		data, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "couldnt read:"+err.Error())
+			return
+		}
+
+		req := models.CreateThreadRequest{}
+		if err := json.Unmarshal(data, &req); err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "couldnt parse:"+err.Error())
+			return
+		}
+
+		thread, err := db.CreateThread(userID, req.Name, os.Getenv("WRITER"))
 		if err != nil {
 			utils.WriteError(rw, http.StatusInternalServerError, "failed to create:"+err.Error())
 			return
@@ -33,21 +46,29 @@ func CreateMakeThreadHandler(db store.Store) http.HandlerFunc {
 
 func CreateGetThreadHandler(db store.Store) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		userID := r.Header.Get("TRIBIST_USERID")
-		if len(userID) == 0 {
-			utils.WriteError(rw, http.StatusForbidden, "unknown user")
-			return
-		}
-
 		v := mux.Vars(r)
 
 		threadID := strings.TrimSpace(v["thread_id"])
 
 		if len(threadID) == 0 {
 			utils.WriteError(rw, http.StatusBadRequest, "invalid thread")
+			return
 		}
 
-		threadData, err := db.GetThread(userID, threadID, os.Getenv("WRITER"))
+		userStr := strings.TrimSpace(v["username"])
+		if len(userStr) == 0 {
+			utils.WriteError(rw, http.StatusBadRequest, "invalid user")
+			return
+		}
+
+		user, err := db.GetUserByHandle(userStr, os.Getenv("WRITER"))
+		if err != nil {
+			log.Println("failed get userbyhandle:", err.Error())
+			utils.WriteError(rw, http.StatusBadRequest, "invalid user")
+			return
+		}
+
+		threadData, err := db.GetThread(user.ID, threadID, os.Getenv("WRITER"))
 		if err != nil {
 			utils.WriteError(rw, http.StatusBadRequest, "failed to get:"+err.Error())
 			return
