@@ -461,7 +461,8 @@ Unknown Tweet`}
     }
 
     return (
-        <main className="flex bg-white min-h-screen max-h-screen w-full overflow-y-hidden flex-col items-center justify-stretch">
+        <main className={"flex bg-white min-h-screen max-h-screen w-full flex-col items-center justify-stretch" +
+            (threadVisible?"":" overflow-scroll")}>
             <Header showSpinner={pageLoading}></Header>
             <div className="mt-[60px]"/>
             <div className="flex flex-col items-center">
@@ -481,7 +482,7 @@ Unknown Tweet`}
             <div className={"flex flex-row w-full md:w-fit" +
                 (threadVisible?" overflow-hidden":"")}>
             <div className={"max-h-full w-full md:w-fit" +
-                (threadVisible?" md:overflow-y-scroll":"")}>
+                (threadVisible?" overflow-y-scroll":"")}>
                     <div className="flex flex-col items-center">
                     <span className="text-black pl-[10px] text-xl w-[90%] md:w-[510px]">{">> "}<b>{threadName}</b></span>
                         {tweets.length > 0 ?
@@ -544,7 +545,7 @@ Nothing here **yet**!`} key={1} date="Start of time"
                             )
                         }
                     </div>
-                    <div className="mt-[10px]">
+                    <div className="mt-[10px] mb-[50px]">
                         {loggedIn ? (
                             <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
                                 onSendClicked={onSendClicked} value={editorValue} viewing={showEditorTweet}
