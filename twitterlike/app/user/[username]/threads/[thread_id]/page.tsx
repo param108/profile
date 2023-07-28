@@ -324,7 +324,8 @@ Unknown Tweet`}
             ...t,
             ...newThreads
         }))
-    }, [threadCatalog, tweets, username])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tweets, username])
     // Add infinite scroll!
     useEffect(()=> {
         const infiniteScroll = () => {
