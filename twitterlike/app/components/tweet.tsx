@@ -39,7 +39,7 @@ export default function Tweet(props: TweetProps) {
     var toplayerStyle = `
             w-full bg-white hover:bg-cyan-50
             min-h-[100px] pl-[15px] pr-[5px] pt-[5px]
-            pb-[40px] overflow-x-auto`;
+            pb-[40px] overflow-x-auto m-auto`;
     if (!props.visible) {
         toplayerStyle += " invisible"
     }

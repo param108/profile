@@ -26,6 +26,7 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+@media only screen and (min-width: 768px) {
 ::-webkit-scrollbar {
   width: 10px;
   height: 5px;
@@ -34,4 +35,5 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background-color: gray;
+}
 }

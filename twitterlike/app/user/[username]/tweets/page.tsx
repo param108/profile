@@ -552,43 +552,50 @@ Unknown Tweet`}
     }
 
     return (
-        <main className="flex bg-white min-h-screen max-h-screen  w-full overflow-y-hidden flex-col items-center justify-stretch">
+        <main className={"flex bg-white min-h-screen max-h-screen  w-full flex-col items-center justify-stretch" +
+            (threadVisible?"":" overflow-scroll")}>
             <Header showSpinner={pageLoading}></Header>
             <div className="mt-[60px]"/>
-            <div className="flex flex-row max-h-full overflow-y-clip">
-            <div className="max-h-full overflow-y-scroll  ">
-            {loggedIn?(
-                <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
-                    onSendClicked={onSendClicked} value={editorValue} viewing={showEditorTweet}
-                    onChange={onChanged} key={10000} tweet={{
-                        created_at: "Preview",
-                        id: 'new',
-                        tweet: ''
-                    }}
-                    showMenu={false}
-                    defaultMessage={`
+            <div className="flex flex-col items-center w-full">
+                {loggedIn ? (
+                    <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
+                        onSendClicked={onSendClicked} value={editorValue} viewing={showEditorTweet}
+                        onChange={onChanged} key={10000} tweet={{
+                            created_at: "Preview",
+                            id: 'new',
+                            tweet: ''
+                        }}
+                        showMenu={false}
+                        defaultMessage={`
 This is a blog. A **blog** of _tweets_.
 Used to be called **micro-blogging** until twitter
 **Hijacked** the space.
 `}
-                    editClicked={()=>{}}
-                    deleteClicked={()=>{}}
-                    editorHideable={false}
-                    hideClicked={()=>{}}
-                    visible={true}
-                    url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
-                                   ></EditPair>):(
-                <div className="mb-[10px]">
-                    <span className="text-pink-600 cursor-pointer" onClick={()=>(location.href=`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets`)}>{username}</span>
-                </div>
-            )}
-            { showError?(
-                <div
-                    className="p-[5px] bg-red-200 rounded mb-[5px]"
-                    onClick={()=>setShowError(false)}>
-                    {errorMessage}
-                </div>):null
-            }
+                        editClicked={() => { }}
+                        deleteClicked={() => { }}
+                        editorHideable={false}
+                        hideClicked={() => { }}
+                        visible={true}
+                        url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?` + searchParams.toString()}
+                    ></EditPair>) : (
+                    <div className="mb-[10px]">
+                        <span className="text-pink-600 cursor-pointer" onClick={() => (location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets`)}>{username}</span>
+                    </div>
+                )}
+                {showError ? (
+                    <div
+                        className="p-[5px] bg-red-200 rounded mb-[5px]"
+                        onClick={() => setShowError(false)}>
+                        {errorMessage}
+                    </div>) : null
+                }
+            </div>
+
+            <div className={"flex flex-row" +
+                (threadVisible?" overflow-hidden":"")}>
+            <div className={"max-h-full" +
+                (threadVisible?" overflow-y-scroll": "")}>
+            <div className="flex flex-col items-center">
             { tweets.length > 0 ?
                 tweets.map((k: TweetType ,idx : number)=>{
                     let threads = hasThread(k.tweet).map((x:ThreadInfo)=>{
@@ -614,8 +621,12 @@ Used to be called **micro-blogging** until twitter
                         deleteClicked={()=>{onDeleteTweetClicked(k)()}}
                         threadList={threads}
                         viewThread={(threadID:string)=>{
-                            setThreadData(threadCatalog[threadID])
-                            setThreadVisible(true)
+                            if (bigScreen || largeScreen) {
+                                setThreadData(threadCatalog[threadID])
+                                setThreadVisible(true)
+                            } else {
+                                location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/threads/${threadID}/`;
+                            }
                         }}
                         externalClicked={(tweet_id:string)=>{
                             location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?id=${tweet_id}`;
@@ -644,8 +655,9 @@ Nothing here **yet**!`} key={1} date="Start of time"
                 )
             }
             </div>
+            </div>
             {(threadVisible && threadData)?(
-            <div className="max-h-full float-right overflow-y-scroll">
+            <div className="max-h-full ml-[10px] float-right overflow-y-scroll">
             <div className="w-[90%] md:w-[510px]">
                 <span className="text-xl">{">> "}<b>{threadData.name}</b></span>
                 <FiZap
@@ -662,6 +674,7 @@ Nothing here **yet**!`} key={1} date="Start of time"
                     className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20}/>
                 ):null}
             </div>
+            <div className="flex flex-col items-center">
             { threadData.tweets.length > 0 ?
                 threadData.tweets.map((k: TweetType ,idx : number)=>{
                     return (
@@ -698,6 +711,7 @@ Nothing here **yet**!`} key={1} date="Start of time"
                         />
                 )
             }
+            </div>
             </div>
             ):null }
             </div>
