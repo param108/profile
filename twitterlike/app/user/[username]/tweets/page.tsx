@@ -563,31 +563,6 @@ Unknown Tweet`}
             <Header showSpinner={pageLoading}></Header>
             <div className="mt-[60px]"/>
             <div className="flex flex-col items-center w-full">
-                {loggedIn ? (
-                    <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
-                        onSendClicked={onSendClicked} value={editorValue} viewing={showEditorTweet}
-                        onChange={onChanged} key={10000} tweet={{
-                            created_at: "Preview",
-                            id: 'new',
-                            tweet: ''
-                        }}
-                        showMenu={false}
-                        defaultMessage={`
-This is a blog. A **blog** of _tweets_.
-Used to be called **micro-blogging** until twitter
-**Hijacked** the space.
-`}
-                        editClicked={() => { }}
-                        deleteClicked={() => { }}
-                        editorHideable={false}
-                        hideClicked={() => { }}
-                        visible={true}
-                        url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?` + searchParams.toString()}
-                    ></EditPair>) : (
-                    <div className="mb-[10px]">
-                        <span className="text-pink-600 cursor-pointer" onClick={() => (location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets`)}>{username}</span>
-                    </div>
-                )}
                 {showError ? (
                     <div
                         className="p-[5px] bg-red-200 rounded mb-[5px]"
@@ -601,7 +576,32 @@ Used to be called **micro-blogging** until twitter
                 (threadVisible?" overflow-hidden":"")}>
             <div className={"max-h-full" +
                 (threadVisible?" overflow-y-scroll": "")}>
-            <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center">
+                {loggedIn ? (
+                    <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
+                    onSendClicked={onSendClicked} value={editorValue} viewing={showEditorTweet}
+                    onChange={onChanged} key={10000} tweet={{
+                        created_at: "Preview",
+                        id: 'new',
+                        tweet: ''
+                    }}
+                    showMenu={false}
+                    defaultMessage={`
+This is a blog. A **blog** of _tweets_.
+Used to be called **micro-blogging** until twitter
+**Hijacked** the space.
+`}
+                    editClicked={() => { }}
+                    deleteClicked={() => { }}
+                    editorHideable={false}
+                    hideClicked={() => { }}
+                    visible={true}
+                    url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?` + searchParams.toString()}
+                        ></EditPair>) : (
+                    <div className="mb-[10px]">
+                        <span className="text-pink-600 cursor-pointer" onClick={() => (location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets`)}>{username}</span>
+                    </div>
+                )}
             { tweets.length > 0 ?
                 tweets.map((k: TweetType ,idx : number)=>{
                     let threads = hasThread(k.tweet).map((x:ThreadInfo)=>{
