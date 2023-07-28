@@ -108,7 +108,7 @@ export default function Tweet(props: TweetProps) {
                             if (v && (props.shownThread != v.id)) {
                                 return (
                                     <li
-                                    className="cursor-pointer text-blue-700 px-[15px] mb-[2px]"
+                                    className="cursor-pointer select-none text-blue-700 px-[15px] mb-[2px]"
                                     key={v.id}
                                     onClick={()=>{ if(props.viewThread){
                                         props.viewThread(v.id);
