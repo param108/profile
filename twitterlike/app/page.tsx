@@ -128,6 +128,8 @@ Used to be called **micro-blogging** until twitter
                   showMenu={false}
                   visible={true}
                   externalClicked={null}
+                  viewThread={null}
+                  threadList={[]}
                   url={`${process.env.NEXT_PUBLIC_HOST}/`}
             ></Tweet>)
         })

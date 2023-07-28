@@ -61,6 +61,8 @@ export default function EditPair( props: EditPairProps) {
             editClicked={()=>{props.editClicked()}}
             externalClicked={null}
             showMenu={props.showMenu}
+            threadList={[]}
+            viewThread={null}
             onClick={()=>{}}/>
             </div>
         ):null)}

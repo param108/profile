@@ -154,6 +154,8 @@ Unknown Tweet`}
                 editClicked={()=>{}}
                 showMenu={false}
                 onClick={()=>{}}
+                threadList={[]}
+                viewThread={null}
                 externalClicked={null}
                 url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                 />
@@ -221,6 +223,8 @@ Unknown Tweet`}
                 showMenu={false}
                 onClick={()=>{}}
                 externalClicked={null}
+                viewThread={null}
+                threadList={[]}
                 url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                 />
                 <input type="text" className="rounded p-[5px] mt-[5px] border border-slate-200 w-[96%] md:w-[510px]"
@@ -316,11 +320,11 @@ Unknown Tweet`}
             })
         })
 
-        setThreadCatalog({
-            ...threadCatalog,
+        setThreadCatalog((t)=>({
+            ...t,
             ...newThreads
-        })
-    }, [tweets])
+        }))
+    }, [threadCatalog, tweets, username])
     // Add infinite scroll!
     useEffect(()=> {
         const infiniteScroll = () => {
@@ -349,7 +353,7 @@ Unknown Tweet`}
         window.removeEventListener('scroll', infiniteScroll);
         window.addEventListener('scroll', infiniteScroll, { passive: true });
         return () => window.removeEventListener('scroll', infiniteScroll);
-    }, [params.username, tweets, queryTags, reverseFlag])
+    }, [selectedTweet, params.username, tweets, queryTags, reverseFlag])
 
     useEffect(()=>{
         if (APIToken.length == 0) {

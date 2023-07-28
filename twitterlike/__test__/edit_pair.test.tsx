@@ -31,10 +31,10 @@ Used to be called **micro-blogging** until twitter
   "baseElement": <body>
     <div>
       <div
-        class="w-full flex flex-col items-center"
+        class="w-full flex flex-col items-center invisible"
       >
         <div
-          class="bg-sky-200 w-[96%] mt-[60px] md:w-[510px] rounded mb-[10px]"
+          class="bg-sky-200 w-[96%] md:w-[510px] rounded mb-[10px]"
         >
           <textarea
             class="block w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black"
@@ -125,29 +125,36 @@ Used to be called **micro-blogging** until twitter
           class="flex flex-col items-center w-full"
         >
           <div
-            class="border border-t-slate-100  bg-white hover:bg-cyan-50 w-[90%] md:w-[510px] min-h-[100px] pl-[15px] pr-[5px] pt-[5px] pb-[40px] overflow-x-auto"
+            class="border w-[90%] md:w-[510px]"
           >
             <div
-              class="flex flex-row"
+              class="
+            w-full bg-white hover:bg-cyan-50
+            min-h-[100px] pl-[15px] pr-[5px] pt-[5px]
+            pb-[40px] overflow-x-auto m-auto invisible"
             >
-              <i
-                class="text-gray-300"
-              />
-              <br />
-            </div>
-            <span
-              class="text-gray-600"
-            >
-              <div>
-                <div
-                  class=""
-                >
-                  <p>
-                    Hello World
-                  </p>
-                </div>
+              <div
+                class="flex flex-row"
+              >
+                <i
+                  class="text-gray-300"
+                />
+                <br />
               </div>
-            </span>
+              <span
+                class="text-gray-600"
+              >
+                <div>
+                  <div
+                    class=""
+                  >
+                    <p>
+                      Hello World
+                    </p>
+                  </div>
+                </div>
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -155,10 +162,10 @@ Used to be called **micro-blogging** until twitter
   </body>,
   "container": <div>
     <div
-      class="w-full flex flex-col items-center"
+      class="w-full flex flex-col items-center invisible"
     >
       <div
-        class="bg-sky-200 w-[96%] mt-[60px] md:w-[510px] rounded mb-[10px]"
+        class="bg-sky-200 w-[96%] md:w-[510px] rounded mb-[10px]"
       >
         <textarea
           class="block w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black"
@@ -249,29 +256,36 @@ Used to be called **micro-blogging** until twitter
         class="flex flex-col items-center w-full"
       >
         <div
-          class="border border-t-slate-100  bg-white hover:bg-cyan-50 w-[90%] md:w-[510px] min-h-[100px] pl-[15px] pr-[5px] pt-[5px] pb-[40px] overflow-x-auto"
+          class="border w-[90%] md:w-[510px]"
         >
           <div
-            class="flex flex-row"
+            class="
+            w-full bg-white hover:bg-cyan-50
+            min-h-[100px] pl-[15px] pr-[5px] pt-[5px]
+            pb-[40px] overflow-x-auto m-auto invisible"
           >
-            <i
-              class="text-gray-300"
-            />
-            <br />
-          </div>
-          <span
-            class="text-gray-600"
-          >
-            <div>
-              <div
-                class=""
-              >
-                <p>
-                  Hello World
-                </p>
-              </div>
+            <div
+              class="flex flex-row"
+            >
+              <i
+                class="text-gray-300"
+              />
+              <br />
             </div>
-          </span>
+            <span
+              class="text-gray-600"
+            >
+              <div>
+                <div
+                  class=""
+                >
+                  <p>
+                    Hello World
+                  </p>
+                </div>
+              </div>
+            </span>
+          </div>
         </div>
       </div>
     </div>
