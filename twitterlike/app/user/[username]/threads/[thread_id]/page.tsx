@@ -169,7 +169,7 @@ Unknown Tweet`}
             </div>
         )
     }
-
+    const router = useRouter();
     var [createThreadName, setCreateThreadName ] = useState("")
     var [createThreadLoading, setCreateThreadLoading] = useState(false)
     var [createThreadErrorMessage, setCreateThreadErrorMessage] = useState("")
@@ -288,12 +288,11 @@ Unknown Tweet`}
                 setPageLoading(false)
             });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [params.username])
+    }, [params.username, params.thread_id])
 
     useEffect(()=>{
         var seen:{ [name:string]:boolean } = {}
         var newThreads: { [name:string]:(ThreadData|null) } = {}
-        var savedThreadCatalog = {...threadCatalog}
         tweets.forEach((tweet: TweetType)=>{
             let ts = hasThread(tweet.tweet);
             ts.forEach((t: ThreadInfo)=>{
@@ -307,12 +306,12 @@ Unknown Tweet`}
                     getThread(username, t.id).then(
                         (res)=>{
                             let key = res.data.data.id;
-                            let data = {...savedThreadCatalog};
-                            data[key] = res.data.data;
-                            savedThreadCatalog = data;
-                            console.log(savedThreadCatalog);
 
-                            setThreadCatalog(savedThreadCatalog);
+                            setThreadCatalog((t)=> {
+                                let data = {...t};
+                                data[key] = res.data.data;
+                                return data;
+                            });
                         }
                     )
                     newThreads[t.id] = null;
@@ -579,13 +578,15 @@ Used to be called **micro-blogging** until twitter
                                 onClick={() => { setThreadVisible(false) }}
                                 className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20} />
                             <FiExternalLink
-                                onClick={() => { setThreadVisible(false) }}
-                                className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20} />
-                            {loggedIn ? (
+                                onClick={()=>{router.push(
+                                    `${process.env.NEXT_PUBLIC_HOST}/user/${username}/threads/${threadData?.id}/`)}}
+                                className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20}/>
+                            {loggedIn?(
                                 <FiEdit3
-                                    onClick={() => { setThreadVisible(false) }}
-                                    className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20} />
-                            ) : null}
+                                    onClick={()=>{router.push(
+                                        `${process.env.NEXT_PUBLIC_HOST}/user/${username}/threads/${threadData?.id}/`)}}
+                                    className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20}/>
+                            ):null}
                         </div>
                         {threadData.tweets.length > 0 ?
                             threadData.tweets.map((k: TweetType, idx: number) => {

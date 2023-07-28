@@ -387,7 +387,6 @@ Unknown Tweet`}
     useEffect(()=>{
         var seen:{ [name:string]:boolean } = {}
         var newThreads: { [name:string]:(ThreadData|null) } = {}
-        var savedThreadCatalog = {...threadCatalog}
         tweets.forEach((tweet: TweetType)=>{
             let ts = hasThread(tweet.tweet);
             ts.forEach((t: ThreadInfo)=>{
@@ -401,12 +400,12 @@ Unknown Tweet`}
                     getThread(username, t.id).then(
                         (res)=>{
                             let key = res.data.data.id;
-                            let data = {...savedThreadCatalog};
-                            data[key] = res.data.data;
-                            savedThreadCatalog = data;
-                            console.log(savedThreadCatalog);
+                            setThreadCatalog((t)=> {
+                                let data = {...t};
+                                data[key] = res.data.data;
+                                return data;
+                            });
 
-                            setThreadCatalog(savedThreadCatalog);
                         }
                     )
                     newThreads[t.id] = null;
