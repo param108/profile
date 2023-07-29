@@ -293,6 +293,7 @@ Unknown Tweet`}
     useEffect(()=>{
         var seen:{ [name:string]:boolean } = {}
         var newThreads: { [name:string]:(ThreadData|null) } = {}
+        setEditorValue(`#thread:${params.thread_id}:${tweets.length}`)
         tweets.forEach((tweet: TweetType)=>{
             let ts = hasThread(tweet.tweet);
             ts.forEach((t: ThreadInfo)=>{
