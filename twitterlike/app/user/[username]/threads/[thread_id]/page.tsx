@@ -5,8 +5,8 @@ import Editor from "@/app/components/editor";
 import EditPair from "@/app/components/edit_tweet_pair";
 import Header from "@/app/components/header";
 import Tweet from "@/app/components/tweet";
-import { addThread, hasThread, mergeTweets, ThreadInfo } from "@/app/strings";
-import { AxiosResponse } from "axios";
+import { addThread, hasThread, mergeTweets, sortThreadTweets, ThreadInfo } from "@/app/strings";
+import { AxiosError, AxiosResponse } from "axios";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 import { FiEdit3, FiExternalLink, FiZap } from "react-icons/fi";
@@ -77,7 +77,6 @@ export default function ShowTweet() {
     var [ threadCatalog, setThreadCatalog ] = useState<{[name:string]:(ThreadData|null)}>({})
     // should we show the tweet for the editor?
     var [ showEditorTweet, setShowEditorTweet ] = useState(false)
-    var [ edittableTweet, setEdittableTweet ] = useState("")
     var [ editTweetValue, setEditTweetValue ] = useState("")
     var [ editTweetLoading, setEditTweetLoading ] = useState(false)
     var [ editTweetErrorMessage, setEditTweetErrorMessage ] = useState("")
@@ -85,13 +84,12 @@ export default function ShowTweet() {
     var [ delTweetLoading, setDelTweetLoading ] = useState(false)
     var [ delTweetErrorMessage, setDelTweetErrorMessage ] = useState("")
     var [ delTweetShowError, setDelTweetShowError ] = useState(false)
-    var [ queryTags, setQueryTags ] :[ string[], Function ] = useState([])
+
     // thread control
     var [ threadVisible, setThreadVisible ] = useState(false)
     var [ threadData, setThreadData ] = useState<ThreadData|null>(null)
     var [ pageLoading, setPageLoading ] = useState(false)
     var [ reverseFlag, setReverseFlag ] = useState(false)
-    var [ selectedTweet, setSelectedTweet ] = useState("")
     var [ threadName, setThreadName ] = useState("")
 
     console.log("rerendering user-tweet-page");
@@ -184,12 +182,21 @@ Unknown Tweet`}
                 chosenTweet.tweet = addThread(chosenTweet.tweet, thread_id);
                 updateTweet(APIToken, chosenTweet.tweet, chosenTweet.id).
                     then((res)=>{
-                        setTweets(mergeTweets(tweets,[res.data.data], reverseFlag))
-                        setOpenModal("closed")
+                        getThread(params.username, params.thread_id).
+                            then((res:AxiosResponse)=>{
+                                setTweets(sortThreadTweets(res.data.data.tweets, params.thread_id))
+                                setOpenModal("closed")
+                            }).
+                            catch(()=>{
+                                setErrorMessage("Failed to get tweets.")
+                                setShowError(true)
+                            }).
+                            finally(()=>{
+                                setCreateThreadLoading(false)
+                            })
                     }).catch(()=>{
                         setCreateThreadErrorMessage("Something went wrong")
                         setCreateThreadShowError(true)
-                    }).finally(()=>{
                         setCreateThreadLoading(false)
                     })
             }).
@@ -276,17 +283,17 @@ Unknown Tweet`}
 
         getThread(params.username, params.thread_id).
             then((res:AxiosResponse)=>{
-                console.log(res.data.data)
-                setTweets(res.data.data.tweets)
+                setTweets(sortThreadTweets(res.data.data.tweets, params.thread_id))
                 setThreadName(res.data.data.name)
                 setUsername(params.username)
-                setPageLoading(false)
             }).
             catch(()=>{
                 setErrorMessage("Failed to get tweets.")
                 setShowError(true)
+            }).
+            finally(()=>{
                 setPageLoading(false)
-            });
+            })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params.username, params.thread_id])
 
@@ -357,17 +364,19 @@ Unknown Tweet`}
             setEditorValue(tweet)
             sendTweet(APIToken, tweet).
                 then(()=>{
-                    setEditorValue("")
-                    setShowEditorTweet(false)
-                    setEditorLoading(false)
                     getThread(params.username, params.thread_id).
                         then((res:AxiosResponse)=>{
-                            setTweets(res.data.data.tweets)
+                            setTweets(sortThreadTweets(res.data.data.tweets, params.thread_id))
+                            setEditorValue("")
+                            setShowEditorTweet(false)
                         }).
                         catch(()=>{
                             setErrorMessage("Failed to get tweets.")
                             setShowError(true)
-                        });
+                        }).
+                        finally(()=>{
+                            setEditorLoading(false)
+                        })
                 }).
                 catch(()=>{
                     setShowError(true)
@@ -399,10 +408,18 @@ Unknown Tweet`}
         setEditTweetLoading(true)
         updateTweet(APIToken, editTweetValue, chosenTweet.id).
         then((res)=>{
-            setEditTweetLoading(false)
-            console.log(res.data)
-            setTweets(mergeTweets(tweets,[res.data.data], reverseFlag))
-            setOpenModal("closed")
+            getThread(params.username, params.thread_id).
+                then((res:AxiosResponse)=>{
+                    setTweets(sortThreadTweets(res.data.data.tweets, params.thread_id))
+                    setOpenModal("closed")
+                }).
+                catch(()=>{
+                    setErrorMessage("Failed to get tweets.")
+                    setShowError(true)
+                }).
+                finally(()=>{
+                    setEditTweetLoading(false)
+                })
         }).catch(()=>{
             setEditTweetErrorMessage("Something went wrong")
             setEditTweetShowError(true)
@@ -421,13 +438,22 @@ Unknown Tweet`}
         setDelTweetLoading(true)
         deleteTweet(APIToken, chosenTweet.id).
             then((res)=>{
-                setTweets(tweets.filter((x)=>(x.id != res.data.data.id)))
-                setOpenModal("closed")
+                getThread(params.username, params.thread_id).
+                    then((res:AxiosResponse)=>{
+                        setTweets(sortThreadTweets(res.data.data.tweets, params.thread_id))
+                        setOpenModal("closed")
+                    }).
+                    catch(()=>{
+                        setErrorMessage("Failed to get tweets.")
+                        setShowError(true)
+                    }).
+                    finally(()=>{
+                        setDelTweetLoading(false)
+                    })
             }).
             catch(()=>{
                 setDelTweetErrorMessage("Something went wrong")
                 setDelTweetShowError(true)
-            }).finally(()=>{
                 setDelTweetLoading(false)
             })
     }

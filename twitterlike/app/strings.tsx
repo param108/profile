@@ -186,6 +186,39 @@ export function addThread(tweet: string, thread_id: string):string {
     return cmd + tweet;
 }
 
+// sort the thread of tweets in order of sequence number
+export function sortThreadTweets(tweets: TweetType[], thread_id: string):TweetType[] {
+    let foundTweets:{[key: string]:number} = {}
+
+    return tweets.sort((x,y) => {
+        let seqX = 0;
+        let seqY = 0;
+        if (x.id in foundTweets) {
+            seqX = foundTweets[x.id]
+        } else {
+            let threadsInfoX = hasThread(x.tweet);
+            seqX = threadsInfoX.filter((t)=>(t.id === thread_id))[0].seq;
+        }
+
+        if (y.id in foundTweets) {
+            seqY = foundTweets[y.id]
+        } else {
+            let threadsInfoY = hasThread(y.tweet);
+            seqY = threadsInfoY.filter((t)=>(t.id === thread_id))[0].seq;
+        }
+
+        if (seqX > seqY) {
+            return 1;
+        }
+
+        if (seqX < seqY) {
+            return -1;
+        }
+
+        return 0
+    })
+}
+
 export function formatTweet(tweet: string, baseURL: string):ReactElement {
     const converter = new showdown.Converter();
     
