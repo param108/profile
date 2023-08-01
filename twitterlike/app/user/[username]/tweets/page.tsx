@@ -418,6 +418,56 @@ Unknown Tweet`}
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [username, tweets])
 
+    // We need to go one layer deeper to populate the threadview
+    useEffect(()=>{
+        var seen:{ [name:string]:boolean } = {}
+        var newThreads: { [name:string]:(ThreadData|null) } = {}
+        let keys = Object.keys(threadCatalog);
+        keys.forEach((threadKey: string)=>{
+            if (threadCatalog && threadCatalog[threadKey] === null) {
+                return;
+            }
+            let thread = threadCatalog[threadKey];
+            if (thread === null) {
+                return
+            }
+
+            thread.tweets.forEach((tweet: TweetType) => {
+                let ts = hasThread(tweet.tweet);
+                ts.forEach((t: ThreadInfo)=>{
+                    if (t.id in seen) {
+                        return
+                    }
+                    seen[t.id] = true;
+
+                    if (!(t.id in threadCatalog)) {
+                        // launch a request for a thread
+                        getThread(username, t.id).then(
+                            (res) => {
+                                let key = res.data.data.id;
+                                setThreadCatalog((t) => {
+                                    let data = { ...t };
+                                    data[key] = res.data.data;
+                                    return data;
+                                });
+
+                            }
+                        )
+                        newThreads[t.id] = null;
+                    }
+                })
+            })
+        })
+
+        if (Object.keys(newThreads).length > 0) {
+            setThreadCatalog((t)=>({
+                ...t,
+                ...newThreads
+            }))
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [username, threadCatalog])
+
     useEffect(()=>{
         if (APIToken.length == 0) {
             return
@@ -688,42 +738,58 @@ Nothing here **yet**!`} key={1} date="Start of time"
                 ):null}
             </div>
             <div className="flex flex-col items-center">
-            { threadData.tweets.length > 0 ?
-                threadData.tweets.map((k: TweetType ,idx : number)=>{
-                    return (
-                        <Tweet
-                        visible={true}
-                        key={idx}
-                        tweet_id={k.id}
-                        tweet={k.tweet}
-                        date={k.created_at}
-                        showMenu={loggedIn}
-                        onClick={()=>{}}
-                        editClicked={()=>{onEditTweetClicked(k)()}}
-                        deleteClicked={()=>{onDeleteTweetClicked(k)()}}
-                        url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
-                        externalClicked={(tweet_id:string)=>{
-                            location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?id=${tweet_id}`;
-                        }}
-                        viewThread={null}
-                        threadList={[]}
-                        ></Tweet>
-                    )
-                }) : (
-                    <Tweet tweet_id={"1"}  tweet={`
+            {(()=>{
+                if (threadData && threadData.tweets.length > 0) {
+                    return threadData.tweets.map((k: TweetType ,idx : number)=>{
+                        let threadsInfo = hasThread(k.tweet)
+                        let threads = threadsInfo.map((x:ThreadInfo)=>{
+                            if (x.id === threadData?.id) {
+                                return null
+                            }
+                            if (x.id in threadCatalog) {
+                                return threadCatalog[x.id];
+                            }
+                            return null
+                        }).filter((x)=>(x !== null));
+
+                        return (
+                            <Tweet
+                            visible={true}
+                            key={idx}
+                            tweet_id={k.id}
+                            tweet={k.tweet}
+                            date={k.created_at}
+                            showMenu={loggedIn}
+                            onClick={()=>{}}
+                            editClicked={()=>{onEditTweetClicked(k)()}}
+                            deleteClicked={()=>{onDeleteTweetClicked(k)()}}
+                            url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
+                            externalClicked={(tweet_id:string)=>{
+                                location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?id=${tweet_id}`;
+                            }}
+                            viewThread={(threadID: string) => {
+                                location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/threads/${threadID}/`;
+                            }}
+
+                            threadList={threads}
+                                ></Tweet>
+                        )
+                    })} else {
+                        return (
+                            <Tweet tweet_id={"1"}  tweet={`
 Nothing here **yet**!`} key={1} date="Start of time"
-                    onClick={()=>{}}
-                    editClicked={()=>{}}
-                    deleteClicked={()=>{}}
-                    externalClicked={null}
-                    showMenu={false}
-                    visible={true}
-                    threadList={[]}
-                    viewThread={null}
-                    url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
-                        />
-                )
-            }
+                            onClick={()=>{}}
+                            editClicked={()=>{}}
+                            deleteClicked={()=>{}}
+                            externalClicked={null}
+                            showMenu={false}
+                            visible={true}
+                            threadList={[]}
+                            viewThread={null}
+                            url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
+                                />
+                        )
+                    }})()}
             </div>
             </div>
             ):null }
