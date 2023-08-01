@@ -133,7 +133,6 @@ export default function ShowTweet() {
     var [ threadCatalog, setThreadCatalog ] = useState<{[name:string]:(ThreadData|null)}>({})
     // should we show the tweet for the editor?
     var [ showEditorTweet, setShowEditorTweet ] = useState(false)
-    var [ edittableTweet, setEdittableTweet ] = useState("")
     var [ editTweetValue, setEditTweetValue ] = useState("")
     var [ editTweetLoading, setEditTweetLoading ] = useState(false)
     var [ editTweetErrorMessage, setEditTweetErrorMessage ] = useState("")
@@ -147,7 +146,6 @@ export default function ShowTweet() {
     var [ threadData, setThreadData ] = useState<ThreadData|null>(null)
     var [ pageLoading, setPageLoading ] = useState(false)
     var [ reverseFlag, setReverseFlag ] = useState(false)
-    var [ selectedTweet, setSelectedTweet ] = useState("")
 
     console.log("rerendering user-tweet-page");
     // Which modal is open
@@ -350,7 +348,6 @@ Unknown Tweet`}
         setPageLoading(true);
 
         if (idStr) {
-            setSelectedTweet(idStr);
             getATweetForUser(params.username, idStr).
                 then((res:AxiosResponse)=>{
                 console.log(res.data.data)
@@ -527,7 +524,6 @@ Unknown Tweet`}
             })
     }
 
-    var [ lastRefreshTime, setLastRefreshTime ] = useState(0);
     const onScroll=(e: UIEvent<HTMLElement>)=>{
         let scrollTop = e.currentTarget.scrollTop;
         let scrollHeight = e.currentTarget.scrollHeight;
@@ -535,14 +531,6 @@ Unknown Tweet`}
 
         if (scrollTop + clientHeight > (0.9*scrollHeight)) {
             if (!pageLoading) {
-                let currentTime = Date.now();
-
-                // only try to load if the last refresh was more than
-                // 5 seconds ago
-                if ((currentTime - lastRefreshTime) < 5000) {
-                    return;
-                }
-
                 setPageLoading(true)
                 getTweetsForUser([params.username], queryTags, tweets.length, reverseFlag).
                     then((res:AxiosResponse)=>{
@@ -554,9 +542,6 @@ Unknown Tweet`}
                         setErrorMessage("Failed to get tweets.")
                         setShowError(true)
                         setPageLoading(false)
-                    }).
-                    finally(()=>{
-                        setLastRefreshTime(Date.now())
                     })
             }
         }
