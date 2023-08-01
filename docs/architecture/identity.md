@@ -4,9 +4,10 @@
 
 Users can login using 
 
-1. Google
-2. Facebook
-3. Twitter
+1. Twitter
+and hopefully in the future
+1. Facebook (WIP
+2. Google
 
 We will store the following in our database
 1. user's email id
@@ -129,7 +130,7 @@ CREATE TABLE invalid_tokens (
     
 ## Use cases
 
-- [ ] As a user I want to be able to create an account using Twitter
+- [X] As a user I want to be able to create an account using Twitter
 - [ ] As a user I want to be able to create an account using Google
 - [ ] As a user I want to be able to create an account using Facebook
 - [ ] As a user I want to be able to logout
