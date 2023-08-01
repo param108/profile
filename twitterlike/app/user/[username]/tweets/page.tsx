@@ -8,7 +8,7 @@ import Tweet from "@/app/components/tweet";
 import { addThread, hasThread, mergeTweets, ThreadInfo } from "@/app/strings";
 import { AxiosResponse } from "axios";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
+import { UIEvent, Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 import { FiEdit3, FiExternalLink, FiZap } from "react-icons/fi";
 import ReactModal from "react-modal";
 import { RingLoader } from "react-spinners";
@@ -420,35 +420,6 @@ Unknown Tweet`}
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [username, tweets])
-    // Add infinite scroll!
-    useEffect(()=> {
-        const infiniteScroll = () => {
-            if (selectedTweet.length > 0) {
-                return;
-            }
-            // End of the document reached?
-            console.log(window.innerHeight, document.documentElement.scroll, document.documentElement.offsetHeight);
-            if (window.innerHeight + document.documentElement.scrollTop
-                >= (document.documentElement.offsetHeight)) {
-                setPageLoading(true)
-                getTweetsForUser([params.username], queryTags, tweets.length, reverseFlag).
-                    then((res:AxiosResponse)=>{
-                        setTweets(mergeTweets(tweets, res.data.data, reverseFlag))
-                        setUsername(params.username)
-                        setPageLoading(false)
-                    }).
-                    catch(()=>{
-                        setErrorMessage("Failed to get tweets.")
-                        setShowError(true)
-                        setPageLoading(false)
-                    });
-            }
-        }
-
-        window.removeEventListener('scroll', infiniteScroll);
-        window.addEventListener('scroll', infiniteScroll, { passive: true });
-        return () => window.removeEventListener('scroll', infiniteScroll);
-    }, [selectedTweet, params.username, tweets, queryTags, reverseFlag])
 
     useEffect(()=>{
         if (APIToken.length == 0) {
@@ -556,8 +527,43 @@ Unknown Tweet`}
             })
     }
 
+    var [ lastRefreshTime, setLastRefreshTime ] = useState(0);
+    const onScroll=(e: UIEvent<HTMLElement>)=>{
+        let scrollTop = e.currentTarget.scrollTop;
+        let scrollHeight = e.currentTarget.scrollHeight;
+        let clientHeight = e.currentTarget.clientHeight;
+
+        if (scrollTop + clientHeight > (0.9*scrollHeight)) {
+            if (!pageLoading) {
+                let currentTime = Date.now();
+
+                // only try to load if the last refresh was more than
+                // 5 seconds ago
+                if ((currentTime - lastRefreshTime) < 5000) {
+                    return;
+                }
+
+                setPageLoading(true)
+                getTweetsForUser([params.username], queryTags, tweets.length, reverseFlag).
+                    then((res:AxiosResponse)=>{
+                        setTweets(mergeTweets(tweets, res.data.data, reverseFlag))
+                        setUsername(params.username)
+                        setPageLoading(false)
+                    }).
+                    catch(()=>{
+                        setErrorMessage("Failed to get tweets.")
+                        setShowError(true)
+                        setPageLoading(false)
+                    }).
+                    finally(()=>{
+                        setLastRefreshTime(Date.now())
+                    })
+            }
+        }
+    }
+
     return (
-        <main className={"flex bg-white min-h-screen max-h-screen  w-full flex-col items-center justify-stretch" +
+        <main onScroll={onScroll} className={"flex bg-white min-h-screen max-h-screen  w-full flex-col items-center justify-stretch" +
             (threadVisible?"":" overflow-scroll")}>
             <Header showSpinner={pageLoading}></Header>
             <div className="mt-[60px]"/>
@@ -573,7 +579,7 @@ Unknown Tweet`}
 
             <div className={"flex flex-row" +
                 (threadVisible?" overflow-hidden":"")}>
-            <div className={"max-h-full" +
+            <div onScroll={onScroll} className={"max-h-full" +
                 (threadVisible?" overflow-y-scroll": "")}>
                 <div className="flex flex-col items-center">
                 {loggedIn ? (
