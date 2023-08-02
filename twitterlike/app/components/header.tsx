@@ -201,6 +201,18 @@ export default function Header(props:HeaderProps) {
                             <li className="select-none bg-black hover:bg-slate-500 w-full pl-[15px] py-[5px] block"
                                 onClick={()=>{location.href=`${process.env.NEXT_PUBLIC_BE_URL}/users/login?source=guest&redirect_url=${path}&guest=true`}}>{"Guest Login"}</li>
                             ):null}
+                            <li className="select-none bg-black hover:bg-slate-500 w-full pl-[15px] py-[5px] block">
+                                <Toggle
+                                    checked={useDarkMode}
+                                        onChange={() => {
+                                            setUseDarkMode(!useDarkMode);
+                                            let mode = (!useDarkMode) ? "dark" : "light";
+                                            if (props.changeDarkMode) {
+                                                props.changeDarkMode(mode)
+                                            }
+                                            localStorage.setItem("dark_mode", mode)
+                                        }} icons={false} />
+                            </li>
                     </ul>
                 </div>
                     )
