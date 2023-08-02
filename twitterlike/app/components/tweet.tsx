@@ -37,7 +37,7 @@ export default function Tweet(props: TweetProps) {
     }
 
     var toplayerStyle = `
-            w-full bg-white hover:bg-cyan-50
+            w-full bg-white dark:bg-slate-700 hover:bg-cyan-50
             min-h-[100px] pl-[15px] pr-[5px] pt-[5px]
             pb-[40px] overflow-x-auto m-auto`;
     if (!props.visible) {
@@ -87,17 +87,18 @@ export default function Tweet(props: TweetProps) {
             ):null}
 
             <div className="flex flex-row">
-            <i className="text-gray-300">{formatDate(props.date)}</i>
+            <i className="text-gray-500">{formatDate(props.date)}</i>
             {(menuVisible && props.showMenu)?
-                (<FiExternalLink className="ml-[10px] cursor-pointer text-sky-800"size={20} onClick={()=>{
+                (<FiExternalLink className="ml-[10px] cursor-pointer text-sky-800 dark:text-sky-500"size={20} onClick={()=>{
                     if (props.externalClicked) {
                         props.externalClicked(props.tweet_id);
                     }}}/>):null}<br/>
             </div>
-            <span className="text-gray-600">{formatTweet(props.tweet, props.url)}</span>
+            <span className="text-gray-600 dark:text-slate-100">{formatTweet(props.tweet, props.url)}</span>
             </div>
             {atleastOneThread()?(
-            <div className={(menuVisible && props.showMenu)?"w-full overflow-auto bg-cyan-50":"w-full overflow-auto bg-gray-50"}>
+            <div className={(menuVisible && props.showMenu)?"w-full overflow-auto bg-cyan-50 dark:bg-slate-700":
+                "w-full overflow-auto bg-gray-50 dark:bg-slate-700"}>
              {(!expanded)?(
                  <span className="float-right" onClick={()=>setExpanded(true)}><GiScrollUnfurled className="cursor-pointer m-[5px] p-[5px] rounded text-indigo-800 bg-sky-200" size={30}/></span>
             ):(
@@ -108,7 +109,7 @@ export default function Tweet(props: TweetProps) {
                             if (v && (props.shownThread != v.id)) {
                                 return (
                                     <li
-                                    className="cursor-pointer select-none text-blue-700 px-[15px] mb-[2px]"
+                                    className="cursor-pointer select-none text-blue-700 dark:text-cyan-300 px-[15px] mb-[2px]"
                                     key={v.id}
                                     onClick={()=>{ if(props.viewThread){
                                         props.viewThread(v.id);

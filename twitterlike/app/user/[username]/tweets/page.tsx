@@ -19,7 +19,8 @@ const largeEditModalStyle = {
     content: {
         left: "25%",
         right: "25%",
-        top: "100px"
+        top: "100px",
+        background: "#64748b"
     }
 };
 
@@ -27,7 +28,8 @@ const bigEditModalStyle = {
     content: {
         left: "10%",
         right: "10%",
-        top: "100px"
+        top: "100px",
+        background: "#64748b"
     }
 };
 
@@ -35,7 +37,8 @@ const smallEditModalStyle = {
     content: {
         left: "2%",
         right: "2%",
-        top: "100px"
+        top: "100px",
+        background: "#64748b"
     }
 };
 
@@ -43,7 +46,8 @@ const largeDelModalStyle = {
     content: {
         left: "25%",
         right: "25%",
-        top: "100px"
+        top: "100px",
+        background: "#64748b"
     }
 };
 
@@ -51,7 +55,8 @@ const bigDelModalStyle = {
     content: {
         left: "10%",
         right: "10%",
-        top: "100px"
+        top: "100px",
+        background: "#64748b"
     }
 };
 
@@ -59,7 +64,8 @@ const smallDelModalStyle = {
     content: {
         left: "2%",
         right: "2%",
-        top: "100px"
+        top: "100px",
+        background: "#64748b"
     }
 };
 
@@ -146,6 +152,11 @@ export default function ShowTweet() {
     var [ threadData, setThreadData ] = useState<ThreadData|null>(null)
     var [ pageLoading, setPageLoading ] = useState(false)
     var [ reverseFlag, setReverseFlag ] = useState(false)
+    var [ darkMode, setDarkMode ] = useState("dark")
+
+    useEffect(()=>{
+        setDarkMode((localStorage.getItem('dark_mode')=="dark")?"dark":"")
+    },[])
 
     console.log("rerendering user-tweet-page");
     // Which modal is open
@@ -598,9 +609,13 @@ Unknown Tweet`}
     }
 
     return (
-        <main onScroll={onScroll} className={"flex bg-white min-h-screen max-h-screen  w-full flex-col items-center justify-stretch" +
+        <main onScroll={onScroll} className={
+            darkMode + " flex bg-white dark:bg-slate-900 min-h-screen max-h-screen  w-full flex-col items-center justify-stretch" +
             (threadVisible?"":" overflow-scroll")}>
-            <Header showSpinner={pageLoading}></Header>
+            <Header changeDarkMode={(mode:string)=>{
+                setDarkMode(mode)
+                document.body.className = ((mode=="dark")?"dark":"")
+            }} showSpinner={pageLoading}></Header>
             <div className="mt-[60px]"/>
             <div className="flex flex-col items-center w-full">
                 {showError ? (
@@ -722,7 +737,7 @@ Nothing here **yet**!`} key={1} date="Start of time"
             {(threadVisible && threadData)?(
             <div className="max-h-full ml-[10px] float-right overflow-y-scroll">
             <div className="w-[90%] md:w-[510px]">
-                <span className="text-xl">{">> "}<b>{threadData.name}</b></span>
+                <span className="text-black dark:text-white text-xl">{">> "}<b>{threadData.name}</b></span>
                 <FiZap
                 onClick={()=>{setThreadVisible(false)}}
                 className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20}/>

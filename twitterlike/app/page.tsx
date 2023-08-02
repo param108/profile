@@ -73,6 +73,13 @@ export default function Home() {
   var [ APIToken, setAPIToken ] = useState("")
   var [ loggedIn, setLoggedIn ] = useState(false)
   var [ username, setUsername ] = useState("")
+  var [ darkMode, setDarkMode ] = useState("dark")
+
+  useEffect(()=>{
+    setDarkMode((localStorage.getItem('dark_mode')=="dark")?"dark":"")
+  },[])
+
+
   useEffect(()=>{
     const token = localStorage.getItem('api_token');
     if (token && token.length > 0) {
@@ -98,8 +105,11 @@ export default function Home() {
       })
   }, [APIToken])
   return (
-    <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
-      <Header showSpinner={false}></Header>
+    <main className={darkMode +" flex bg-white dark:bg-slate-900 min-h-screen flex-col items-center justify-stretch"}>
+      <Header changeDarkMode={(mode:string)=>{
+        setDarkMode(mode)
+        document.body.className = ((mode=="dark")?"dark":"")
+      }} showSpinner={false}></Header>
       <div className='mt-[60px]'/>
       <div className='flex flex-col w-full items-center' onClick={(e)=>{
         if (loggedIn) {
