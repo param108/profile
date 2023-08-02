@@ -37,7 +37,7 @@ Used to be called **micro-blogging** until twitter
           class="bg-sky-200 w-[96%] md:w-[510px] rounded mb-[10px]"
         >
           <textarea
-            class="block w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black"
+            class="block dark:bg-slate-700 w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black dark:text-slate-100"
             placeholder="What are you thinking about ?"
           >
             Hello World
@@ -129,7 +129,7 @@ Used to be called **micro-blogging** until twitter
           >
             <div
               class="
-            w-full bg-white hover:bg-cyan-50
+            w-full bg-white dark:bg-slate-700 hover:bg-cyan-50
             min-h-[100px] pl-[15px] pr-[5px] pt-[5px]
             pb-[40px] overflow-x-auto m-auto invisible"
             >
@@ -137,12 +137,12 @@ Used to be called **micro-blogging** until twitter
                 class="flex flex-row"
               >
                 <i
-                  class="text-gray-300"
+                  class="text-gray-500"
                 />
                 <br />
               </div>
               <span
-                class="text-gray-600"
+                class="text-gray-600 dark:text-slate-100"
               >
                 <div>
                   <div
@@ -168,7 +168,7 @@ Used to be called **micro-blogging** until twitter
         class="bg-sky-200 w-[96%] md:w-[510px] rounded mb-[10px]"
       >
         <textarea
-          class="block w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black"
+          class="block dark:bg-slate-700 w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black dark:text-slate-100"
           placeholder="What are you thinking about ?"
         >
           Hello World
@@ -260,7 +260,7 @@ Used to be called **micro-blogging** until twitter
         >
           <div
             class="
-            w-full bg-white hover:bg-cyan-50
+            w-full bg-white dark:bg-slate-700 hover:bg-cyan-50
             min-h-[100px] pl-[15px] pr-[5px] pt-[5px]
             pb-[40px] overflow-x-auto m-auto invisible"
           >
@@ -268,12 +268,12 @@ Used to be called **micro-blogging** until twitter
               class="flex flex-row"
             >
               <i
-                class="text-gray-300"
+                class="text-gray-500"
               />
               <br />
             </div>
             <span
-              class="text-gray-600"
+              class="text-gray-600 dark:text-slate-100"
             >
               <div>
                 <div

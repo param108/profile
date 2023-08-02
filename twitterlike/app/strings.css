@@ -2,7 +2,18 @@ a {
     color: blue;
 }
 
+.dark a {
+    color: cyan;
+}
 .font-kamal {
     font-family: Kalam;
     font-size: xx-large;
+}
+
+.Modal {
+    background-color: "black"
+}
+
+.ReactModal__Content.ReactModal__Content--after-open {
+    background-color: "#64748b";
 }

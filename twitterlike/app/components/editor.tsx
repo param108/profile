@@ -26,7 +26,7 @@ export default function Editor(props: EditorProps) {
         <div className={topDivStyle}>
             {props.isLoggedIn ? (
                 <textarea value={props.value} onChange={(e)=> (props.onChange(e.target.value))} placeholder={"What are you thinking about ?"}
-                    className="block w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black">
+                    className="block dark:bg-slate-700 w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black dark:text-slate-100">
                 </textarea>
             ):(
                 <div className="w-[96%] md:w-[500px] h-[150px] bg-white

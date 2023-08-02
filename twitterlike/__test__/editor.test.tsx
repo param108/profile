@@ -185,7 +185,7 @@ Used to be called **micro-blogging** until twitter
         class="bg-sky-200 w-[96%] md:w-[510px] rounded mb-[10px]"
       >
         <textarea
-          class="block w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black"
+          class="block dark:bg-slate-700 w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black dark:text-slate-100"
           placeholder="What are you thinking about ?"
         />
         <div
@@ -262,7 +262,7 @@ Used to be called **micro-blogging** until twitter
       class="bg-sky-200 w-[96%] md:w-[510px] rounded mb-[10px]"
     >
       <textarea
-        class="block w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black"
+        class="block dark:bg-slate-700 w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black dark:text-slate-100"
         placeholder="What are you thinking about ?"
       />
       <div

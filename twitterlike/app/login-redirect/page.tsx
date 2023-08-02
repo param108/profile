@@ -146,7 +146,7 @@ export default function LoginUser() {
 
     return (
         <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
-        <Header showSpinner={false}></Header>
+        <Header changeDarkMode={null} showSpinner={false}></Header>
         <div className="mt-[100px] md:mt-[150px] flex flex-col items-center">
             <span className="text-gray-500 md:text-xl">Logging you in...</span>
             <ProgressBar

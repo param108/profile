@@ -6,12 +6,15 @@ import { MouseEventHandler, ReactElement, useEffect, useReducer, useState } from
 import { FiCloudRain, FiZap } from "react-icons/fi";
 import ReactModal from "react-modal";
 import RingLoader from "react-spinners/RingLoader"
-
+import Toggle from 'react-toggle'
+import 'react-toggle/style.css'
+import './header.css'
 const largeModalStyle = {
     content: {
         left: "25%",
         right: "25%",
-        top: "100px"
+        top: "100px",
+        background: "#64748b"
     }
 };
 
@@ -19,7 +22,8 @@ const bigModalStyle = {
     content: {
         left: "10%",
         right: "10%",
-        top: "100px"
+        top: "100px",
+        background: "#64748b"
     }
 };
 
@@ -27,12 +31,14 @@ const smallModalStyle = {
     content: {
         left: "2%",
         right: "2%",
-        top: "100px"
+        top: "100px",
+        background: "#64748b"
     }
 };
 
 type HeaderProps = {
-    showSpinner: boolean
+    showSpinner: boolean,
+    changeDarkMode: Function|null
 }
 
 export default function Header(props:HeaderProps) {
@@ -83,7 +89,7 @@ export default function Header(props:HeaderProps) {
 
     const loginDiv = function(): ReactElement {
         return (
-            <div className="relative top-[50%] w-full flex flex-col items-center -translate-y-1/2 text-gray-600">
+            <div className="relative top-[50%] w-full flex flex-col items-center -translate-y-1/2 text-gray-50">
                 <span>If you are already signed up, this will log you in. </span>
                 <span>If not, this will <b>sign you up</b></span>
                 <div onClick={()=>{
@@ -102,17 +108,30 @@ export default function Header(props:HeaderProps) {
     };
 
     var [loggedInUser, setLoggedInUser] = useState("")
-
+    var [useDarkMode, setUseDarkMode] = useState(true)
     useEffect(()=>{
         const username = localStorage.getItem('username')
         if (username && username.length > 0) {
             setLoggedInUser(username)
-        } 
+        }
+        const darkMode = localStorage.getItem('dark_mode')
+        if (darkMode) {
+            if (darkMode == "dark") {
+                setUseDarkMode(true)
+            } else {
+                setUseDarkMode(false)
+            }
+        } else {
+            setUseDarkMode(false)
+        }
+        if (props.changeDarkMode) {
+            props.changeDarkMode(darkMode)
+        }
     }, [])
 
     const aboutDiv = function(): ReactElement {
         return (
-            <div className="pt-[50px] px-[5px] md:px-[50px] text-gray-600">
+            <div className="pt-[50px] px-[5px] md:px-[50px] text-gray-50">
                 <p>I am a twitter addict. I tweet throughout the day even on bad days.
                 My tweets cover everything from my random thoughts, to stuff I have read, to politics. Some of these are
                 only output and seldom re-read while others I like to revisit over and over again.</p><br/>
@@ -137,6 +156,18 @@ export default function Header(props:HeaderProps) {
                 onClick={()=>(location.href=`/user/${loggedInUser}/tweets`)}>{"@"+loggedInUser}</button>): null}
                 <RingLoader className="inline-block float-left" color="#EC4899"
                         loading={props.showSpinner} size={30}/>
+                <div className="float-right mr-[50px] p-[5px]">
+                <Toggle
+                checked={useDarkMode}
+                onChange={()=>{
+                    setUseDarkMode(!useDarkMode);
+                    let mode = (!useDarkMode)?"dark":"light";
+                    if (props.changeDarkMode) {
+                        props.changeDarkMode(mode)
+                    }
+                    localStorage.setItem("dark_mode", mode)
+                }} icons={false}/>
+                </div>
                 <button className="text-white float-right p-[5px] mr-[50px]"
                     onClick={menuClick("login")}>{"Login/Signup"}</button>
                 <button className="text-white float-right p-[5px] mr-[50px]"

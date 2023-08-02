@@ -38,7 +38,7 @@ Then [**signup**](https://google.com)!
       >
         <div
           class="
-            w-full bg-white hover:bg-cyan-50
+            w-full bg-white dark:bg-slate-700 hover:bg-cyan-50
             min-h-[100px] pl-[15px] pr-[5px] pt-[5px]
             pb-[40px] overflow-x-auto m-auto invisible"
         >
@@ -46,14 +46,14 @@ Then [**signup**](https://google.com)!
             class="flex flex-row"
           >
             <i
-              class="text-gray-300"
+              class="text-gray-500"
             >
               13/03/2022
             </i>
             <br />
           </div>
           <span
-            class="text-gray-600"
+            class="text-gray-600 dark:text-slate-100"
           >
             <div>
               <div
@@ -127,7 +127,7 @@ download as you wish.
     >
       <div
         class="
-            w-full bg-white hover:bg-cyan-50
+            w-full bg-white dark:bg-slate-700 hover:bg-cyan-50
             min-h-[100px] pl-[15px] pr-[5px] pt-[5px]
             pb-[40px] overflow-x-auto m-auto invisible"
       >
@@ -135,14 +135,14 @@ download as you wish.
           class="flex flex-row"
         >
           <i
-            class="text-gray-300"
+            class="text-gray-500"
           >
             13/03/2022
           </i>
           <br />
         </div>
         <span
-          class="text-gray-600"
+          class="text-gray-600 dark:text-slate-100"
         >
           <div>
             <div
