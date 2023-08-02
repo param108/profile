@@ -611,7 +611,7 @@ Unknown Tweet`}
     return (
         <main onScroll={onScroll} className={
             darkMode + " flex bg-white dark:bg-slate-900 min-h-screen max-h-screen  w-full flex-col items-center justify-stretch" +
-            (threadVisible?"":" overflow-scroll")}>
+            (threadVisible?"":" overflow-y-scroll")}>
             <Header changeDarkMode={(mode:string)=>{
                 setDarkMode(mode)
                 document.body.className = ((mode=="dark")?"dark":"")
