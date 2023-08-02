@@ -550,7 +550,7 @@ Unknown Tweet`}
             <div className={"max-h-full w-full md:w-fit" +
                 (threadVisible?" overflow-y-scroll":"")}>
                     <div className="flex flex-col items-center">
-                    <span className="text-black pl-[10px] text-xl w-[90%] md:w-[510px]">{">> "}<b>{threadName}</b></span>
+                    <span className="text-black dark:text-gray-50 pl-[10px] text-xl w-[90%] md:w-[510px]">{">> "}<b>{threadName}</b></span>
                         {tweets.length > 0 ?
                             tweets.map((k: TweetType, idx: number) => {
                                 let threads = hasThread(k.tweet).map((x: ThreadInfo) => {
