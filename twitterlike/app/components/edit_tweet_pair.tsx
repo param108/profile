@@ -20,7 +20,11 @@ type EditPairProps = {
     editorHideable: boolean,
     url: string,
     visible: boolean,
-    headerMargin?: boolean
+    headerMargin?: boolean,
+    onImageClicked?: Function,
+    imageSource?: string|null,
+    showEditImage?: boolean,
+    imageUpdated?: Function
 }
 
 export default function EditPair( props: EditPairProps) {
@@ -33,6 +37,7 @@ export default function EditPair( props: EditPairProps) {
     if (!props.visible) {
         toplayerStyle += " invisible"
     }
+
     return (
         <div className={toplayerStyle}>
         {(props.editting)?(
@@ -46,8 +51,18 @@ export default function EditPair( props: EditPairProps) {
             hideable={props.editorHideable}
             url={props.url}
             hideClicked={props.hideClicked}
+            onImageClicked={props.onImageClicked}
             headerMargin={headerMargin}/>
         ):null}
+        {(props.showEditImage)?(
+                <input accept="image/*"className="w-[90%] md:w-[510px] my-[5px] border" type="file"
+                 onChange={(e)=>{
+                     if (e.target.files && e.target.files.length > 0) {
+                         if (props.imageUpdated) {
+                             props.imageUpdated(URL.createObjectURL(e.target.files[0]))
+                         }
+                     }
+                 }}/>):null}
         {(props.viewing?(
             <div
             className="flex flex-col items-center w-full">
@@ -63,6 +78,7 @@ export default function EditPair( props: EditPairProps) {
             showMenu={props.showMenu}
             threadList={[]}
             viewThread={null}
+            imageSource={props.imageSource}
             onClick={()=>{}}/>
             </div>
         ):null)}

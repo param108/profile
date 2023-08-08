@@ -5,7 +5,8 @@ import "./interceptors";
 export type TweetType = {
     tweet: string,
     created_at: string,
-    id: string
+    id: string,
+    image: string,
 }
 
 export type UpdateTweetResponse = {

@@ -21,6 +21,7 @@ type TweetProps = {
     threadList: (ThreadData|null)[],
     viewThread: Function|null,
     shownThread?: string,
+    imageSource?: string|null,
 }
 
 export default function Tweet(props: TweetProps) {
@@ -120,9 +121,13 @@ export default function Tweet(props: TweetProps) {
                     }
                 </ul>
              )}
-
             </div>
             ):null}
+            {/* image */}
+            {props.imageSource?(
+            <img src={props.imageSource} className=" w-full md:w-[510px]"/>
+            ):null
+            }
         </div>
     );
 }

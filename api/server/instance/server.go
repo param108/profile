@@ -25,7 +25,7 @@ type Server struct {
 	r    *mux.Router
 	s    *http.Server
 	DB   store.Store
-
+	AWS  *utils.AWS
 	// periodicQuit External call to quit
 	periodicQuit chan struct{}
 
@@ -62,6 +62,13 @@ func NewServer(port int) (*Server, error) {
 	} else {
 		server.DB = db
 	}
+
+	aws, err := utils.NewAWS()
+	if err != nil {
+		return nil, err
+	}
+
+	server.AWS = aws
 
 	// Must be done at the end
 	server.RegisterHandlers()
@@ -156,4 +163,9 @@ func (s *Server) RegisterHandlers() {
 	s.r.HandleFunc("/user/{username}/threads/{thread_id}/delete", utils.AuthM(
 		threads.CreateDeleteThreadHandler(s.DB)).ServeHTTP).
 		Methods(http.MethodPost)
+
+	s.r.HandleFunc("/signed_image_url", utils.AuthM(
+		tweets.CreatePutImageSignedUrlHandler(s.DB, s.AWS)).ServeHTTP).
+		Methods(http.MethodGet)
+
 }

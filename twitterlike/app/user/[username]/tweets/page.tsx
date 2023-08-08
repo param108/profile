@@ -166,9 +166,12 @@ export default function ShowTweet() {
     var [chosenTweet, setChosenTweet]:[TweetType, Dispatch<SetStateAction<TweetType>>] = useState({
         tweet:"",
         id:"",
-        created_at:""
+        created_at:"",
+        image:"",
     })
 
+    var [editImageSource, setEditImageSource ] = useState<string|null>(null)
+    var [editImageShowUpload, setEditImageShowUpload] = useState(false)
     const editTweetDiv = ()=>{
         return (
             <div className="flex flex-col items-center w-full">
@@ -191,6 +194,14 @@ Unknown Tweet`}
             editorHideable={false}
             hideClicked={()=>{}}
             visible={true}
+            showEditImage={editImageShowUpload}
+            onImageClicked={()=>{
+                setEditImageShowUpload(!editImageShowUpload)
+            }}
+            imageUpdated={(src: string)=>{
+                setEditImageSource(src)
+            }}
+            imageSource={editImageSource}
             url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                 />
             </div>)
@@ -221,6 +232,7 @@ Unknown Tweet`}
                 externalClicked={null}
                 threadList={[]}
                 viewThread={null}
+                imageSource={chosenTweet?.image}
                 url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                 />
                 <div className="w-[90%] md:w-[510px] mt-[10px]">
@@ -310,6 +322,49 @@ Unknown Tweet`}
         )
     }
 
+    var [uploadImageSource, setUploadImageSource ] = useState<string|null>(null)
+    const createImageUploadDiv = ()=>{
+        return (
+            <div className="flex flex-col items-center w-full">
+                { createThreadShowError?(
+                    <div
+                    className="p-[5px] bg-red-200 rounded mb-[5px]"
+                    onClick={()=>setCreateThreadShowError(false)}>
+                        {createThreadErrorMessage}
+                    </div>):null
+                }
+                <span className="text-black mb-[10px]">Upload an Image</span>
+                <Tweet
+                visible={true}
+                tweet_id={chosenTweet?.id}
+                tweet={chosenTweet?.tweet}
+                date={chosenTweet?.created_at}
+                deleteClicked={()=>{}}
+                editClicked={()=>{}}
+                showMenu={false}
+                onClick={()=>{}}
+                externalClicked={null}
+                viewThread={null}
+                threadList={[]}
+                imageSource={uploadImageSource}
+                url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
+                />
+                <input accept="image/*"className="w-[90%] md:w-[510px] my-[5px] border" type="file"
+                 onChange={(e)=>{
+                     if (e.target.files && e.target.files.length > 0) {
+                         setUploadImageSource(URL.createObjectURL(e.target.files[0]))
+                     }
+                 }}/>
+                <div className="w-[90%] md:w-[510px] mt-[10px]">
+                <div className="inline-block float-right pr-[10px]">
+                    <RingLoader className="inline-block" color="#EC4899"
+                        loading={createThreadLoading} size={30}/>
+                </div>
+                </div>
+            </div>
+        )
+    }
+
     const [largeScreen, setLargeScreen] = useState(
         (typeof window === "undefined")?true:window.matchMedia("(min-width: 1024px)").matches
     )
@@ -387,10 +442,6 @@ Unknown Tweet`}
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params.username])
-
-    const getThreadCatalog = () => {
-        return threadCatalog;
-    }
 
     useEffect(()=>{
         var seen:{ [name:string]:boolean } = {}
@@ -543,6 +594,7 @@ Unknown Tweet`}
         return () => {
             setOpenModal("edit_tweet")
             setChosenTweet(tweet)
+            setEditImageSource(tweet.image)
             setEditTweetValue(tweet.tweet)
         }
     }
@@ -634,11 +686,21 @@ Unknown Tweet`}
                 <div className="flex flex-col items-center">
                 {loggedIn ? (
                     <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
-                    onSendClicked={onSendClicked} value={editorValue} viewing={showEditorTweet}
+                    onSendClicked={onSendClicked} value={editorValue}
+                    viewing={(showEditorTweet||(uploadImageSource && (uploadImageSource.length > 0)))}
+                    imageSource={uploadImageSource}
+                    onImageClicked={()=>{
+                        setChosenTweet({
+                            id: "None",
+                            tweet: editorValue,
+                            created_at: "Now"
+                        })
+                        setOpenModal("upload_image")}}
                     onChange={onChanged} key={10000} tweet={{
                         created_at: "Preview",
                         id: 'new',
-                        tweet: ''
+                        tweet: '',
+                        image:'',
                     }}
                     showMenu={false}
                     defaultMessage={`
@@ -838,6 +900,18 @@ Nothing here **yet**!`} key={1} date="Start of time"
                     className="text-pink-600 float-right"
                     onClick={()=>{setOpenModal("closed")}}/>
                     {createThreadDiv()}
+            </ReactModal>
+            { /* UploadImageModal */ }
+            <ReactModal
+                style={largeScreen?largeDelModalStyle:(bigScreen)?bigDelModalStyle:smallDelModalStyle}
+                isOpen={openModal=="upload_image"}>
+                <FiZap
+                    size={30}
+                    className="text-pink-600 float-right"
+                    onClick={()=>{
+                        setOpenModal("closed")
+                    }}/>
+                    {createImageUploadDiv()}
             </ReactModal>
 
         </main>

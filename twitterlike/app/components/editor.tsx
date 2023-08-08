@@ -6,6 +6,7 @@ type EditorProps = {
     isLoggedIn: Boolean,
     defaultMessage: string,
     onSendClicked: Function,
+    onImageClicked?: Function,
     onChange: Function,
     showLoading: boolean,
     hideClicked: Function,
@@ -36,7 +37,13 @@ mt-[5px] mx-[2%] md:mx-[5px] p-[5px] rounded focus:outline-none overflow-x-auto 
             )}
             {props.isLoggedIn ? (
                         <div className="block pt-[5px]">
-                            <button className="px-[10px]"><FiImage className="text-indigo-800" size={30} /></button>
+                            <button className="px-[10px]">
+                    <FiImage onClick={()=>{
+                        if (props.onImageClicked) {
+                            props.onImageClicked()
+                        }
+                    }} className="text-indigo-800" size={30} />
+                            </button>
                             <div className="inline-block float-right pr-[10px]">
                                 <RingLoader className="inline-block" color="#EC4899"
                                     loading={props.showLoading} size={30}/>
