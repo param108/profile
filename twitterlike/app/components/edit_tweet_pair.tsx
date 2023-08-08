@@ -3,6 +3,7 @@ import { TweetType } from "../apis/tweets"
 import Editor  from "./editor"
 import Tweet from "./tweet"
 import { GiBoltBomb, GiChemicalDrop } from "react-icons/gi"
+import { FiTrash } from "react-icons/fi"
 type EditPairProps = {
     editting: boolean,
     viewing: boolean,
@@ -55,14 +56,25 @@ export default function EditPair( props: EditPairProps) {
             headerMargin={headerMargin}/>
         ):null}
         {(props.showEditImage)?(
-                <input accept="image/*"className="w-[90%] md:w-[510px] my-[5px] border" type="file"
-                 onChange={(e)=>{
+            <div className="block w-[90%] md:w-[510px]">
+                <input
+                accept="image/*"
+                className="w-[94%] my-[5px] border inline-block" type="file"
+                onChange={(e)=>{
                      if (e.target.files && e.target.files.length > 0) {
                          if (props.imageUpdated) {
                              props.imageUpdated(URL.createObjectURL(e.target.files[0]))
                          }
                      }
-                 }}/>):null}
+                }}/>
+                <FiTrash
+                className="cursor-pointer text-red-800 w-[6%] p-[5px] inline-block"
+                onClick={()=>{
+                    if (props.imageUpdated) {
+                        props.imageUpdated(null)
+                    }}}
+                size={30}/>
+                </div>):null}
         {(props.viewing?(
             <div
             className="flex flex-col items-center w-full">

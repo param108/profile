@@ -9,7 +9,7 @@ import { addThread, hasThread, mergeTweets, ThreadInfo } from "@/app/strings";
 import { AxiosResponse } from "axios";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { UIEvent, Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
-import { FiEdit3, FiExternalLink, FiZap } from "react-icons/fi";
+import { FiEdit3, FiExternalLink, FiTrash, FiZap } from "react-icons/fi";
 import ReactModal from "react-modal";
 import { RingLoader } from "react-spinners";
 import _ from "underscore";
@@ -349,12 +349,20 @@ Unknown Tweet`}
                 imageSource={uploadImageSource}
                 url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                 />
-                <input accept="image/*"className="w-[90%] md:w-[510px] my-[5px] border" type="file"
-                 onChange={(e)=>{
+                <div className="block w-[90%] md:w-[510px]">
+                <input
+                accept="image/*"
+                className="w-[94%] my-[5px] border inline-block" type="file"
+                onChange={(e)=>{
                      if (e.target.files && e.target.files.length > 0) {
                          setUploadImageSource(URL.createObjectURL(e.target.files[0]))
                      }
-                 }}/>
+                }}/>
+                <FiTrash
+                className="cursor-pointer text-red-800 w-[6%] p-[5px] inline-block"
+                onClick={()=>{setUploadImageSource(null)}}
+                size={30}/>
+                </div>
                 <div className="w-[90%] md:w-[510px] mt-[10px]">
                 <div className="inline-block float-right pr-[10px]">
                     <RingLoader className="inline-block" color="#EC4899"
