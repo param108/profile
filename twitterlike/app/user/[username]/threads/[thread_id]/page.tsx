@@ -242,7 +242,7 @@ Unknown Tweet`}
                 threadList={[]}
                 url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                 />
-                <input type="text" className="rounded p-[5px] mt-[5px] border border-slate-200 w-[96%] md:w-[510px]"
+                <input type="text" className="rounded text-black p-[5px] mt-[5px] border border-slate-200 w-[96%] md:w-[510px]"
                     placeholder="New thread name..." value={createThreadName}
                     onChange={(t)=>{setCreateThreadName(t.target.value)}}/>
                 <div className="w-[90%] md:w-[510px] mt-[10px]">
