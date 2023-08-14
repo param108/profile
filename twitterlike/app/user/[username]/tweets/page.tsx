@@ -1,6 +1,14 @@
 "use client";
 import { getProfile } from "@/app/apis/login";
-import { deleteTweet, getATweetForUser, getTweetsForUser, sendTweet, TweetType, updateTweet } from "@/app/apis/tweets";
+import { deleteTweet,
+         getATweetForUser,
+         getTweetsForUser,
+         sendTweet,
+         signedURL,
+         TweetType,
+         updateTweet,
+         uploadPhoto
+       } from "@/app/apis/tweets";
 import Editor from "@/app/components/editor";
 import EditPair from "@/app/components/edit_tweet_pair";
 import Header from "@/app/components/header";
@@ -14,6 +22,7 @@ import ReactModal from "react-modal";
 import { RingLoader } from "react-spinners";
 import _ from "underscore";
 import { createThread, getThread, ThreadData } from "@/app/apis/threads";
+import { parseUrl } from "next/dist/shared/lib/router/utils/parse-url";
 
 const largeEditModalStyle = {
     content: {
@@ -171,6 +180,7 @@ export default function ShowTweet() {
     })
 
     var [editImageSource, setEditImageSource ] = useState<string|null>(null)
+    var [editImageData, setEditImageData] = useState<File|null>(null)
     var [editImageShowUpload, setEditImageShowUpload] = useState(false)
     const editTweetDiv = ()=>{
         return (
@@ -198,8 +208,9 @@ Unknown Tweet`}
             onImageClicked={()=>{
                 setEditImageShowUpload(!editImageShowUpload)
             }}
-            imageUpdated={(src: string)=>{
-                setEditImageSource(src)
+            imageUpdated={(fileData: File)=>{
+                setEditImageSource(URL.createObjectURL(fileData))
+                setEditImageData(fileData)
             }}
             imageSource={editImageSource}
             url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
@@ -322,7 +333,9 @@ Unknown Tweet`}
         )
     }
 
-    var [uploadImageSource, setUploadImageSource ] = useState<string|null>(null)
+    var [uploadImageSource, setUploadImageSource] = useState<string|null>(null)
+    var [uploadImageData, setUploadImageData] = useState<File|null>(null)
+
     const createImageUploadDiv = ()=>{
         return (
             <div className="flex flex-col items-center w-full">
@@ -355,12 +368,16 @@ Unknown Tweet`}
                 className="w-[94%] my-[5px] border inline-block" type="file"
                 onChange={(e)=>{
                      if (e.target.files && e.target.files.length > 0) {
+                         setUploadImageData(e.target.files[0])
                          setUploadImageSource(URL.createObjectURL(e.target.files[0]))
                      }
                 }}/>
                 <FiTrash
                 className="cursor-pointer text-red-800 w-[6%] p-[5px] inline-block"
-                onClick={()=>{setUploadImageSource(null)}}
+                onClick={()=>{
+                    setUploadImageSource(null)
+                    setUploadImageData(null)
+                }}
                 size={30}/>
                 </div>
                 <div className="w-[90%] md:w-[510px] mt-[10px]">
@@ -565,27 +582,86 @@ Unknown Tweet`}
 
             // save the value returned so that we don't lose it
             // if there is some error.
+            // check if an image is there
+            // if it has get a signed url
+            // upload the image to the signed url
+            // update the url to the tweet.
+            // upload the tweet
             setEditorValue(tweet)
-            sendTweet(APIToken, tweet).
-                then(()=>{
-                    setEditorValue("")
-                    setShowEditorTweet(false)
-                    setEditorLoading(false)
-                    getTweetsForUser([params.username], [], 0, reverseFlag).
-                        then((res:AxiosResponse)=>{
-                            setTweets(mergeTweets(tweets, res.data.data, reverseFlag))
-                            setUsername(params.username)
-                        }).
-                        catch(()=>{
-                            setErrorMessage("Failed to get tweets.")
-                            setShowError(true)
-                        });
-                }).
-                catch(()=>{
-                    setShowError(true)
-                    setErrorMessage("Failed to upload tweet")
-                    setEditorLoading(false)
-                })
+            if (uploadImageData) {
+                signedURL(APIToken, uploadImageData ? uploadImageData.name : "").then(
+                    (res) => {
+                        let headers = res.data.data.headers;
+                        let url = res.data.data.url;
+                        let data = null;
+                        data = new FormData()
+                        data.append(
+                            url.split("/").reverse()[0],
+                            uploadImageData ? uploadImageData : "",
+                            uploadImageData?.name
+                        )
+                        uploadPhoto(url, headers, data).then(
+                            () => {
+                                let parsedUrl = new URL(url)
+                                let filename = parsedUrl.pathname.split("/").reverse()[0]
+                                sendTweet(APIToken, tweet, filename).
+                                    then(() => {
+                                        setEditorValue("")
+                                        setShowEditorTweet(false)
+                                        setEditorLoading(false)
+                                        getTweetsForUser([params.username], [], 0, reverseFlag).
+                                            then((res: AxiosResponse) => {
+                                                setTweets(mergeTweets(tweets, res.data.data, reverseFlag))
+                                                setUsername(params.username)
+                                                setEditorLoading(false)
+                                            }).
+                                            catch(() => {
+                                                setErrorMessage("Failed to get tweets.")
+                                                setShowError(true)
+                                                setEditorLoading(false)
+                                            });
+                                    }).
+                                    catch(() => {
+                                        setShowError(true)
+                                        setErrorMessage("Failed to upload tweet")
+                                        setEditorLoading(false)
+                                    })
+                            }
+                        ).catch(() => {
+                            setErrorMessage("failed upload photo");
+                            setEditorLoading(false)
+                        })
+                    }
+                ).catch(
+                    () => {
+                        setErrorMessage("failed to upload (signed url)")
+                        setEditorLoading(false)
+                    }
+                )
+            } else {
+                sendTweet(APIToken, tweet, "").
+                    then(() => {
+                        setEditorValue("")
+                        setShowEditorTweet(false)
+                        setEditorLoading(false)
+                        getTweetsForUser([params.username], [], 0, reverseFlag).
+                            then((res: AxiosResponse) => {
+                                setTweets(mergeTweets(tweets, res.data.data, reverseFlag))
+                                setUsername(params.username)
+                                setEditorLoading(false)
+                            }).
+                            catch(() => {
+                                setErrorMessage("Failed to get tweets.")
+                                setShowError(true)
+                                setEditorLoading(false)
+                            });
+                    }).
+                    catch(() => {
+                        setShowError(true)
+                        setErrorMessage("Failed to upload tweet")
+                        setEditorLoading(false)
+                    })
+            }
         }
     }
 
@@ -695,7 +771,10 @@ Unknown Tweet`}
                 {loggedIn ? (
                     <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
                     onSendClicked={onSendClicked} value={editorValue}
-                    viewing={(showEditorTweet||(uploadImageSource && (uploadImageSource.length > 0)))}
+                    viewing={
+                        (showEditorTweet||
+                            (uploadImageSource &&
+                                (uploadImageSource.length > 0)))?true:false}
                     imageSource={uploadImageSource}
                     onImageClicked={()=>{
                         setChosenTweet({

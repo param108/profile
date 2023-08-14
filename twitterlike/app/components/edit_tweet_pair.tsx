@@ -63,7 +63,7 @@ export default function EditPair( props: EditPairProps) {
                 onChange={(e)=>{
                      if (e.target.files && e.target.files.length > 0) {
                          if (props.imageUpdated) {
-                             props.imageUpdated(URL.createObjectURL(e.target.files[0]))
+                             props.imageUpdated(e.target.files[0])
                          }
                      }
                 }}/>
