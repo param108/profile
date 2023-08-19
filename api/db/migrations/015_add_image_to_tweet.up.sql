@@ -1,5 +1,5 @@
 ALTER TABLE tweets
-ADD COLUMN image varchar(50) NOT NULL DEFAULT '';
+ADD COLUMN image varchar(150) NOT NULL DEFAULT '';
 
 ALTER TABLE tweets
 ADD COLUMN image_compressed BOOLEAN DEFAULT false;
