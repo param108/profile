@@ -1,6 +1,7 @@
 package tweets
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -30,7 +31,7 @@ func CreatePutImageSignedUrlHandler(db store.Store, aws *utils.AWS) http.Handler
 			suffix = "." + suffix
 		}
 
-		bucket := os.Getenv("AWS_BUCKET")
+		bucket := os.Getenv("AWS_IMAGE_BUCKET")
 		u,err := uuid.NewUUID()
 		if err != nil {
 			utils.WriteError(rw, http.StatusInternalServerError, "failed to create uuid")
@@ -41,6 +42,7 @@ func CreatePutImageSignedUrlHandler(db store.Store, aws *utils.AWS) http.Handler
 			userID+"_"+u.String()+suffix,
 			time.Second*600)
 		if err != nil {
+			fmt.Println("failed to create url", err.Error())
 			utils.WriteError(rw, http.StatusInternalServerError, "failed to create url")
 			return
 		}

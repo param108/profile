@@ -594,19 +594,22 @@ Unknown Tweet`}
                         let headers = res.data.data.headers;
                         let url = res.data.data.url;
                         let data = null;
+                        let filename = url.split("/").reverse()[0];
                         data = new FormData()
                         data.append(
-                            url.split("/").reverse()[0],
+                            filename,
                             uploadImageData ? uploadImageData : "",
                             uploadImageData?.name
                         )
-                        uploadPhoto(url, headers, data).then(
+                        uploadPhoto(url, filename, headers, data).then(
                             () => {
                                 let parsedUrl = new URL(url)
                                 let filename = parsedUrl.pathname.split("/").reverse()[0]
                                 sendTweet(APIToken, tweet, filename).
                                     then(() => {
                                         setEditorValue("")
+                                        setUploadImageData(null)
+                                        setUploadImageSource(null)
                                         setShowEditorTweet(false)
                                         setEditorLoading(false)
                                         getTweetsForUser([params.username], [], 0, reverseFlag).

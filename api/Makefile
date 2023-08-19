@@ -43,6 +43,6 @@ migrate:
 	./build/server migrate --migrationsPath db/migrations
 
 dev:	build
-	cp dev.env .env
+	if [ ! -e .env ]; then cp dev.env .env; fi
 	PGPASSWORD="profile" psql -h "localhost" -U "profile" < db/scripts/dev_init.sql
 	./build/server serve

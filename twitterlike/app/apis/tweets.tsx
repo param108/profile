@@ -134,7 +134,7 @@ export const signedURL = async (token: string, filename: string) => {
             "TRIBIST_JWT": token,
         },
         params: {
-            suffix: filename.split(".").reverse().pop(),
+            suffix: filename.split(".").reverse()[0],
         },
         retry: 3
     };
@@ -146,17 +146,17 @@ export const signedURL = async (token: string, filename: string) => {
     return res;
 }
 
-export const uploadPhoto = async (url: string, headers: {[key:string]:string}, fileData: FormData) => {
+export const uploadPhoto = async (url: string, key: string, headers: {[key:string]:string}, fileData: FormData) => {
     const config = {
         headers:{
-            ...headers
+            "Content-Type": ""
         },
         retry: 3
     };
-
+    console.log(config);
     const res = await axios.put<SignedURLResponse>(
        url,
-        fileData,
+        fileData.get(key),
         config
     );
     return res;
