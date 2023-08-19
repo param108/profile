@@ -90,7 +90,7 @@ func TestThreadCRUD(t *testing.T) {
 			tweet, _, _ := testDB.(*StoreImpl).InsertTweet(userID,
 				fmt.Sprintf(`#display
 The first #tweet is a short
-#Hello #World%d.`, i), "", threadWriter)
+#Hello #World%d.`, i), "", "", threadWriter)
 			firstThreadTweets = append(firstThreadTweets, tweet.ID)
 			err := testDB.AddTweetToThread(userID, tweet.ID, firstThread.ID, threadWriter)
 			assert.Nil(t, err, "Failed to add Tweet")
@@ -104,7 +104,7 @@ The first #tweet is a short
 			tweet, _, _ := testDB.(*StoreImpl).InsertTweet(userID,
 				fmt.Sprintf(`#display
 The first #tweet is a short
-#Hello #World%d.`, i), "", threadWriter)
+#Hello #World%d.`, i), "", "", threadWriter)
 			secondThreadTweets = append(secondThreadTweets, tweet.ID)
 			err := testDB.AddTweetToThread(userID, tweet.ID, secondThread.ID, threadWriter)
 			assert.Nil(t, err, "Failed to add Tweet")

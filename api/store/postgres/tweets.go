@@ -122,9 +122,27 @@ func (db *PostgresDB) UpdateTweet(
 	writer string,
 ) (*models.Tweet, []*models.Tag, error) {
 	err := db.db.Transaction(func(tx *gorm.DB) error {
+		// update image_compressed and image_compressed_failed if image has changed
 		if err := tx.Model(&models.Tweet{}).
-			Where("id = ? and user_id = ? and writer = ?", tweet.ID, tweet.UserID, writer).
-			Update("tweet", tweet.Tweet).Error; err != nil {
+			Where("id = ? and user_id = ? and writer = ? and image != ?",
+				tweet.ID, tweet.UserID, writer, tweet.Image).
+			Update("tweet", tweet.Tweet).
+			Update("image", tweet.Image).
+			Update("image_compressed", false).
+			Update("image_compressed_failed", false).
+			Error; err != nil {
+			return err
+		}
+
+		// dont update image_compressed and image_compressed_failed if image hasnt changed
+		// case
+		// FIXME: can we do this without a second query ?
+		if err := tx.Model(&models.Tweet{}).
+			Where("id = ? and user_id = ? and writer = ? and image = ?",
+				tweet.ID, tweet.UserID, writer, tweet.Image).
+			Update("tweet", tweet.Tweet).
+			Update("image", tweet.Image).
+			Error; err != nil {
 			return err
 		}
 

@@ -13,7 +13,7 @@ import (
 )
 
 type GetPutImageUrlResponse struct {
-	URL string `json:"url"`
+	URL     string            `json:"url"`
 	Headers map[string]string `json:"headers"`
 }
 
@@ -32,7 +32,7 @@ func CreatePutImageSignedUrlHandler(db store.Store, aws *utils.AWS) http.Handler
 		}
 
 		bucket := os.Getenv("AWS_IMAGE_BUCKET")
-		u,err := uuid.NewUUID()
+		u, err := uuid.NewUUID()
 		if err != nil {
 			utils.WriteError(rw, http.StatusInternalServerError, "failed to create uuid")
 			return
@@ -48,7 +48,7 @@ func CreatePutImageSignedUrlHandler(db store.Store, aws *utils.AWS) http.Handler
 		}
 
 		ret := GetPutImageUrlResponse{
-			URL: url,
+			URL:     url,
 			Headers: headers,
 		}
 

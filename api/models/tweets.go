@@ -3,12 +3,15 @@ package models
 import "time"
 
 type Tweet struct {
-	ID        string    `gorm:"default:uuid_generate_v4()" json:"id"`
-	UserID    string    `json:"user_id"`
-	Tweet     string    `json:"tweet"`
-	Flags     string    `json:"flags"`
-	Writer    string    `json:"writer"`
-	CreatedAt time.Time `json:"created_at"`
+	ID                    string    `gorm:"default:uuid_generate_v4()" json:"id"`
+	UserID                string    `json:"user_id"`
+	Tweet                 string    `json:"tweet"`
+	Flags                 string    `json:"flags"`
+	Image                 string    `json:"image"`
+	ImageCompressed       bool      `json:"image_compressed"`
+	ImageCompressedFailed bool      `json:"image_compressed_failed"`
+	Writer                string    `json:"writer"`
+	CreatedAt             time.Time `json:"created_at"`
 }
 
 type Tag struct {
@@ -34,6 +37,7 @@ type PostTweetsRequest struct {
 
 type PutTweetRequest struct {
 	Tweet   string `json:"tweet"`
+	Image   string `json:"image"`
 	TweetID string `json:"tweet_id"`
 	Flags   string `json:"flags"`
 }

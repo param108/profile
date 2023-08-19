@@ -32,11 +32,11 @@ type Store interface {
 	// InsertTweet inserts a tweet and all tags in a transaction
 	// It will ignore the first line of flags as those are for display only.
 	// From the rest extract tags and insert them in tweet table
-	InsertTweet(userID string, tweet string,
+	InsertTweet(userID string, tweet string, image string,
 		flags string, writer string) (*models.Tweet, []*models.Tag, error)
 
 	// UpdateTweet edits a tweet
-	UpdateTweet(userID, tweetID, tweet, flags,
+	UpdateTweet(userID, tweetID, tweet, image, flags,
 		writer string) (*models.Tweet, []*models.Tag, error)
 
 	// GetTweets get tweets between a offset and limit

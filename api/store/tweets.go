@@ -11,13 +11,14 @@ import (
 // InsertTweet inserts a tweet and all tags in a transaction
 // It will ignore the first line of flags as those are for display only.
 // From the rest extract tags and insert them in tweet table
-func (s *StoreImpl) InsertTweet(userID string, tweet string,
+func (s *StoreImpl) InsertTweet(userID string, tweet string, image string,
 	flags string, writer string) (*models.Tweet, []*models.Tag, error) {
 	tw := &models.Tweet{
 		UserID: userID,
 		Tweet:  tweet,
 		Writer: writer,
 		Flags:  flags,
+		Image:  image,
 	}
 
 	threads, err := utils.ExtractThreads(tweet)
@@ -50,13 +51,14 @@ func (s *StoreImpl) InsertTweet(userID string, tweet string,
 
 // UpdateTweet edits a tweet
 func (s *StoreImpl) UpdateTweet(userID, tweetID,
-	tweet, flags, writer string) (*models.Tweet, []*models.Tag, error) {
+	tweet, image, flags, writer string) (*models.Tweet, []*models.Tag, error) {
 	tw := &models.Tweet{
 		ID:     tweetID,
 		UserID: userID,
 		Tweet:  tweet,
 		Writer: writer,
 		Flags:  flags,
+		Image:  image,
 	}
 
 	threads, err := utils.ExtractThreads(tweet)

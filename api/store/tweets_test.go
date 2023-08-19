@@ -53,10 +53,11 @@ func TestInsertTweet(t *testing.T) {
 		tw, tags, err := testDB.(*StoreImpl).InsertTweet(userID,
 			`#display
 The first tweet has no tags.
-notags.`, "", tweetWriter)
+notags.`, "image.jpg", "", tweetWriter)
 		assert.Nil(t, err, "failed to insert tweets and tags")
 		assert.NotNil(t, tw.CreatedAt, "empty created_at")
 		assert.NotEmpty(t, tw.ID, "ID is empty")
+		assert.Equal(t, "image.jpg", tw.Image, "image incorrect")
 		assert.Equal(t, 0, len(tags), "incorrect number of tags")
 		noTagTweetID = tw.ID
 		fmt.Println("INSERT", tw.CreatedAt, tw.Tweet, tw.ID)
@@ -65,8 +66,9 @@ notags.`, "", tweetWriter)
 
 	t.Run("Update tweet with no tags", func(t *testing.T) {
 		tw, tags, err := testDB.UpdateTweet(userID, noTagTweetID, `
-No tweet tag anywhere`, "", tweetWriter)
+No tweet tag anywhere`, "new_image.jpg", "", tweetWriter)
 		assert.Nil(t, err, "failed to update tweet")
+		assert.Equal(t, "new_image.jpg", tw.Image, "image incorrect")
 		assert.Equal(t, `
 No tweet tag anywhere`, tw.Tweet, "invalid updated tweet")
 		assert.Zero(t, len(tags), "returned some spurious tags")
@@ -77,7 +79,7 @@ No tweet tag anywhere`, tw.Tweet, "invalid updated tweet")
 		tw, tags, err := testDB.(*StoreImpl).InsertTweet(userID,
 			`#display
 The first #tweet is a short
-#Hello #World.`, "", tweetWriter)
+#Hello #World.`, "", "", tweetWriter)
 		assert.Nil(t, err, "failed to insert tweets and tags")
 		assert.NotNil(t, tw.CreatedAt, "empty created_at")
 		assert.NotEmpty(t, tw.ID, "ID is empty")
@@ -93,7 +95,7 @@ The first #tweet is a short
 		tw, tags, err := testDB.(*StoreImpl).InsertTweet(userID,
 			`#display
 The first #tweet is a short
-#Hello #World.`, "", tweetWriter)
+#Hello #World.`, "", "", tweetWriter)
 		assert.Nil(t, err, "failed to insert tweets and tags")
 		assert.NotNil(t, tw.CreatedAt, "empty created_at")
 		assert.NotEmpty(t, tw.ID, "ID is empty")
@@ -144,7 +146,7 @@ The first #tweet is a short
 			oldTweetID,
 			`#display
 The first #tweet is a short
-#Hello #World #Tree.`, "", tweetWriter)
+#Hello #World #Tree.`, "", "", tweetWriter)
 		assert.Nil(t, err, "failed to insert tweets and tags")
 		assert.NotNil(t, tw.CreatedAt, "empty created_at")
 		assert.NotEmpty(t, tw.ID, "ID is empty")
@@ -194,7 +196,7 @@ The first #tweet is a short
 			oldTweetID,
 			`#display
 The first is a short
-#Hello #World #Tree.`, "", tweetWriter)
+#Hello #World #Tree.`, "", "", tweetWriter)
 		assert.Nil(t, err, "failed to insert tweets and tags")
 		assert.NotNil(t, tw.CreatedAt, "empty created_at")
 		assert.NotEmpty(t, tw.ID, "ID is empty")
@@ -282,7 +284,7 @@ The first is a short
 				testDB.(*StoreImpl).InsertTweet(userID,
 					`#display
 The first #tweet is a short
-#Hello #World.`, "", tweetWriter)
+#Hello #World.`, "", "", tweetWriter)
 			}
 			tweets, err := testDB.GetTweets(userID, 0, 10, false, tweetWriter)
 			assert.Nil(t, err, "failed to get tweets")
@@ -300,7 +302,7 @@ The first #tweet is a short
 			testDB.(*StoreImpl).InsertTweet(userID,
 				fmt.Sprintf(`#display
 The first tweet is #tweet_%d
-#Hello #World.`, i), "", tweetWriter)
+#Hello #World.`, i), "", "", tweetWriter)
 		}
 		tweets, err := testDB.SearchTweetsByTags(
 			userID,
@@ -354,7 +356,7 @@ The first tweet is #tweet_%d
 		assert.Nil(t, err, "failed to create thread")
 		tweetStr := fmt.Sprintf(`#thread:%s:%d
 This tweet is part of thread %s`, thread.ID, 0, thread.ID)
-		tweet, _, err := testDB.InsertTweet(userID, tweetStr, "", tweetWriter)
+		tweet, _, err := testDB.InsertTweet(userID, tweetStr, "", "", tweetWriter)
 		assert.Nil(t, err, "failed insert tweet")
 		threadTweet = tweet
 		threadData, err := testDB.GetThread(userID, thread.ID, tweetWriter)
@@ -367,7 +369,7 @@ This tweet is part of thread %s`, thread.ID, 0, thread.ID)
 	t.Run("update tweet remove thread", func(t *testing.T) {
 		tweetStr := fmt.Sprintf(`
 This tweet is not part of thread`)
-		_, _, err := testDB.UpdateTweet(userID, threadTweet.ID, tweetStr, "", tweetWriter)
+		_, _, err := testDB.UpdateTweet(userID, threadTweet.ID, tweetStr, "", "", tweetWriter)
 		assert.Nil(t, err, "failed to update tweet")
 		threadData, err := testDB.GetThread(userID, threadID, tweetWriter)
 		assert.Nil(t, err, "invalid thread")
@@ -377,7 +379,7 @@ This tweet is not part of thread`)
 	t.Run("update tweet add thread again", func(t *testing.T) {
 		tweetStr := fmt.Sprintf(`#thread:%s:%d
 This tweet is part of thread %s`, threadID, 0, threadID)
-		_, _, err := testDB.UpdateTweet(userID, threadTweet.ID, tweetStr, "", tweetWriter)
+		_, _, err := testDB.UpdateTweet(userID, threadTweet.ID, tweetStr, "", "", tweetWriter)
 		assert.Nil(t, err, "failed to update tweet")
 		threadData, err := testDB.GetThread(userID, threadID, tweetWriter)
 		assert.Nil(t, err, "invalid thread")
@@ -396,7 +398,7 @@ func TestDeleteGuestData(t *testing.T) {
 				testDB.(*StoreImpl).InsertTweet(models.GuestUserID,
 					fmt.Sprintf(`#display
 The first #tweet is a short
-#Hello #World%d.`, i), "", guestWriter)
+#Hello #World%d.`, i), "", "", guestWriter)
 			}
 			tweets, err := testDB.GetTweets(models.GuestUserID, 0, 40, false, guestWriter)
 			assert.Nil(t, err, "failed to get tweets")

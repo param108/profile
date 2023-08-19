@@ -11,7 +11,6 @@ import (
 
 type AWS struct {
 	Config aws.Config
-
 }
 
 func NewAWS() (*AWS, error) {
@@ -32,17 +31,17 @@ func (awsMgr *AWS) CreateSignedPutUrl(bucket, name string,
 	request, err := s3Cl.PresignPutObject(context.TODO(),
 		&s3.PutObjectInput{
 			Bucket: aws.String(bucket),
-			Key: aws.String(name),
+			Key:    aws.String(name),
 		}, func(opts *s3.PresignOptions) {
 			opts.Expires = expiry
 		})
-	if (err != nil) {
+	if err != nil {
 		return "", nil, err
 	}
 
 	headers := map[string]string{}
 
-	for k,v := range request.SignedHeader {
+	for k, v := range request.SignedHeader {
 		headers[k] = v[0]
 	}
 
@@ -56,17 +55,17 @@ func (awsMgr *AWS) CreateSignedGetUrl(bucket, name string,
 	request, err := s3Cl.PresignGetObject(context.TODO(),
 		&s3.GetObjectInput{
 			Bucket: aws.String(bucket),
-			Key: aws.String(name),
+			Key:    aws.String(name),
 		}, func(opts *s3.PresignOptions) {
 			opts.Expires = expiry
 		})
-	if (err != nil) {
+	if err != nil {
 		return "", nil, err
 	}
 
 	headers := map[string]string{}
 
-	for k,v := range request.SignedHeader {
+	for k, v := range request.SignedHeader {
 		headers[k] = v[0]
 	}
 

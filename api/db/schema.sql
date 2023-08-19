@@ -172,7 +172,10 @@ CREATE TABLE public.tweets (
     flags character varying(100) DEFAULT ''::character varying NOT NULL,
     created_at timestamp with time zone DEFAULT (now() AT TIME ZONE 'utc'::text) NOT NULL,
     writer uuid NOT NULL,
-    deleted boolean DEFAULT false NOT NULL
+    deleted boolean DEFAULT false NOT NULL,
+    image character varying(50) DEFAULT ''::character varying NOT NULL,
+    image_compressed boolean DEFAULT false,
+    image_compressed_failed boolean DEFAULT false
 );
 
 
@@ -310,6 +313,13 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: idx_image_compressed_failed; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_image_compressed_failed ON public.tweets USING btree (image_compressed, image_compressed_failed);
 
 
 --
