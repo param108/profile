@@ -500,6 +500,54 @@ Unknown Tweet`}
             });
                 }, [APIToken, params.username])
 
+    useEffect(()=>{
+        let seenThreads: {[key: string]:Boolean} = {};
+        let effectiveTweetLength = 0;
+        if (tweets.length < 20) {
+            // If tweets are less than 20 long already then
+            // probably we don't have enough tweets.
+            return;
+        }
+
+        tweets.forEach((k: TweetType)=>{
+            let threadsInfo = hasThread(k.tweet)
+            let tweetVisible = false;
+            // If a tweet is part of threads and each thread has already been represented
+            // by a previous tweet then don't render this tweet
+            threadsInfo.forEach((x)=>{
+                if (x.id in seenThreads) {
+                    return;
+                }
+                seenThreads[x.id] = true;
+                tweetVisible = true;
+                return;
+            })
+
+            if (tweetVisible) {
+                effectiveTweetLength++;
+            }
+
+        })
+
+        if (effectiveTweetLength < 20) {
+            console.log("effectiveTweetLength", effectiveTweetLength);
+            setPageLoading(true)
+            getTweetsForUser([params.username], queryTags, tweets.length, reverseFlag).
+                then((res:AxiosResponse)=>{
+                    if (res.data.data.length > 0) {
+                        setTweets(mergeTweets(tweets, res.data.data, reverseFlag))
+                        setUsername(params.username)
+                    }
+                    setPageLoading(false)
+                }).
+                catch(()=>{
+                    setErrorMessage("Failed to get tweets.")
+                    setShowError(true)
+                    setPageLoading(false)
+                })
+        }
+    }, [tweets])
+
     const onSendClicked= (tweet: string) => {
         if (loggedIn) {
             setEditorLoading(true)
