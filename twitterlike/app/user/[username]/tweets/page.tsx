@@ -512,6 +512,11 @@ Unknown Tweet`}
         tweets.forEach((k: TweetType)=>{
             let threadsInfo = hasThread(k.tweet)
             let tweetVisible = false;
+
+            // a tweet without a thread is always visible
+            if (threadsInfo.length == 0) {
+                tweetVisible = true;
+            }
             // If a tweet is part of threads and each thread has already been represented
             // by a previous tweet then don't render this tweet
             threadsInfo.forEach((x)=>{
