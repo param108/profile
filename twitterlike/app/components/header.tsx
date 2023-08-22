@@ -127,6 +127,7 @@ export default function Header(props:HeaderProps) {
         if (props.changeDarkMode) {
             props.changeDarkMode(darkMode)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const aboutDiv = function(): ReactElement {

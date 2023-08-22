@@ -546,6 +546,7 @@ Unknown Tweet`}
                     setPageLoading(false)
                 })
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tweets])
 
     const onSendClicked= (tweet: string) => {
