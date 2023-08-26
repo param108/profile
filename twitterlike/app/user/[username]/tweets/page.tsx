@@ -315,7 +315,7 @@ Unknown Tweet`}
                 threadList={[]}
                 url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?`+searchParams.toString()}
                 />
-                <input type="text" className="rounded p-[5px] mt-[5px] border border-slate-200 w-[96%] md:w-[510px]"
+                <input type="text" className="rounded text-black p-[5px] mt-[5px] border border-slate-200 w-[96%] md:w-[510px]"
                     placeholder="New thread name..." value={createThreadName}
                     onChange={(t)=>{setCreateThreadName(t.target.value)}}/>
                 <div className="w-[90%] md:w-[510px] mt-[10px]">
@@ -575,6 +575,60 @@ Unknown Tweet`}
                 setPageLoading(false)
             });
                 }, [APIToken, params.username])
+
+    useEffect(()=>{
+        let seenThreads: {[key: string]:Boolean} = {};
+        let effectiveTweetLength = 0;
+        if (tweets.length < 20) {
+            // If tweets are less than 20 long already then
+            // probably we don't have enough tweets.
+            return;
+        }
+
+        tweets.forEach((k: TweetType)=>{
+            let threadsInfo = hasThread(k.tweet)
+            let tweetVisible = false;
+
+            // a tweet without a thread is always visible
+            if (threadsInfo.length == 0) {
+                tweetVisible = true;
+            }
+            // If a tweet is part of threads and each thread has already been represented
+            // by a previous tweet then don't render this tweet
+            threadsInfo.forEach((x)=>{
+                if (x.id in seenThreads) {
+                    return;
+                }
+                seenThreads[x.id] = true;
+                tweetVisible = true;
+                return;
+            })
+
+            if (tweetVisible) {
+                effectiveTweetLength++;
+            }
+
+        })
+
+        if (effectiveTweetLength < 20) {
+            console.log("effectiveTweetLength", effectiveTweetLength);
+            setPageLoading(true)
+            getTweetsForUser([params.username], queryTags, tweets.length, reverseFlag).
+                then((res:AxiosResponse)=>{
+                    if (res.data.data.length > 0) {
+                        setTweets(mergeTweets(tweets, res.data.data, reverseFlag))
+                        setUsername(params.username)
+                    }
+                    setPageLoading(false)
+                }).
+                catch(()=>{
+                    setErrorMessage("Failed to get tweets.")
+                    setShowError(true)
+                    setPageLoading(false)
+                })
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tweets])
 
     const onSendClicked= (tweet: string) => {
         if (loggedIn) {
