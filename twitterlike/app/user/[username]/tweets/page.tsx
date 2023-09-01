@@ -5,7 +5,7 @@ import Editor from "@/app/components/editor";
 import EditPair from "@/app/components/edit_tweet_pair";
 import Header from "@/app/components/header";
 import Tweet from "@/app/components/tweet";
-import { addThread, hasThread, mergeTweets, ThreadInfo } from "@/app/strings";
+import { addThread, hasThread, mergeTweets, sortThreadTweets, ThreadInfo } from "@/app/strings";
 import { AxiosResponse } from "axios";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { UIEvent, Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
@@ -410,6 +410,9 @@ Unknown Tweet`}
                             let key = res.data.data.id;
                             setThreadCatalog((t)=> {
                                 let data = {...t};
+                                let tTweets = sortThreadTweets(res.data.data.tweets, 
+                                                               res.data.data.id);
+                                res.data.data.tweets = tTweets;
                                 data[key] = res.data.data;
                                 return data;
                             });
@@ -458,6 +461,9 @@ Unknown Tweet`}
                                 let key = res.data.data.id;
                                 setThreadCatalog((t) => {
                                     let data = { ...t };
+                                    let tTweets = sortThreadTweets(res.data.data.tweets, 
+                                                                   res.data.data.id);
+                                    res.data.data.tweets = tTweets;
                                     data[key] = res.data.data;
                                     return data;
                                 });
