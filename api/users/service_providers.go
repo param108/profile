@@ -31,6 +31,7 @@ func CreateServiceProviderLoginRedirect(db store.Store) http.HandlerFunc {
 		env := os.Getenv("ENV")
 
 		if env == "dev" {
+			fmt.Println("dev found\n")
 			// We have only one dev user.
 			loginDevUser(rw, r, db)
 			return

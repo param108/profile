@@ -134,7 +134,7 @@ export const signedURL = async (token: string, filename: string) => {
             "TRIBIST_JWT": token,
         },
         params: {
-            suffix: filename.split(".").reverse()[0],
+            suffix: "jpeg",
         },
         retry: 3
     };

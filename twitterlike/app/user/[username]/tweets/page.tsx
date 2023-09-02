@@ -23,6 +23,7 @@ import { RingLoader } from "react-spinners";
 import _ from "underscore";
 import { createThread, getThread, ThreadData } from "@/app/apis/threads";
 import { parseUrl } from "next/dist/shared/lib/router/utils/parse-url";
+import imageCompression from "browser-image-compression";
 
 const largeEditModalStyle = {
     content: {
@@ -631,6 +632,12 @@ Unknown Tweet`}
     }, [tweets])
 
     const onSendClicked= (tweet: string) => {
+        const compressOptions = {
+            maxSizeMB: 0.1,
+            maxWidthOrHeight: 1920,
+            fileType: "image/jpeg"
+        }
+
         if (loggedIn) {
             setEditorLoading(true)
 
@@ -649,45 +656,54 @@ Unknown Tweet`}
                         let url = res.data.data.url;
                         let data = null;
                         let filename = url.split("/").reverse()[0];
-                        data = new FormData()
-                        data.append(
-                            filename,
-                            uploadImageData ? uploadImageData : "",
-                            uploadImageData?.name
-                        )
-                        uploadPhoto(url, filename, headers, data).then(
-                            () => {
-                                let parsedUrl = new URL(url)
-                                let filename = parsedUrl.pathname.split("/").reverse()[0]
-                                sendTweet(APIToken, tweet, filename).
-                                    then(() => {
-                                        setEditorValue("")
-                                        setUploadImageData(null)
-                                        setUploadImageSource(null)
-                                        setShowEditorTweet(false)
-                                        setEditorLoading(false)
-                                        getTweetsForUser([params.username], [], 0, reverseFlag).
-                                            then((res: AxiosResponse) => {
-                                                setTweets(mergeTweets(tweets, res.data.data, reverseFlag))
-                                                setUsername(params.username)
-                                                setEditorLoading(false)
-                                            }).
-                                            catch(() => {
-                                                setErrorMessage("Failed to get tweets.")
-                                                setShowError(true)
-                                                setEditorLoading(false)
-                                            });
-                                    }).
-                                    catch(() => {
-                                        setShowError(true)
-                                        setErrorMessage("Failed to upload tweet")
+
+                        if (uploadImageData) {
+                            imageCompression(uploadImageData, compressOptions).then(
+                                (fileData: File) => {
+                                    data = new FormData()
+                                    data.append(
+                                        filename,
+                                        fileData ? fileData : "",
+                                        fileData?.name
+                                    )
+                                    uploadPhoto(url, filename, headers, data).then(
+                                        () => {
+                                            let parsedUrl = new URL(url)
+                                            let filename = parsedUrl.pathname.split("/").reverse()[0]
+                                            sendTweet(APIToken, tweet, filename).
+                                                then(() => {
+                                                    setEditorValue("")
+                                                    setUploadImageData(null)
+                                                    setUploadImageSource(null)
+                                                    setShowEditorTweet(false)
+                                                    setEditorLoading(false)
+                                                    getTweetsForUser([params.username], [], 0, reverseFlag).
+                                                        then((res: AxiosResponse) => {
+                                                            setTweets(mergeTweets(tweets, res.data.data, reverseFlag))
+                                                            setUsername(params.username)
+                                                            setEditorLoading(false)
+                                                        }).
+                                                        catch(() => {
+                                                            setErrorMessage("Failed to get tweets.")
+                                                            setShowError(true)
+                                                            setEditorLoading(false)
+                                                        });
+                                                }).
+                                                catch(() => {
+                                                    setShowError(true)
+                                                    setErrorMessage("Failed to upload tweet")
+                                                    setEditorLoading(false)
+                                                })
+                                        }
+                                    ).catch(() => {
+                                        setErrorMessage("failed upload photo");
                                         setEditorLoading(false)
                                     })
-                            }
-                        ).catch(() => {
-                            setErrorMessage("failed upload photo");
-                            setEditorLoading(false)
-                        })
+                                }).catch(() => {
+                                    setErrorMessage("failed upload photo");
+                                    setEditorLoading(false)
+                                })
+                        }
                     }
                 ).catch(
                     () => {
