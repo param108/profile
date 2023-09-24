@@ -25,6 +25,23 @@ func CreatePutImageSignedUrlHandler(db store.Store, aws *utils.AWS) http.Handler
 			return
 		}
 
+		// Check if this user is allowed to upload images
+		resources, err := db.GetResources(userID, os.Getenv("WRITER"))
+		if err != nil {
+			utils.WriteError(rw, http.StatusInternalServerError, "couldnt check limits")
+			return
+		}
+
+		for _, res := range resources {
+			if res.T == "image" {
+				if res.Value >= res.Max {
+					utils.WriteError(rw, http.StatusTooManyRequests, "too many images")
+					return
+				}
+				break
+			}
+		}
+
 		suffix := strings.TrimSpace(r.URL.Query().Get("suffix"))
 		// add .<suffix> to the key if a suffix is provided.
 		if len(suffix) > 0 {

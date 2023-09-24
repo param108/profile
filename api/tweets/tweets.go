@@ -156,11 +156,20 @@ func CreatePostTweetsHandler(db store.Store) http.HandlerFunc {
 			return
 		}
 
+		if len(req.Image) > 0 {
+			_, err := db.LockResource(userID, "image", os.Getenv("WRITER"))
+			if err != nil {
+				utils.WriteError(rw, http.StatusTooManyRequests, "too many images")
+				return
+			}
+		}
+
 		tweet, _, err := db.InsertTweet(userID, req.Tweet, req.Image, "", os.Getenv("WRITER"))
 		if err != nil {
 			utils.WriteError(rw, http.StatusInternalServerError, err.Error())
 			return
 		}
+
 		utils.WriteData(rw, http.StatusOK, tweet)
 	}
 }
@@ -183,6 +192,21 @@ func CreateUpdateTweetHandler(db store.Store) http.HandlerFunc {
 		if len(userID) == 0 {
 			utils.WriteError(rw, http.StatusForbidden, "unknown user")
 			return
+		}
+
+		oldTweet, err := db.GetTweet(userID, req.TweetID, os.Getenv("WRITER"))
+		if err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "unknown tweet")
+			return
+		}
+
+		// If the image has changed we need to unlock a new resource
+		if oldTweet.Image != req.Image && len(req.Image) != 0 {
+			_, err := db.LockResource(userID, "image", os.Getenv("WRITER"))
+			if err != nil {
+				utils.WriteError(rw, http.StatusTooManyRequests, "too many images")
+				return
+			}
 		}
 
 		tweet, _, err := db.UpdateTweet(
