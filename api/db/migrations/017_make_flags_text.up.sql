@@ -1,0 +1,2 @@
+ALTER TABLE tweets
+ALTER COLUMN flags TYPE TEXT;
