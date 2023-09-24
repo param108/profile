@@ -29,6 +29,7 @@ type TweetTag struct {
 
 type PostTweetsRequest struct {
 	Tweet string `json:"tweet"`
+	Flags string `json:"flags"`
 }
 
 type PutTweetRequest struct {
