@@ -21,3 +21,6 @@ Please read [How to contribute](https://github.com/param108/profile/blob/main/do
 
 [param108](https://github.com/param108/profile)
 
+# Misc
+
+[Test cases] (https://docs.google.com/spreadsheets/d/1s-0jeaILZIvobKHS7vuLrjmEBa03gigQILEn0-3hDp8/edit#gid=0)
