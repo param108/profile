@@ -247,14 +247,12 @@ The first is a short
 
 	t.Run("get tweets after the latest one", func(t *testing.T) {
 		tweets, err := testDB.GetTweets(userID, 1, 10, false, tweetWriter)
-		fmt.Println(tweets)
 		assert.Nil(t, err, "failed to get tweets")
 		assert.Equal(t, 2, len(tweets))
 		// Make sure its the earliest one
 		assert.Equal(t, oldTweetID, tweets[0].ID)
 
 		tweets, err = testDB.GetTweets(userID, 0, 10, true, tweetWriter)
-		fmt.Println(tweets)
 		assert.Nil(t, err, "failed to get tweets")
 		assert.Equal(t, 3, len(tweets))
 		// Make sure its the earliest one
@@ -352,9 +350,9 @@ The first tweet is #tweet_%d
 		thread, err := testDB.CreateThread(userID, "junk", tweetWriter)
 		threadID = thread.ID
 		assert.Nil(t, err, "failed to create thread")
-		tweetStr := fmt.Sprintf(`#thread:%s:%d
-This tweet is part of thread %s`, thread.ID, 0, thread.ID)
-		tweet, _, err := testDB.InsertTweet(userID, tweetStr, "", tweetWriter)
+		tweetStr := fmt.Sprintf(`This tweet is part of thread %s`, thread.ID)
+		flagsStr := fmt.Sprintf(`#thread:%s:%d`, thread.ID, 0)
+		tweet, _, err := testDB.InsertTweet(userID, tweetStr, flagsStr, tweetWriter)
 		assert.Nil(t, err, "failed insert tweet")
 		threadTweet = tweet
 		threadData, err := testDB.GetThread(userID, thread.ID, tweetWriter)
@@ -362,6 +360,7 @@ This tweet is part of thread %s`, thread.ID, 0, thread.ID)
 		assert.Equal(t, 1, len(threadData.Tweets))
 		assert.Equal(t, tweet.ID, threadData.Tweets[0].ID, "check tweet returned properly")
 		assert.Equal(t, tweetStr, threadData.Tweets[0].Tweet, "invalid saved tweet")
+		assert.Equal(t, flagsStr, threadData.Tweets[0].Flags)
 	})
 
 	t.Run("update tweet remove thread", func(t *testing.T) {
@@ -375,16 +374,58 @@ This tweet is not part of thread`)
 	})
 
 	t.Run("update tweet add thread again", func(t *testing.T) {
-		tweetStr := fmt.Sprintf(`#thread:%s:%d
-This tweet is part of thread %s`, threadID, 0, threadID)
-		_, _, err := testDB.UpdateTweet(userID, threadTweet.ID, tweetStr, "", tweetWriter)
+		tweetStr := fmt.Sprintf(`This tweet is part of thread %s`, threadID)
+		flagsStr := fmt.Sprintf(`#thread:%s:%d`, threadID, 0)
+		_, _, err := testDB.UpdateTweet(userID, threadTweet.ID, tweetStr, flagsStr, tweetWriter)
 		assert.Nil(t, err, "failed to update tweet")
 		threadData, err := testDB.GetThread(userID, threadID, tweetWriter)
 		assert.Nil(t, err, "invalid thread")
 		assert.Equal(t, 1, len(threadData.Tweets))
 		assert.Equal(t, threadTweet.ID, threadData.Tweets[0].ID, "check tweet returned properly")
 		assert.Equal(t, tweetStr, threadData.Tweets[0].Tweet, "invalid saved tweet")
+		assert.Equal(t, flagsStr, threadData.Tweets[0].Flags)
 	})
+
+	tweetTeardown(tweetWriter)
+	t.Run("Get all tweets", func(t *testing.T) {
+		for i := 0; i < 50; i++ {
+			testDB.(*StoreImpl).InsertTweet(userID,
+				fmt.Sprintf(`#display
+The first tweet is #tweet_%d
+#Hello #World.`, i), "", tweetWriter)
+		}
+
+		var getAllTweets = func(step int) (int, int) {
+			offset := 0
+			numLoops := 0
+			// Get all the tweets
+			for {
+				tweets, newOffset, err := testDB.UnsafeGetAllTweets(tweetWriter, offset, step)
+				numLoops++
+				assert.Nil(t, err, "Failed to get all tweets")
+				assert.Equal(t, len(tweets), newOffset-offset)
+				if (newOffset - offset) < step {
+					offset = newOffset
+					break
+				}
+				offset = newOffset
+			}
+			return offset, numLoops
+		}
+
+		// perfectly divisible
+		offset, numLoops := getAllTweets(10)
+		assert.Equal(t, 50, offset, "invalid number of tweets retrieved")
+		assert.Equal(t, 6, numLoops, "invalid number of loops run")
+
+		// not perfectly divisible
+		offset, numLoops = getAllTweets(3)
+		assert.Equal(t, 50, offset, "invalid number of tweets retrieved")
+		assert.Equal(t, 17, numLoops, "invalid number of loops run")
+
+	})
+
+	tweetTeardown(tweetWriter)
 
 }
 

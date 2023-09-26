@@ -14,7 +14,7 @@ func ExtractTags(tweet string) ([]string, error) {
 	ret := []string{}
 
 	lines := strings.Split(tweet, "\n")
-	for _, line := range lines[1:] {
+	for _, line := range lines {
 		val := p.FindAllStringSubmatch(line, -1)
 		for _, v := range val {
 			ret = append(ret, v[1])

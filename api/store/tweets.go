@@ -2,6 +2,7 @@ package store
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/param108/profile/api/models"
@@ -20,7 +21,7 @@ func (s *StoreImpl) InsertTweet(userID string, tweet string,
 		Flags:  flags,
 	}
 
-	threads, err := utils.ExtractThreads(tweet)
+	threads, err := utils.ExtractThreads(flags)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -59,7 +60,7 @@ func (s *StoreImpl) UpdateTweet(userID, tweetID,
 		Flags:  flags,
 	}
 
-	threads, err := utils.ExtractThreads(tweet)
+	threads, err := utils.ExtractThreads(flags)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -133,4 +134,12 @@ func (s *StoreImpl) DeleteTweet(userID string, tweetID string, writer string) (*
 func (s *StoreImpl) DeleteGuestData(userID string, maxTweets int,
 	writer string) error {
 	return s.db.DeleteGuestData(userID, maxTweets, writer)
+}
+
+func (s *StoreImpl) UnsafeGetAllTweets(writer string, offset int, count int) ([]*models.Tweet, int, error) {
+	return s.db.GetAllTweets(writer, offset, count)
+}
+
+func (s *StoreImpl) UnsafeDelete(table, writer string) error {
+	return s.db.Delete(table, writer)
 }
