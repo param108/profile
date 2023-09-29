@@ -398,7 +398,7 @@ Unknown Tweet`}
             }
 
             thread.tweets.forEach((tweet: TweetType) => {
-                let ts = hasThread(tweet.tweet);
+                let ts = hasThread(tweet.flags);
                 ts.forEach((t: ThreadInfo)=>{
                     if (t.id in seen) {
                         return
