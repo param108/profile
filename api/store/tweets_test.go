@@ -51,8 +51,7 @@ func TestInsertTweet(t *testing.T) {
 
 	t.Run("Insert a tweet with no tags", func(t *testing.T) {
 		tw, tags, err := testDB.(*StoreImpl).InsertTweet(userID,
-			`#display
-The first tweet has no tags.
+			`The first tweet has no tags.
 notags.`, "", tweetWriter)
 		assert.Nil(t, err, "failed to insert tweets and tags")
 		assert.NotNil(t, tw.CreatedAt, "empty created_at")
@@ -75,8 +74,7 @@ No tweet tag anywhere`, tw.Tweet, "invalid updated tweet")
 
 	t.Run("Insert a tweet and a few tags", func(t *testing.T) {
 		tw, tags, err := testDB.(*StoreImpl).InsertTweet(userID,
-			`#display
-The first #tweet is a short
+			`The first #tweet is a short
 #Hello #World.`, "", tweetWriter)
 		assert.Nil(t, err, "failed to insert tweets and tags")
 		assert.NotNil(t, tw.CreatedAt, "empty created_at")
@@ -91,8 +89,7 @@ The first #tweet is a short
 
 	t.Run("Insert a second tweet with repeat tags", func(t *testing.T) {
 		tw, tags, err := testDB.(*StoreImpl).InsertTweet(userID,
-			`#display
-The first #tweet is a short
+			`The first #tweet is a short
 #Hello #World.`, "", tweetWriter)
 		assert.Nil(t, err, "failed to insert tweets and tags")
 		assert.NotNil(t, tw.CreatedAt, "empty created_at")
@@ -142,8 +139,7 @@ The first #tweet is a short
 	t.Run("Update tweet with more tags", func(t *testing.T) {
 		tw, tags, err := testDB.(*StoreImpl).UpdateTweet(userID,
 			oldTweetID,
-			`#display
-The first #tweet is a short
+			`The first #tweet is a short
 #Hello #World #Tree.`, "", tweetWriter)
 		assert.Nil(t, err, "failed to insert tweets and tags")
 		assert.NotNil(t, tw.CreatedAt, "empty created_at")
@@ -192,8 +188,7 @@ The first #tweet is a short
 	t.Run("Update tweet with less tags", func(t *testing.T) {
 		tw, tags, err := testDB.(*StoreImpl).UpdateTweet(userID,
 			oldTweetID,
-			`#display
-The first is a short
+			`The first is a short
 #Hello #World #Tree.`, "", tweetWriter)
 		assert.Nil(t, err, "failed to insert tweets and tags")
 		assert.NotNil(t, tw.CreatedAt, "empty created_at")
@@ -278,8 +273,7 @@ The first is a short
 		func(t *testing.T) {
 			for i := 0; i < 20; i++ {
 				testDB.(*StoreImpl).InsertTweet(userID,
-					`#display
-The first #tweet is a short
+					`The first #tweet is a short
 #Hello #World.`, "", tweetWriter)
 			}
 			tweets, err := testDB.GetTweets(userID, 0, 10, false, tweetWriter)
@@ -296,8 +290,7 @@ The first #tweet is a short
 	t.Run("multiple tags and single user", func(t *testing.T) {
 		for i := 0; i < 20; i++ {
 			testDB.(*StoreImpl).InsertTweet(userID,
-				fmt.Sprintf(`#display
-The first tweet is #tweet_%d
+				fmt.Sprintf(`The first tweet is #tweet_%d
 #Hello #World.`, i), "", tweetWriter)
 		}
 		tweets, err := testDB.SearchTweetsByTags(
