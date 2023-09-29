@@ -36,12 +36,18 @@ Used to be called **micro-blogging** until twitter
         <div
           class="bg-sky-200 w-[96%] md:w-[510px] rounded mb-[10px]"
         >
-          <textarea
-            class="block dark:bg-slate-700 w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black dark:text-slate-100"
-            placeholder="What are you thinking about ?"
-          >
-            Hello World
-          </textarea>
+          <div>
+            <textarea
+              class="block dark:bg-slate-700 w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black dark:text-slate-100"
+              placeholder="What are you thinking about ?"
+            >
+              Hello World
+            </textarea>
+            <textarea
+              class="block dark:bg-slate-700 w-[96%] md:w-[500px] h-[50px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black dark:text-slate-100"
+              placeholder="display tags..."
+            />
+          </div>
           <div
             class="block pt-[5px]"
           >
@@ -167,12 +173,18 @@ Used to be called **micro-blogging** until twitter
       <div
         class="bg-sky-200 w-[96%] md:w-[510px] rounded mb-[10px]"
       >
-        <textarea
-          class="block dark:bg-slate-700 w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black dark:text-slate-100"
-          placeholder="What are you thinking about ?"
-        >
-          Hello World
-        </textarea>
+        <div>
+          <textarea
+            class="block dark:bg-slate-700 w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black dark:text-slate-100"
+            placeholder="What are you thinking about ?"
+          >
+            Hello World
+          </textarea>
+          <textarea
+            class="block dark:bg-slate-700 w-[96%] md:w-[500px] h-[50px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black dark:text-slate-100"
+            placeholder="display tags..."
+          />
+        </div>
         <div
           class="block pt-[5px]"
         >

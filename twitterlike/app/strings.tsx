@@ -131,13 +131,13 @@ export function parseCommandLine(flags: string):CommandLineData {
         threads: []
     }
 
-    if (isFlagOn(flags, "#font:kamal")) {
+    if (isFlagOn(flags||'', "#font:kamal")) {
         commandLineExists = true;
         ret.fontKamal = true;
     }
 
     ret.exists = false
-    let threads = hasThread(flags)
+    let threads = hasThread(flags||'')
     if (threads.length > 0) {
         commandLineExists = true;
         ret.hasThread = true;
@@ -162,9 +162,9 @@ export function addThread(flags: string, thread_id: string):string {
         cmd = parts[0];
         parts.splice(0,1);
         flags = parts.join("\n");
-        cmd = cmd + ` #thread:${thread_id}:0\n`;
+        cmd = cmd + ` #thread:${thread_id}:0`;
     } else {
-        cmd = `#thread:${thread_id}:0\n`;
+        cmd = `#thread:${thread_id}:0`;
     }
 
     return cmd + flags;
