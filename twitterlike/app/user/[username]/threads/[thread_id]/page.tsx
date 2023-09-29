@@ -79,6 +79,7 @@ export default function ShowTweet() {
     var [ loggedIn, setLoggedIn ] = useState(false)
     var [ editorLoading, setEditorLoading ] = useState(false)
     var [ editorValue, setEditorValue ] = useState("")
+    var [ flagsValue, setFlagsValue ] = useState("")
     var [ username, setUsername ] = useState("")
     var [ tweets, setTweets ] = useState<TweetType[]>([])
     var [ errorMessage, setErrorMessage ] = useState("");
@@ -87,6 +88,8 @@ export default function ShowTweet() {
     // should we show the tweet for the editor?
     var [ showEditorTweet, setShowEditorTweet ] = useState(false)
     var [ editTweetValue, setEditTweetValue ] = useState("")
+    var [ editFlagsValue, setEditFlagsValue ] = useState("")
+
     var [ editTweetLoading, setEditTweetLoading ] = useState(false)
     var [ editTweetErrorMessage, setEditTweetErrorMessage ] = useState("")
     var [ editTweetShowError, setEditTweetShowError ] = useState(false)
@@ -108,7 +111,8 @@ export default function ShowTweet() {
     var [chosenTweet, setChosenTweet]:[TweetType, Dispatch<SetStateAction<TweetType>>] = useState({
         tweet:"",
         id:"",
-        created_at:""
+        created_at:"",
+        flags:""
     })
 
     const editTweetDiv = ()=>{
@@ -124,6 +128,8 @@ export default function ShowTweet() {
             <EditPair editting={true} isLoggedIn={true} showLoading={editTweetLoading}
             onSendClicked={onEditTweetSendClicked} value={editTweetValue}
             viewing={true}
+            flags={editFlagsValue}
+            onFlagsChange={onEditFlagsChanged}
             onChange={onEditTweetChanged} key={1} tweet={chosenTweet}
             showMenu={false}
             defaultMessage={`
@@ -155,6 +161,7 @@ Unknown Tweet`}
                 visible={true}
                 tweet_id={chosenTweet?.id}
                 tweet={chosenTweet?.tweet}
+                flags={chosenTweet?.flags}
                 date={chosenTweet?.created_at}
                 deleteClicked={()=>{}}
                 editClicked={()=>{}}
@@ -187,8 +194,8 @@ Unknown Tweet`}
                 let thread_id = res.data.data.id
 
                 // update the tweet with the thread hash
-                chosenTweet.tweet = addThread(chosenTweet.tweet, thread_id);
-                updateTweet(APIToken, chosenTweet.tweet, chosenTweet.id).
+                chosenTweet.flags = addThread(chosenTweet.flags, thread_id);
+                updateTweet(APIToken, chosenTweet.tweet, chosenTweet.id, chosenTweet.flags).
                     then((res)=>{
                         getThread(params.username, params.thread_id).
                             then((res:AxiosResponse)=>{
@@ -232,6 +239,7 @@ Unknown Tweet`}
                 visible={true}
                 tweet_id={chosenTweet?.id}
                 tweet={chosenTweet?.tweet}
+                flags={chosenTweet?.flags}
                 date={chosenTweet?.created_at}
                 deleteClicked={()=>{}}
                 editClicked={()=>{}}
@@ -308,9 +316,9 @@ Unknown Tweet`}
     useEffect(()=>{
         var seen:{ [name:string]:boolean } = {}
         var newThreads: { [name:string]:(ThreadData|null) } = {}
-        setEditorValue(`#thread:${params.thread_id}:${tweets.length}`)
+        setFlagsValue(`#thread:${params.thread_id}:${tweets.length}`)
         tweets.forEach((tweet: TweetType)=>{
-            let ts = hasThread(tweet.tweet);
+            let ts = hasThread(tweet.flags);
             ts.forEach((t: ThreadInfo)=>{
                 if (t.id in seen) {
                     return
@@ -413,14 +421,14 @@ Unknown Tweet`}
             });
                 }, [APIToken, params.username])
 
-    const onSendClicked= (tweet: string) => {
+    const onSendClicked= (tweet: string, flags: string) => {
         if (loggedIn) {
             setEditorLoading(true)
 
             // save the value returned so that we don't lose it
             // if there is some error.
             setEditorValue(tweet)
-            sendTweet(APIToken, tweet).
+            sendTweet(APIToken, tweet, flags).
                 then(()=>{
                     getThread(params.username, params.thread_id).
                         then((res:AxiosResponse)=>{
@@ -449,8 +457,17 @@ Unknown Tweet`}
         setEditorValue(newValue)
     }
 
+    const onFlagsChanged= (newValue: string) => {
+        setFlagsValue(newValue)
+    }
+
+
     const onEditTweetChanged=(newValue: string) => {
         setEditTweetValue(newValue)
+    }
+
+    const onEditFlagsChanged=(newValue: string) => {
+        setEditFlagsValue(newValue)
     }
 
     const onEditTweetClicked=(tweet: TweetType)=> {
@@ -458,13 +475,15 @@ Unknown Tweet`}
             setOpenModal("edit_tweet")
             setChosenTweet(tweet)
             setEditTweetValue(tweet.tweet)
+            setEditFlagsValue(tweet.flags)
         }
     }
 
     const onEditTweetSendClicked=()=>{
         setEditTweetShowError(false)
         setEditTweetLoading(true)
-        updateTweet(APIToken, editTweetValue, chosenTweet.id).
+        console.log(editTweetValue, editFlagsValue);
+        updateTweet(APIToken, editTweetValue, chosenTweet.id, editFlagsValue).
         then((res)=>{
             getThread(params.username, params.thread_id).
                 then((res:AxiosResponse)=>{
@@ -553,7 +572,7 @@ Unknown Tweet`}
                     <span className="text-black dark:text-gray-50 pl-[10px] text-xl w-[90%] md:w-[510px]">{">> "}<b>{threadName}</b></span>
                         {tweets.length > 0 ?
                             tweets.map((k: TweetType, idx: number) => {
-                                let threads = hasThread(k.tweet).map((x: ThreadInfo) => {
+                                let threads = hasThread(k.flags).map((x: ThreadInfo) => {
                                     if (x.id in threadCatalog) {
                                         return threadCatalog[x.id];
                                     }
@@ -567,6 +586,7 @@ Unknown Tweet`}
                                         tweet_id={k.id}
                                         tweet={k.tweet}
                                         date={k.created_at}
+                                        flags={k.flags}
                                         showMenu={loggedIn}
                                         onClick={() => {
                                             //setThreadVisible(!threadVisible);
@@ -599,6 +619,7 @@ Unknown Tweet`}
                                 <Tweet tweet_id={"1"} tweet={`
 Nothing here **yet**!`} key={1} date="Start of time"
                                     onClick={() => { }}
+                                    flags={""}
                                     editClicked={() => { }}
                                     deleteClicked={() => { }}
                                     visible={true}
@@ -616,6 +637,7 @@ Nothing here **yet**!`} key={1} date="Start of time"
                             <EditPair editting={true} isLoggedIn={true} showLoading={editorLoading}
                                 onSendClicked={onSendClicked} value={editorValue} viewing={showEditorTweet}
                                 onChange={onChanged} key={10000} tweet={{
+                                    flags: '',
                                     created_at: "Preview",
                                     id: 'new',
                                     tweet: ''
@@ -626,6 +648,8 @@ This is a blog. A **blog** of _tweets_.
 Used to be called **micro-blogging** until twitter
 **Hijacked** the space.
 `}
+                                onFlagsChange={onFlagsChanged}
+                                flags={flagsValue}
                                 editClicked={() => { }}
                                 deleteClicked={() => { }}
                                 editorHideable={false}
@@ -640,7 +664,7 @@ Used to be called **micro-blogging** until twitter
             {(threadVisible && threadData)?(
             <div className="ml-[10px] max-h-full float-right overflow-y-scroll">
                         <div className="w-[90%] md:w-[510px]">
-                            <span className="text-xl">{">> "}<b>{threadData.name}</b></span>
+                            <span className="text-xl text-black dark:text-white">{">> "}<b>{threadData.name}</b></span>
                             <FiZap
                                 onClick={() => { setThreadVisible(false) }}
                                 className="cursor-pointer ml-[10px] text-pink-600 float-right" size={20} />
@@ -658,7 +682,7 @@ Used to be called **micro-blogging** until twitter
                     {(()=>{
                         if (threadData.tweets.length > 0) {
                             return threadData.tweets.map((k: TweetType, idx: number) => {
-                                let threadsInfo = hasThread(k.tweet)
+                                let threadsInfo = hasThread(k.flags)
                                 let threads = threadsInfo.map((x:ThreadInfo)=>{
                                     if (x.id === threadData?.id) {
                                         return null
@@ -674,6 +698,7 @@ Used to be called **micro-blogging** until twitter
                                         visible={true}
                                         key={idx}
                                         tweet_id={k.id}
+                                        flags={k.flags}
                                         tweet={k.tweet}
                                         date={k.created_at}
                                         showMenu={loggedIn}
@@ -702,6 +727,7 @@ Nothing here **yet**!`} key={1} date="Start of time"
                                     externalClicked={null}
                                     showMenu={false}
                                     visible={true}
+                                    flags={''}
                                     threadList={[]}
                                     viewThread={null}
                                     url={`${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?` + searchParams.toString()}

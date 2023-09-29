@@ -116,10 +116,13 @@ export default function Home() {
           location.href=`/user/${username}/tweets`;
           e.stopPropagation()
         }}}>
-      <Editor isLoggedIn={loggedIn} onChange={()=>{}}
+      <Editor isLoggedIn={loggedIn}
+        onChange={()=>{}}
+        onFlagsChange={()=>{}}
         onSendClicked={()=>{}}
         showLoading={false}
         value={""}
+        flags={""}
         hideable={false}
         hideClicked={()=>{}}
         defaultMessage={`
@@ -135,6 +138,7 @@ Used to be called **micro-blogging** until twitter
           return (<Tweet tweet_id={idx.toString()} key={idx} tweet={k.tweet}
                   date={k.created_at} onClick={()=>{}}
                   deleteClicked={()=>{}} editClicked={()=>{}}
+                  flags={''}
                   showMenu={false}
                   visible={true}
                   externalClicked={null}

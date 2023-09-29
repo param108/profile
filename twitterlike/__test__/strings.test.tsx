@@ -6,8 +6,7 @@ this is a great tweet with no tags`;
         expect(
             tagsToHyperlinks(
                 tweet,
-                "https://ui.tribist.com/user/param108/tweets?tags=tweet",
-                true
+                "https://ui.tribist.com/user/param108/tweets?tags=tweet"
             )).toEqual(tweet)
     })
 
@@ -20,7 +19,6 @@ this is an even better [#tweet](https://ui.tribist.com/user/param108/tweets?tags
             tagsToHyperlinks(
                 tweet,
                 "https://ui.tribist.com/user/param108/tweets?tags=param",
-                true
             )).toEqual(expected)
     })
 
@@ -33,7 +31,6 @@ this is an even better [#tweet](https://ui.tribist.com/user/param108/tweets?tags
             tagsToHyperlinks(
                 tweet,
                 "https://ui.tribist.com/user/param108/tweets?tags=tweet,param",
-                true
             )).toEqual(expected)
     })
 
@@ -45,8 +42,7 @@ this is an even better [#tweet2](https://ui.tribist.com/user/param108/tweets?tag
         expect(
             tagsToHyperlinks(
                 tweet,
-                "https://ui.tribist.com/user/param108/tweets?tags=tweet,param",
-                true
+                "https://ui.tribist.com/user/param108/tweets?tags=tweet,param"
             )).toEqual(expected)
     })
 
@@ -62,8 +58,7 @@ this is an even better [#tweet](https://ui.tribist.com/user/param108/tweets?tags
         expect(
             tagsToHyperlinks(
                 tweet,
-                "https://ui.tribist.com/user/param108/tweets?tags=tweet",
-                true
+                "https://ui.tribist.com/user/param108/tweets?tags=tweet"
             )).toEqual(expected)
     })
 
@@ -79,29 +74,23 @@ this is an even better [#tweet](https://ui.tribist.com/user/param108/tweets?tags
         expect(
             tagsToHyperlinks(
                 tweet,
-                "https://ui.tribist.com/user/param108/tweets?tags=tweet",
-                true
+                "https://ui.tribist.com/user/param108/tweets?tags=tweet"
             )).toEqual(expected)
     })
 
     it('adds the thread to tweet without commandline', ()=>{
-        let tweet = `Hello Hello Hello
-`;
+        let flags = ``;
         expect(
-            addThread(tweet, "daedf35f-0ff8-4c23-86aa-98213dead4c4")).toEqual(
-                `#thread:daedf35f-0ff8-4c23-86aa-98213dead4c4:0
-Hello Hello Hello
-`
+            addThread(flags, "daedf35f-0ff8-4c23-86aa-98213dead4c4")).toEqual(
+                `#thread:daedf35f-0ff8-4c23-86aa-98213dead4c4:0`
             );
     })
 
     it('adds the thread to tweet with commandline', ()=>{
-        let tweet = `#thread:daedf35f-0ff8-4c23-86aa-98213dead4c4:0
-Hello Hello Hello`
+        let flags = `#thread:daedf35f-0ff8-4c23-86aa-98213dead4c4:0`
         expect(
-            addThread(tweet, "0a015aee-4922-4f1c-afef-b321ecd835f7")).toEqual(
-                `#thread:daedf35f-0ff8-4c23-86aa-98213dead4c4:0 #thread:0a015aee-4922-4f1c-afef-b321ecd835f7:0
-Hello Hello Hello`
+            addThread(flags, "0a015aee-4922-4f1c-afef-b321ecd835f7")).toEqual(
+                `#thread:daedf35f-0ff8-4c23-86aa-98213dead4c4:0 #thread:0a015aee-4922-4f1c-afef-b321ecd835f7:0`
             )
     })
 })

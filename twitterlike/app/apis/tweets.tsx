@@ -5,6 +5,7 @@ import "./interceptors";
 export type TweetType = {
     tweet: string,
     created_at: string,
+    flags: string,
     id: string
 }
 
@@ -56,7 +57,7 @@ export const getATweetForUser = async (user:string, tweet_id:string) => {
     return res;
 }
 
-export const sendTweet = async (token: string, tweet: string) => {
+export const sendTweet = async (token: string, tweet: string, flags: string) => {
     const config = {
         headers:{
             "TRIBIST_JWT": token,
@@ -67,7 +68,8 @@ export const sendTweet = async (token: string, tweet: string) => {
     const res = await axios.post<TweetType>(
        `${process.env.NEXT_PUBLIC_BE_URL}/tweets`,
         {
-            tweet: tweet
+            tweet: tweet,
+            flags: flags
         },
         config
     );
@@ -75,7 +77,7 @@ export const sendTweet = async (token: string, tweet: string) => {
 
 }
 
-export const updateTweet = async (token: string, tweet: string, tweet_id: string) => {
+export const updateTweet = async (token: string, tweet: string, tweet_id: string, flags: string) => {
     const config = {
         headers:{
             "TRIBIST_JWT": token,
@@ -87,7 +89,8 @@ export const updateTweet = async (token: string, tweet: string, tweet_id: string
        `${process.env.NEXT_PUBLIC_BE_URL}/tweets`,
         {
            tweet: tweet,
-           tweet_id: tweet_id
+           tweet_id: tweet_id,
+           flags: flags
         },
         config
     );

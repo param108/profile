@@ -87,6 +87,14 @@ type Store interface {
 
 	// GetThread Get thread details and all the tweets attached to it
 	GetThread(userID, threadID, writer string) (*models.ThreadData, error)
+
+	//All functions after this line are for internal use only.
+	// UnsafeGetAllTweets Get all Tweets paginated 20 at a time for a writer,
+	// regardless of user
+	UnsafeGetAllTweets(writer string, offset int, count int) ([]*models.Tweet, int, error)
+
+	// UnsafeDelete Delete all tweets from a table for a writer
+	UnsafeDelete(table string, writer string) error
 }
 
 func Periodic(s Store, writer string) {

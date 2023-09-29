@@ -11,16 +11,6 @@ function isFlagOn(tweet: string, flag: string): Boolean {
 
 const threadRegexp=/#thread:([a-z0-9-]{36}):([0-9]{1,})/g;
 
-function hasAThread(tweet: string):boolean {
-    let newTweet = tweet.split('\n');
-    let firstline = newTweet[0]
-
-    if (firstline.match(threadRegexp)) {
-        return true;
-    }
-    return false;
-}
-
 // merge the retrieved tweets with the existing.
 export function mergeTweets(oldTweets: TweetType[],newTweets: TweetType[], reverse: boolean): TweetType[] {
     let found :{[k: string]: boolean} ={}
@@ -74,15 +64,9 @@ export function mergeTweets(oldTweets: TweetType[],newTweets: TweetType[], rever
 
 // searches for hyperlinks in second lines and converts them
 // for display as links
-export function tagsToHyperlinks(tweet: string, baseURL: string, commandLineExists: boolean): string {
+export function tagsToHyperlinks(tweet: string, baseURL: string): string {
     // Ignore tags on the first line
-    let newTweet = tweet.split('\n');
-    let firstline = ""
-    if (commandLineExists) {
-        firstline = newTweet[0]
-        newTweet.splice(0,1);
-    }
-    let remainingTweet=newTweet.join('\n');
+    let remainingTweet=tweet;
 
     // Extract all the tags
     const tagRegexp = /#[a-z0-9A-Z_]+/g;
@@ -123,7 +107,7 @@ export function tagsToHyperlinks(tweet: string, baseURL: string, commandLineExis
             tagReplaced[tag] = true
         }
     }
-    return firstline+"\n"+remainingTweet
+    return remainingTweet
 
 }
 
@@ -134,7 +118,7 @@ export type CommandLineData = {
     threads: ThreadInfo[]
 }
 
-export function parseCommandLine(tweet: string):CommandLineData {
+export function parseCommandLine(flags: string):CommandLineData {
     // TODO Need to move this to a common place.
     // The first line is the command line if it exists
     // Default is for it not to exist.
@@ -147,13 +131,13 @@ export function parseCommandLine(tweet: string):CommandLineData {
         threads: []
     }
 
-    if (isFlagOn(tweet, "#font:kamal")) {
+    if (isFlagOn(flags||'', "#font:kamal")) {
         commandLineExists = true;
         ret.fontKamal = true;
     }
 
     ret.exists = false
-    let threads = hasThread(tweet)
+    let threads = hasThread(flags||'')
     if (threads.length > 0) {
         commandLineExists = true;
         ret.hasThread = true;
@@ -169,21 +153,21 @@ export function parseCommandLine(tweet: string):CommandLineData {
 }
 
 // Add thread to the commandline of a tweet
-export function addThread(tweet: string, thread_id: string):string {
-    let cmdLine = parseCommandLine(tweet);
+export function addThread(flags: string, thread_id: string):string {
+    let cmdLine = parseCommandLine(flags);
 
     let cmd = "";
     if (cmdLine.exists) {
-        let parts = tweet.split("\n");
+        let parts = flags.split("\n");
         cmd = parts[0];
         parts.splice(0,1);
-        tweet = parts.join("\n");
-        cmd = cmd + ` #thread:${thread_id}:0\n`;
+        flags = parts.join("\n");
+        cmd = cmd + ` #thread:${thread_id}:0`;
     } else {
-        cmd = `#thread:${thread_id}:0\n`;
+        cmd = `#thread:${thread_id}:0`;
     }
 
-    return cmd + tweet;
+    return cmd + flags;
 }
 
 // sort the thread of tweets in order of sequence number
@@ -196,15 +180,22 @@ export function sortThreadTweets(tweets: TweetType[], thread_id: string):TweetTy
         if (x.id in foundTweets) {
             seqX = foundTweets[x.id]
         } else {
-            let threadsInfoX = hasThread(x.tweet);
-            seqX = threadsInfoX.filter((t)=>(t.id === thread_id))[0].seq;
+            let threadsInfoX = hasThread(x.flags);
+            let threadInfos = threadsInfoX.filter((t)=>(t.id === thread_id));
+            if (threadInfos.length > 0) {
+                seqX =threadInfos[0].seq
+            };
         }
 
         if (y.id in foundTweets) {
             seqY = foundTweets[y.id]
         } else {
-            let threadsInfoY = hasThread(y.tweet);
-            seqY = threadsInfoY.filter((t)=>(t.id === thread_id))[0].seq;
+            let threadsInfoY = hasThread(y.flags);
+            let threadInfos = threadsInfoY.filter((t)=>(t.id === thread_id));
+            if (threadInfos.length > 0) {
+                seqY =threadInfos[0].seq
+            };
+
         }
 
         if (seqX > seqY) {
@@ -219,20 +210,14 @@ export function sortThreadTweets(tweets: TweetType[], thread_id: string):TweetTy
     })
 }
 
-export function formatTweet(tweet: string, baseURL: string):ReactElement {
+export function formatTweet(tweet: string, baseURL: string, flags: string):ReactElement {
     const converter = new showdown.Converter();
     
     // The first line is the command line if it exists
     // Default is for it not to exist.
-    let cmdLine = parseCommandLine(tweet);
+    let cmdLine = parseCommandLine(flags);
 
-    tweet = tagsToHyperlinks(tweet, baseURL, cmdLine.exists)
-    // If the command Line Exists we need to remove it after processing.
-    if (cmdLine.exists) {
-        let newTweet = tweet.split('\n');
-        newTweet.splice(0,1);
-        tweet=newTweet.join('\n');
-    }
+    tweet = tagsToHyperlinks(tweet, baseURL)
 
     let hdata = converter.makeHtml(tweet);
     let classNames = "";
@@ -256,8 +241,8 @@ export type ThreadInfo = {
 
 // hasThread: Returns the threadID and seq for each tweet in a thread
 // returns the tweets in seq order
-export function hasThread(tweet: string): ThreadInfo[] {
-    const firstLine=tweet.split("\n")[0];
+export function hasThread(flags: string): ThreadInfo[] {
+    const firstLine=flags.split("\n")[0];
     var data: ThreadInfo[] = []
 
     var matches = firstLine.matchAll(threadRegexp)
