@@ -2,7 +2,6 @@ package store
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/param108/profile/api/models"
