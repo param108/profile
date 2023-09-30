@@ -17,6 +17,8 @@ type EditorProps = {
     headerMargin?: boolean,
 }
 
+export const MaxTweetLength:number = 50
+
 export default function Editor(props: EditorProps) {
 
     var topDivStyle = "bg-sky-200 w-[96%] md:w-[510px] rounded mb-[10px]";
@@ -43,7 +45,9 @@ mt-[5px] mx-[2%] md:mx-[5px] p-[5px] rounded focus:outline-none overflow-x-auto 
             )}
             {props.isLoggedIn ? (
                         <div className="block pt-[5px]">
-                            <button className="px-[10px]"><FiImage className="text-indigo-800" size={30} /></button>
+                            <button className="px-[10px]">
+                                <FiImage className="text-indigo-800" size={30} />
+                            </button>
                             <div className="inline-block float-right pr-[10px]">
                                 <RingLoader className="inline-block" color="#EC4899"
                                     loading={props.showLoading} size={30}/>
@@ -52,8 +56,21 @@ mt-[5px] mx-[2%] md:mx-[5px] p-[5px] rounded focus:outline-none overflow-x-auto 
                                 <div onClick={()=>{props.hideClicked();}} className="inline-block float-left pl-[10px]">
                                 <FiX className="text-red-800" size={30}/>
                                     </div>):null}
-
-                    <button className="px-[10px] float-right" onClick={()=>onSendClick()}><FiSend className="text-indigo-800" size={30} /></button>
+                            {(props.value.length <= MaxTweetLength)?(<div className="inline-block float-right">
+                                <button
+                                className="px-[10px] float-right"
+                                onClick={()=>onSendClick()}>
+                                    <FiSend className="text-indigo-800" size={30} />
+                                </button>
+                                <span className="text-indigo-800 text-lg float-right items-center px-[10px]">{MaxTweetLength - props.value.length}</span>
+                                </div>):(<div className="inline-block float-right">
+                                <button
+                                className="px-[10px] float-right"
+                                onClick={()=>{}}>
+                                    <FiSend className="text-red-800" size={30} />
+                                </button>
+                                <span className="text-red-800 text-lg float-right items-center px-[10px]">{MaxTweetLength - props.value.length}</span>
+                                </div>)}
                         </div>
                     ):(
                         <div className="block pt-[5px] min-h-[35px]"></div>

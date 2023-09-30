@@ -233,32 +233,41 @@ Used to be called **micro-blogging** until twitter
           <div
             class="inline-block float-right pr-[10px]"
           />
-          <button
-            class="px-[10px] float-right"
+          <div
+            class="inline-block float-right"
           >
-            <svg
-              class="text-indigo-800"
-              fill="none"
-              height="30"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="30"
-              xmlns="http://www.w3.org/2000/svg"
+            <button
+              class="px-[10px] float-right"
             >
-              <line
-                x1="22"
-                x2="11"
-                y1="2"
-                y2="13"
-              />
-              <polygon
-                points="22 2 15 22 11 13 2 9 22 2"
-              />
-            </svg>
-          </button>
+              <svg
+                class="text-indigo-800"
+                fill="none"
+                height="30"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="30"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <line
+                  x1="22"
+                  x2="11"
+                  y1="2"
+                  y2="13"
+                />
+                <polygon
+                  points="22 2 15 22 11 13 2 9 22 2"
+                />
+              </svg>
+            </button>
+            <span
+              class="text-indigo-800 text-lg float-right items-center px-[10px]"
+            >
+              50
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -316,32 +325,41 @@ Used to be called **micro-blogging** until twitter
         <div
           class="inline-block float-right pr-[10px]"
         />
-        <button
-          class="px-[10px] float-right"
+        <div
+          class="inline-block float-right"
         >
-          <svg
-            class="text-indigo-800"
-            fill="none"
-            height="30"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-            width="30"
-            xmlns="http://www.w3.org/2000/svg"
+          <button
+            class="px-[10px] float-right"
           >
-            <line
-              x1="22"
-              x2="11"
-              y1="2"
-              y2="13"
-            />
-            <polygon
-              points="22 2 15 22 11 13 2 9 22 2"
-            />
-          </svg>
-        </button>
+            <svg
+              class="text-indigo-800"
+              fill="none"
+              height="30"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="30"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <line
+                x1="22"
+                x2="11"
+                y1="2"
+                y2="13"
+              />
+              <polygon
+                points="22 2 15 22 11 13 2 9 22 2"
+              />
+            </svg>
+          </button>
+          <span
+            class="text-indigo-800 text-lg float-right items-center px-[10px]"
+          >
+            50
+          </span>
+        </div>
       </div>
     </div>
   </div>,
@@ -397,18 +415,6 @@ Used to be called **micro-blogging** until twitter
   "rerender": [Function],
   "unmount": [Function],
 }
-`
-
-
-
-
-
-
-
-
-
-
-
-);
+`);
   })
 })
