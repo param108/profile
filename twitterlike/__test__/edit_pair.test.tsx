@@ -131,7 +131,7 @@ Used to be called **micro-blogging** until twitter
               <span
                 class="text-indigo-800 text-lg float-right items-center px-[10px]"
               >
-                39
+                489
               </span>
             </div>
           </div>
@@ -277,7 +277,7 @@ Used to be called **micro-blogging** until twitter
             <span
               class="text-indigo-800 text-lg float-right items-center px-[10px]"
             >
-              39
+              489
             </span>
           </div>
         </div>
