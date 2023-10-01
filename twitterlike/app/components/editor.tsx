@@ -17,7 +17,7 @@ type EditorProps = {
     headerMargin?: boolean,
 }
 
-export const MaxTweetLength:number = 50
+export const MaxTweetLength:number = 500
 
 export default function Editor(props: EditorProps) {
 
