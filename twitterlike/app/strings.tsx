@@ -264,3 +264,11 @@ export function hasThread(flags: string): ThreadInfo[] {
             return -1
         })
 }
+
+
+// replaceLinefeed replaces linefeeds with <br/> followed by linefeed
+export const replaceLinefeed = (tweet: string):string => {
+    let re = /(?<!\<br\/\>)\n/g;
+
+    return tweet.replace(re, '<br/>\n');
+}

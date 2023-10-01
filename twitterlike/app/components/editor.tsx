@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { FiImage, FiScissors, FiSend, FiUserX, FiX } from "react-icons/fi"
-import { formatTweet } from "../strings"
+import { formatTweet, replaceLinefeed } from "../strings"
 import RingLoader from "react-spinners/RingLoader"
 type EditorProps = {
     isLoggedIn: Boolean,
@@ -30,7 +30,12 @@ export default function Editor(props: EditorProps) {
         <div className={topDivStyle}>
             {props.isLoggedIn ? (
                 <div>
-                <textarea value={props.value} onChange={(e)=> (props.onChange(e.target.value))} placeholder={"What are you thinking about ?"}
+                <textarea
+                    value={props.value}
+                    onChange={(e)=> {
+                        props.onChange(replaceLinefeed(e.target.value));
+                    }}
+                    placeholder={"What are you thinking about ?"}
                     className="block dark:bg-slate-700 w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black dark:text-slate-100">
                 </textarea>
                 <textarea value={props.flags} onChange={(e)=> (props.onFlagsChange(e.target.value))} placeholder={"display tags..."}

@@ -1,4 +1,4 @@
-import { addThread, tagsToHyperlinks } from '../app/strings'
+import { addThread, replaceLinefeed, tagsToHyperlinks } from '../app/strings'
 describe('tweets formatting', ()=>{
     it('renders no tags correctly', ()=>{
         let tweet = `
@@ -92,5 +92,31 @@ this is an even better [#tweet](https://ui.tribist.com/user/param108/tweets?tags
             addThread(flags, "0a015aee-4922-4f1c-afef-b321ecd835f7")).toEqual(
                 `#thread:daedf35f-0ff8-4c23-86aa-98213dead4c4:0 #thread:0a015aee-4922-4f1c-afef-b321ecd835f7:0`
             )
+    })
+})
+
+
+describe("replace linefeed",()=>{
+    it('works for simple linefeeds', ()=>{
+        expect(
+            replaceLinefeed(`abcdefgh
+abcdefgh`)).toEqual(`abcdefgh<br/>
+abcdefgh`)
+    })
+
+    it('works for linefeeds with already replaced linefeeds', ()=>{
+        expect(
+            replaceLinefeed(`abcdefgh<br/>
+abcdefgh
+ijklmnop`)).toEqual(`abcdefgh<br/>
+abcdefgh<br/>
+ijklmnop`)
+    })
+
+    it('doesnt convert existing replaced linefeeds', ()=>{
+        expect(
+            replaceLinefeed(`abcdefgh<br/>
+abcdefgh`)).toEqual(`abcdefgh<br/>
+abcdefgh`)
     })
 })
