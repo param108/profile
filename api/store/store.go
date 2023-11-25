@@ -95,6 +95,22 @@ type Store interface {
 
 	// UnsafeDelete Delete all tweets from a table for a writer
 	UnsafeDelete(table string, writer string) error
+
+	// CreateOTP Create a new OTP entry
+	CreateOTP(phone string, now time.Time, writer string) error
+
+	// GetOTP Get an OTP entry without checking
+	GetOTP(phone, writer string) (*models.SpOtp, error)
+
+	// CheckOTP Get an OTP after verification.
+	// Returns error if invalid or expiry etc
+	CheckOTP(phone, code string, now time.Time, writer string) (*models.SpOtp, error)
+
+	// ExpireOTPs expire old otps
+	ExpireOTPs(now time.Time, writer string) error
+
+	// DeleteAllOTPs Delete all otps of a writer.
+	DeleteAllOTPs(writer string) error
 }
 
 func Periodic(s Store, writer string) {
