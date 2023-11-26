@@ -120,4 +120,7 @@ func Periodic(s Store, writer string) {
 	if err := s.DeleteGuestData(models.GuestUserID, 40, writer); err != nil {
 		log.Printf("Failed delete Guest tweets: %s", err.Error())
 	}
+	if err := s.ExpireOTPs(time.Now(), writer); err != nil {
+		log.Printf("Failed expire OTPs: %s", err.Error())
+	}
 }

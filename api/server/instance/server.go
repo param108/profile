@@ -156,4 +156,5 @@ func (s *Server) RegisterHandlers() {
 	s.r.HandleFunc("/user/{username}/threads/{thread_id}/delete", utils.AuthM(
 		threads.CreateDeleteThreadHandler(s.DB)).ServeHTTP).
 		Methods(http.MethodPost)
+
 }

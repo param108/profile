@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/param108/profile/api/models"
+	"gorm.io/gorm"
 )
 
 const OTP_EXPIRY_MINUTES = 20
@@ -68,6 +69,16 @@ func (db *PostgresDB) CheckOTP(
 		return nil, errors.New("Not Found")
 	}
 
+	if spOtps[0].Retries == 3 {
+		return nil, errors.New("Expired")
+	}
+
+	spOtps[0].Retries += 1
+
+	if err := db.db.Save(spOtps[0]).Error; err != nil {
+		return nil, err
+	}
+
 	ret := spOtps[0]
 
 	if ret.Expiry.Before(now) {
@@ -82,9 +93,13 @@ func (db *PostgresDB) CheckOTP(
 }
 
 func (db *PostgresDB) ExpireOTPs(now time.Time, writer string) error {
-	return db.db.Table("sp_otps").Where(
+	err := db.db.Table("sp_otps").Where(
 		"expiry < ? and writer = ?",
 		now, writer).Delete(&models.SpOtp{}).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil
+	}
+	return err
 }
 
 func (db *PostgresDB) DeleteAllOTPs(writer string) error {
