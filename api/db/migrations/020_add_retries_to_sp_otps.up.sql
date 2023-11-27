@@ -1,0 +1,2 @@
+ALTER TABLE sp_otps
+ADD COLUMN retries int NOT NULL DEFAULT 0;

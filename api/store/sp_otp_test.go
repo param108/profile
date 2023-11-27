@@ -48,12 +48,29 @@ func TestOTP(t *testing.T) {
 	})
 
 	t.Run("check invalid phone", func(t *testing.T) {
+		// Invalid phone will not increment retries
 		_, err := testDB.CheckOTP("9999999999", validCode, st.Add(2*time.Minute), writer)
 		assert.NotNil(t, err, "Check succeeded for invalid phone")
 	})
 
-	t.Run("check valid otp", func(t *testing.T) {
+	t.Run("check expiry after 3 tries for valid code", func(t *testing.T) {
+		// This is the 3rd retry with proper phone number
+		testDB.CheckOTP(phone1, validCode, st.Add(25*time.Minute), writer)
+
+		// even though everything is valid, this will fail
+		// because we have run out of retries
 		_, err := testDB.CheckOTP(phone1, validCode, st.Add(2*time.Minute), writer)
+		assert.NotNil(t, err, "succeeded after 3  retries")
+	})
+
+	t.Run("check valid otp", func(t *testing.T) {
+		err := testDB.CreateOTP(phone1, st, writer)
+		assert.Nil(t, err, "Failed to create OTP")
+
+		otp, err := testDB.GetOTP(phone1, writer)
+		assert.Nil(t, err, "couldnt find OTP")
+
+		_, err = testDB.CheckOTP(phone1, otp.Code, st.Add(2*time.Minute), writer)
 		assert.Nil(t, err, "Check failed for valid otp")
 	})
 
