@@ -158,12 +158,10 @@ func (s *Server) RegisterHandlers() {
 		threads.CreateDeleteThreadHandler(s.DB)).ServeHTTP).
 		Methods(http.MethodPost)
 
-	s.r.HandleFunc("/sp/otp", utils.AuthSP(
-		spotps.CreateMakeOTPHandler(s.DB)).ServeHTTP).
+	s.r.HandleFunc("/sp/otp", (spotps.CreateMakeOTPHandler(s.DB)).ServeHTTP).
 		Methods(http.MethodPost)
 
-	s.r.HandleFunc("/sp/otp/check", utils.AuthSP(
-		spotps.CreateCheckOTPHandler(s.DB)).ServeHTTP).
+	s.r.HandleFunc("/sp/otp/check", (spotps.CreateCheckOTPHandler(s.DB)).ServeHTTP).
 		Methods(http.MethodPost)
 
 }
