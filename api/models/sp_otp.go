@@ -22,3 +22,9 @@ type CheckOTPRequest struct {
 	APIKey   string `json:"api_key"`
 	IsSignUp bool   `json:"is_sign_up"`
 }
+
+type CheckOTPResponse struct {
+	SpUser       *SpUser `json:"user"`
+	AccessToken  string  `json:"access_token"`
+	RefreshToken string  `json:"refresh_token"`
+}

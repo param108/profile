@@ -111,6 +111,9 @@ type Store interface {
 
 	// DeleteAllOTPs Delete all otps of a writer.
 	DeleteAllOTPs(writer string) error
+
+	// FindOrCreateSPUser Find or create an SP User
+	FindOrCreateSPUser(phone string, writer string) (*models.SpUser, error)
 }
 
 func Periodic(s Store, writer string) {

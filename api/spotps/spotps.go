@@ -65,13 +65,31 @@ func CreateCheckOTPHandler(db store.Store) http.HandlerFunc {
 
 		spOtp, err := db.CheckOTP(req.Phone, req.Code, time.Now(), os.Getenv("WRITER"))
 		if err != nil {
-			utils.WriteError(rw, http.StatusInternalServerError, "Internal Error:"+err.Error())
+			utils.WriteError(rw, http.StatusForbidden, "forbidden")
 			return
 		}
+
+		// TODO delete the OTP now.
 
 		// successful validation of otp
 		// 1. Create the spuser if not exists
 		// 2. Create the access and refresh tokens for that user
-		utils.WriteData(rw, http.StatusOK, "ok")
+		spUser, err := db.FindOrCreateSPUser(spOtp.Phone, os.Getenv("WRITER"))
+		if err != nil {
+			utils.WriteError(rw, http.StatusInternalServerError, "Failed finding sp user:"+err.Error())
+			return
+		}
+
+		accessToken, refreshToken, err := utils.CreateSignedSPTokens(spUser.Phone, spUser.ID)
+		if err != nil {
+			utils.WriteError(rw, http.StatusInternalServerError, "Failed creating tokens:"+err.Error())
+			return
+		}
+		resp := models.CheckOTPResponse{
+			SpUser:       spUser,
+			AccessToken:  accessToken,
+			RefreshToken: refreshToken,
+		}
+		utils.WriteData(rw, http.StatusOK, resp)
 	}
 }

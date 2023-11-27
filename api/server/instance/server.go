@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/param108/profile/api/common"
+	"github.com/param108/profile/api/spotps"
 	"github.com/param108/profile/api/store"
 	"github.com/param108/profile/api/threads"
 	"github.com/param108/profile/api/tweets"
@@ -155,6 +156,14 @@ func (s *Server) RegisterHandlers() {
 
 	s.r.HandleFunc("/user/{username}/threads/{thread_id}/delete", utils.AuthM(
 		threads.CreateDeleteThreadHandler(s.DB)).ServeHTTP).
+		Methods(http.MethodPost)
+
+	s.r.HandleFunc("/sp/otp", utils.AuthSP(
+		spotps.CreateMakeOTPHandler(s.DB)).ServeHTTP).
+		Methods(http.MethodPost)
+
+	s.r.HandleFunc("/sp/otp/check", utils.AuthSP(
+		spotps.CreateCheckOTPHandler(s.DB)).ServeHTTP).
 		Methods(http.MethodPost)
 
 }
