@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/param108/profile/api/common"
 	"github.com/param108/profile/api/spotps"
+	"github.com/param108/profile/api/spuser"
 	"github.com/param108/profile/api/store"
 	"github.com/param108/profile/api/threads"
 	"github.com/param108/profile/api/tweets"
@@ -161,7 +162,14 @@ func (s *Server) RegisterHandlers() {
 	s.r.HandleFunc("/sp/otp", (spotps.CreateMakeOTPHandler(s.DB)).ServeHTTP).
 		Methods(http.MethodPost)
 
+	// Creates the sp user.
 	s.r.HandleFunc("/sp/otp/check", (spotps.CreateCheckOTPHandler(s.DB)).ServeHTTP).
+		Methods(http.MethodPost)
+
+	s.r.HandleFunc("/sp/users", utils.AuthSP(spuser.CreateGetSPUserHandler(s.DB)).ServeHTTP).
+		Methods(http.MethodGet)
+
+	s.r.HandleFunc("/sp/users/update", utils.AuthSP(spuser.CreateUpdateSPUserHandler(s.DB)).ServeHTTP).
 		Methods(http.MethodPost)
 
 }
