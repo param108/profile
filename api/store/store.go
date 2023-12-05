@@ -114,6 +114,12 @@ type Store interface {
 
 	// FindOrCreateSPUser Find or create an SP User
 	FindOrCreateSPUser(phone string, writer string) (*models.SpUser, error)
+
+	//GetSPUserByID get a sp User by ID
+	GetSPUserByID(id string, writer string) (*models.SpUser, error)
+
+	// UpdateSPUser update a spUser
+	UpdateSPUser(user *models.SpUser) (*models.SpUser, error)
 }
 
 func Periodic(s Store, writer string) {

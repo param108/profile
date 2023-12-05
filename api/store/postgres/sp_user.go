@@ -27,3 +27,24 @@ func (db *PostgresDB) FindOrCreateSPUser(
 	}
 	return spUser, nil
 }
+
+func (db *PostgresDB) GetSPUserByID(id string, writer string) (*models.SpUser, error) {
+	users := []*models.SpUser{}
+	if err := db.db.Where("id = ? and writer = ?", id, writer).Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	if len(users) == 0 {
+		return nil, errors.New("not found")
+	}
+
+	return users[0], nil
+}
+
+func (db *PostgresDB) UpdateSPUser(user *models.SpUser) (*models.SpUser, error) {
+	if err := db.db.Save(user).Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
