@@ -87,7 +87,7 @@ func CreateSignedSPTokens(phone, userID string) (string, string, error) {
 			// A usual scenario is to set the expiration time relative to the current time
 			IssuedAt:  jwt.NewNumericDate(timeNow),
 			NotBefore: jwt.NewNumericDate(timeNow),
-			ExpiresAt: jwt.NewNumericDate(timeNow.Add(7 * 24 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(timeNow.Add(24 * 7 * 24 * time.Hour)),
 			Issuer:    "tribist",
 			Subject:   "refresh",
 			ID:        userID,

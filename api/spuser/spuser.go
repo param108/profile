@@ -14,9 +14,9 @@ import (
 
 func CreateGetSPUserHandler(db store.Store) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		userID := r.URL.Query().Get("id")
+		userID := r.Header.Get("SP_USERID")
 		if len(userID) == 0 {
-			utils.WriteError(rw, http.StatusBadRequest, "user_id is mandatory")
+			utils.WriteError(rw, http.StatusForbidden, "unknown user")
 			return
 		}
 
