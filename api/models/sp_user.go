@@ -64,3 +64,9 @@ type SpGroupMessage struct {
 	CreatedAt   time.Time `json:"created_at" gorm:"default:NOW()"`
 	Writer      string    `json:"writer"`
 }
+
+type RefreshTokenResponse struct {
+	SpUser       *SpUser `json:"user"`
+	AccessToken  string  `json:"access_token"`
+	RefreshToken string  `json:"refresh_token"`
+}

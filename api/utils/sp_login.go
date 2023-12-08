@@ -89,7 +89,7 @@ func CreateSignedSPTokens(phone, userID string) (string, string, error) {
 			NotBefore: jwt.NewNumericDate(timeNow),
 			ExpiresAt: jwt.NewNumericDate(timeNow.Add(7 * 24 * time.Hour)),
 			Issuer:    "tribist",
-			Subject:   "access",
+			Subject:   "refresh",
 			ID:        userID,
 			Audience:  []string{"public"},
 		},
@@ -126,6 +126,49 @@ func AuthSP(next http.Handler) http.Handler {
 			}
 			return
 		}
+
+		// refresh token cannot be used for normal APIs
+		if claims.Subject == "refresh" {
+			http.Error(w, "forbidden", http.StatusForbidden)
+			return
+		}
+
+		r.Header.Set("SP_USERID", claims.UserID)
+		r.Header.Set("SP_PHONE", claims.Phone)
+		next.ServeHTTP(w, r)
+	})
+}
+
+// AuthRefreshSP delete SP_USER header and then
+// repopulate with an empty value if unauthenticated,
+// returns 401 or 403 if failure and does not proceed to handler.
+// This middleware expects a refresh token,
+// It will return 403 for access token.
+func AuthRefreshSP(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.Header.Del("SP_PHONE")
+		r.Header.Del("SP_USERID")
+
+		jwtStr := r.Header.Get("TRIBIST_JWT")
+
+		claims, err := parseSPToken(jwtStr)
+		if err != nil {
+			if err.Error() == "unauthorized" {
+				http.Error(w, "unauthorized", http.StatusUnauthorized)
+			}
+
+			if err.Error() == "forbidden" {
+				http.Error(w, "forbidden", http.StatusForbidden)
+			}
+			return
+		}
+
+		// access token cannot be used for refresh
+		if claims.Subject == "access" {
+			http.Error(w, "forbidden", http.StatusForbidden)
+			return
+		}
+
 		r.Header.Set("SP_USERID", claims.UserID)
 		r.Header.Set("SP_PHONE", claims.Phone)
 		next.ServeHTTP(w, r)

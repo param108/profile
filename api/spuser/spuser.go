@@ -73,3 +73,34 @@ func CreateUpdateSPUserHandler(db store.Store) http.HandlerFunc {
 		utils.WriteData(rw, http.StatusOK, spUser)
 	}
 }
+
+func CreateRefreshSPUserTokenHandler(db store.Store) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		userID := r.Header.Get("SP_USERID")
+		phone := r.Header.Get("SP_PHONE")
+
+		if len(userID) == 0 || len(phone) == 0 {
+			utils.WriteError(rw, http.StatusForbidden, "unknown user")
+			return
+		}
+
+		spUser, err := db.FindOrCreateSPUser(phone, os.Getenv("WRITER"))
+		if err != nil {
+			utils.WriteError(rw, http.StatusInternalServerError, "Failed finding sp user:"+err.Error())
+			return
+		}
+
+		accessToken, refreshToken, err := utils.CreateSignedSPTokens(spUser.Phone, spUser.ID)
+		if err != nil {
+			utils.WriteError(rw, http.StatusInternalServerError, "Failed creating tokens:"+err.Error())
+			return
+		}
+
+		resp := models.RefreshTokenResponse{
+			SpUser:       spUser,
+			AccessToken:  accessToken,
+			RefreshToken: refreshToken,
+		}
+		utils.WriteData(rw, http.StatusOK, resp)
+	}
+}
