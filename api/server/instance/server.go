@@ -172,4 +172,7 @@ func (s *Server) RegisterHandlers() {
 	s.r.HandleFunc("/sp/users/update", utils.AuthSP(spuser.CreateUpdateSPUserHandler(s.DB)).ServeHTTP).
 		Methods(http.MethodPost)
 
+	s.r.HandleFunc("/sp/refresh", utils.AuthRefreshSP(spuser.CreateRefreshSPUserTokenHandler(s.DB)).ServeHTTP).
+		Methods(http.MethodPost)
+
 }
