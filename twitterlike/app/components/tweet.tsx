@@ -9,6 +9,7 @@ import { FiExternalLink } from "react-icons/fi";
 type TweetProps = {
     tweet_id: string,
     tweet: string,
+    flags: string,
     date: string,
     onClick: Function,
     deleteClicked: Function,
@@ -95,7 +96,7 @@ export default function Tweet(props: TweetProps) {
                         props.externalClicked(props.tweet_id);
                     }}}/>):null}<br/>
             </div>
-            <span className="text-gray-600 dark:text-slate-100">{formatTweet(props.tweet, props.url)}</span>
+            <span className="text-gray-600 dark:text-slate-100">{formatTweet(props.tweet, props.url, props.flags)}</span>
             </div>
             {atleastOneThread()?(
             <div className={(menuVisible && props.showMenu)?"w-full overflow-auto bg-cyan-50 dark:bg-slate-700":

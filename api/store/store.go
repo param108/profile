@@ -96,6 +96,39 @@ type Store interface {
 
 	// GetResources get resource count
 	GetResources(userID, writer string) ([]*models.Resource, error)
+
+	//All functions after this line are for internal use only.
+	// UnsafeGetAllTweets Get all Tweets paginated 20 at a time for a writer,
+	// regardless of user
+	UnsafeGetAllTweets(writer string, offset int, count int) ([]*models.Tweet, int, error)
+
+	// UnsafeDelete Delete all tweets from a table for a writer
+	UnsafeDelete(table string, writer string) error
+
+	// CreateOTP Create a new OTP entry
+	CreateOTP(phone string, now time.Time, writer string) error
+
+	// GetOTP Get an OTP entry without checking
+	GetOTP(phone, writer string) (*models.SpOtp, error)
+
+	// CheckOTP Get an OTP after verification.
+	// Returns error if invalid or expiry etc
+	CheckOTP(phone, code string, now time.Time, writer string) (*models.SpOtp, error)
+
+	// ExpireOTPs expire old otps
+	ExpireOTPs(now time.Time, writer string) error
+
+	// DeleteAllOTPs Delete all otps of a writer.
+	DeleteAllOTPs(writer string) error
+
+	// FindOrCreateSPUser Find or create an SP User
+	FindOrCreateSPUser(phone string, writer string) (*models.SpUser, error)
+
+	//GetSPUserByID get a sp User by ID
+	GetSPUserByID(id string, writer string) (*models.SpUser, error)
+
+	// UpdateSPUser update a spUser
+	UpdateSPUser(user *models.SpUser) (*models.SpUser, error)
 }
 
 func Periodic(s Store, writer string) {
@@ -104,5 +137,8 @@ func Periodic(s Store, writer string) {
 	}
 	if err := s.DeleteGuestData(models.GuestUserID, 40, writer); err != nil {
 		log.Printf("Failed delete Guest tweets: %s", err.Error())
+	}
+	if err := s.ExpireOTPs(time.Now(), writer); err != nil {
+		log.Printf("Failed expire OTPs: %s", err.Error())
 	}
 }

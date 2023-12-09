@@ -21,6 +21,7 @@ _Interested ?_
 Then [**signup**](https://google.com)!
 `}
                         key={1}
+                        flags={''}
                         date={"13/03/2022"}
                         onClick={()=>{}}
                         deleteClicked={()=>{}}

@@ -15,49 +15,41 @@ func TestTagExtraction(t *testing.T) {
 	tweets := []testTweet{
 		// 0: simple tag in middle of sentence
 		{
-			`
-There was #no way to do this`,
+			`There was #no way to do this`,
 			[]string{"no"},
 		},
 		// 1: tag at beginning of sentence
 		{
-			`
-#the end is nigh`,
+			`#the end is nigh`,
 			[]string{"the"},
 		},
 		// 2: tag at end of sentence
 		{
-			`
-Towards the end it was #horrible
+			`Towards the end it was #horrible
 You know I almost #died`,
 			[]string{"horrible", "died"},
 		},
 		// 3: tag with _
 		{
-			`
-Towards the end it was #horrible_
+			`Towards the end it was #horrible_
 You know I almost #totally_died`,
 			[]string{"horrible_", "totally_died"},
 		},
 		// 4: -, or any other character terminates
 		{
-			`
-Towards the end it was #horrible-
+			`Towards the end it was #horrible-
 You know I almost #totally-died`,
 			[]string{"horrible", "totally"},
 		},
 		// 5: multiple tags in the same line
-		// ignore tags on first line
 		{
-			`#top #tags #for #config #only
-This tweet has #two tags in the same #line.`,
+			`This tweet has #two tags in the same #line.`,
 			[]string{"two", "line"},
 		},
 		// 6: multiple consecutive # or a # on its own
 		// should be ignored
 		{
-			`#top #tags #for #config #only
-# This tweet has #two tags in the same #line.
+			`# This tweet has #two tags in the same #line.
 
 ## Subheading`,
 			[]string{"two", "line"},

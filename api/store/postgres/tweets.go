@@ -122,6 +122,7 @@ func (db *PostgresDB) UpdateTweet(
 	writer string,
 ) (*models.Tweet, []*models.Tag, error) {
 	err := db.db.Transaction(func(tx *gorm.DB) error {
+<<<<<<< HEAD
 		// update image_compressed and image_compressed_failed if image has changed
 		if err := tx.Model(&models.Tweet{}).
 			Where("id = ? and user_id = ? and writer = ? and image != ?",
@@ -143,6 +144,12 @@ func (db *PostgresDB) UpdateTweet(
 			Update("tweet", tweet.Tweet).
 			Update("image", tweet.Image).
 			Error; err != nil {
+=======
+
+		if err := tx.Model(&models.Tweet{}).
+			Where("id = ? and user_id = ? and writer = ?", tweet.ID, tweet.UserID, writer).
+			Updates(models.Tweet{Tweet: tweet.Tweet, Flags: tweet.Flags}).Error; err != nil {
+>>>>>>> 6a842701b6b9b6aaa4103c49d48f8750819d7b73
 			return err
 		}
 
@@ -440,4 +447,15 @@ func (db *PostgresDB) DeleteGuestData(
 		}
 		return nil
 	})
+}
+
+func (db *PostgresDB) GetAllTweets(writer string, offset int, count int) ([]*models.Tweet, int, error) {
+	ret := []*models.Tweet{}
+
+	err := db.db.Table("tweets").Where("writer = ?", writer).Offset(offset).Limit(count).Find(&ret).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return ret, offset + len(ret), nil
 }

@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.9 (Ubuntu 14.9-0ubuntu0.22.04.1)
--- Dumped by pg_dump version 14.9 (Ubuntu 14.9-0ubuntu0.22.04.1)
+-- Dumped from database version 14.10 (Ubuntu 14.10-0ubuntu0.22.04.1)
+-- Dumped by pg_dump version 14.10 (Ubuntu 14.10-0ubuntu0.22.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -59,12 +59,134 @@ CREATE TABLE public.onetime (
 
 
 --
+-- Name: resources; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.resources (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    user_id uuid NOT NULL,
+    t character varying(50) NOT NULL,
+    value integer DEFAULT 0,
+    max integer DEFAULT 0,
+    writer uuid NOT NULL,
+    CONSTRAINT resources_check CHECK (((value >= 0) AND (value <= max)))
+);
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.schema_migrations (
     version bigint NOT NULL,
     dirty boolean NOT NULL
+);
+
+
+--
+-- Name: sp_group_messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sp_group_messages (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    sp_group_id uuid NOT NULL,
+    sp_user_id uuid NOT NULL,
+    sp_message_id uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT now(),
+    writer uuid NOT NULL
+);
+
+
+--
+-- Name: sp_group_users; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sp_group_users (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    sp_group_id uuid NOT NULL,
+    sp_user_id uuid NOT NULL,
+    deleted boolean DEFAULT false NOT NULL,
+    created_at timestamp with time zone DEFAULT now(),
+    deleted_at timestamp with time zone,
+    writer uuid NOT NULL
+);
+
+
+--
+-- Name: sp_groups; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sp_groups (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    name character varying(100) NOT NULL,
+    parent uuid,
+    deleted boolean DEFAULT false NOT NULL,
+    description text DEFAULT ''::text NOT NULL,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now(),
+    deleted_at timestamp with time zone,
+    writer uuid NOT NULL
+);
+
+
+--
+-- Name: sp_message_comments; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sp_message_comments (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    sp_user_id uuid NOT NULL,
+    sp_message_id uuid NOT NULL,
+    msg_text text DEFAULT ''::text NOT NULL,
+    created_at timestamp with time zone DEFAULT now(),
+    writer uuid NOT NULL
+);
+
+
+--
+-- Name: sp_messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sp_messages (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    sp_user_id uuid NOT NULL,
+    msg_type character varying(100) NOT NULL,
+    msg_value integer DEFAULT 0 NOT NULL,
+    msg_text text DEFAULT ''::text NOT NULL,
+    created_at timestamp with time zone DEFAULT now(),
+    writer uuid NOT NULL
+);
+
+
+--
+-- Name: sp_otps; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sp_otps (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    phone character varying(20) NOT NULL,
+    code character varying(10) NOT NULL,
+    expiry timestamp with time zone NOT NULL,
+    writer uuid NOT NULL,
+    retries integer DEFAULT 0 NOT NULL
+);
+
+
+--
+-- Name: sp_users; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sp_users (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    phone character varying(20) NOT NULL,
+    name character varying(100) NOT NULL,
+    photo_url text NOT NULL,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now(),
+    deleted boolean DEFAULT false NOT NULL,
+    writer uuid NOT NULL,
+    deleted_at timestamp with time zone,
+    profile_updated boolean DEFAULT false NOT NULL
 );
 
 
@@ -169,11 +291,11 @@ CREATE TABLE public.tweets (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     user_id uuid NOT NULL,
     tweet character varying(500) NOT NULL,
-    flags character varying(100) DEFAULT ''::character varying NOT NULL,
+    flags text DEFAULT ''::character varying NOT NULL,
     created_at timestamp with time zone DEFAULT (now() AT TIME ZONE 'utc'::text) NOT NULL,
     writer uuid NOT NULL,
     deleted boolean DEFAULT false NOT NULL,
-    image character varying(50) DEFAULT ''::character varying NOT NULL,
+    image character varying(150) DEFAULT ''::character varying NOT NULL,
     image_compressed boolean DEFAULT false,
     image_compressed_failed boolean DEFAULT false
 );
@@ -236,11 +358,99 @@ ALTER TABLE ONLY public.onetime
 
 
 --
+-- Name: resources resources_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.resources
+    ADD CONSTRAINT resources_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: resources resources_user_id_writer_t_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.resources
+    ADD CONSTRAINT resources_user_id_writer_t_key UNIQUE (user_id, writer, t);
+
+
+--
 -- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
+
+
+--
+-- Name: sp_group_messages sp_group_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sp_group_messages
+    ADD CONSTRAINT sp_group_messages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sp_group_users sp_group_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sp_group_users
+    ADD CONSTRAINT sp_group_users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sp_groups sp_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sp_groups
+    ADD CONSTRAINT sp_groups_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sp_message_comments sp_message_comments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sp_message_comments
+    ADD CONSTRAINT sp_message_comments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sp_messages sp_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sp_messages
+    ADD CONSTRAINT sp_messages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sp_otps sp_otps_phone_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sp_otps
+    ADD CONSTRAINT sp_otps_phone_key UNIQUE (phone);
+
+
+--
+-- Name: sp_otps sp_otps_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sp_otps
+    ADD CONSTRAINT sp_otps_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sp_users sp_users_phone_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sp_users
+    ADD CONSTRAINT sp_users_phone_key UNIQUE (phone);
+
+
+--
+-- Name: sp_users sp_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sp_users
+    ADD CONSTRAINT sp_users_pkey PRIMARY KEY (id);
 
 
 --
@@ -327,6 +537,62 @@ CREATE INDEX idx_image_compressed_failed ON public.tweets USING btree (image_com
 --
 
 CREATE INDEX idx_index_user_id_tag ON public.tags USING btree (user_id, tag);
+
+
+--
+-- Name: idx_resources_user_id_type; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_resources_user_id_type ON public.resources USING btree (user_id, writer, t);
+
+
+--
+-- Name: idx_sp_group_messages_sp_group_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_sp_group_messages_sp_group_id ON public.sp_group_messages USING btree (sp_group_id, created_at, writer);
+
+
+--
+-- Name: idx_sp_group_users_sp_group_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_sp_group_users_sp_group_id ON public.sp_group_users USING btree (sp_group_id, writer);
+
+
+--
+-- Name: idx_sp_group_users_sp_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_sp_group_users_sp_user_id ON public.sp_group_users USING btree (sp_user_id, writer);
+
+
+--
+-- Name: idx_sp_groups_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_sp_groups_name ON public.sp_groups USING btree (name, writer);
+
+
+--
+-- Name: idx_sp_message_comments_sp_message_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_sp_message_comments_sp_message_id ON public.sp_message_comments USING btree (sp_message_id, writer);
+
+
+--
+-- Name: idx_sp_messages_msg_type; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_sp_messages_msg_type ON public.sp_messages USING btree (msg_type, created_at, writer);
+
+
+--
+-- Name: idx_sp_messages_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_sp_messages_user_id ON public.sp_messages USING btree (sp_user_id, created_at, writer);
 
 
 --

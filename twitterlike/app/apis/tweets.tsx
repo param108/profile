@@ -7,6 +7,7 @@ export type TweetType = {
     created_at: string,
     id: string,
     image: string,
+    flags: string,
 }
 
 export type SignedURLRequest = {
@@ -71,7 +72,7 @@ export const getATweetForUser = async (user:string, tweet_id:string) => {
     return res;
 }
 
-export const sendTweet = async (token: string, tweet: string, image: string) => {
+export const sendTweet = async (token: string, tweet: string, image: string, flags: string) => {
     const config = {
         headers:{
             "TRIBIST_JWT": token,
@@ -83,7 +84,8 @@ export const sendTweet = async (token: string, tweet: string, image: string) => 
        `${process.env.NEXT_PUBLIC_BE_URL}/tweets`,
         {
             tweet: tweet,
-            image: image
+            image: image,
+            flags: flags
         },
         config
     );
@@ -91,7 +93,7 @@ export const sendTweet = async (token: string, tweet: string, image: string) => 
 
 }
 
-export const updateTweet = async (token: string, tweet: string, tweet_id: string) => {
+export const updateTweet = async (token: string, tweet: string, tweet_id: string, flags: string) => {
     const config = {
         headers:{
             "TRIBIST_JWT": token,
@@ -103,7 +105,8 @@ export const updateTweet = async (token: string, tweet: string, tweet_id: string
        `${process.env.NEXT_PUBLIC_BE_URL}/tweets`,
         {
            tweet: tweet,
-           tweet_id: tweet_id
+           tweet_id: tweet_id,
+           flags: flags
         },
         config
     );

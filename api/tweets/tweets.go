@@ -164,7 +164,8 @@ func CreatePostTweetsHandler(db store.Store) http.HandlerFunc {
 			}
 		}
 
-		tweet, _, err := db.InsertTweet(userID, req.Tweet, req.Image, "", os.Getenv("WRITER"))
+		tweet, _, err := db.InsertTweet(userID, req.Tweet, req.Image, req.Flags,
+			os.Getenv("WRITER"))
 		if err != nil {
 			utils.WriteError(rw, http.StatusInternalServerError, err.Error())
 			return

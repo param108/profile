@@ -11,9 +11,11 @@ type EditPairProps = {
     isLoggedIn: boolean,
     defaultMessage: string,
     onChange: Function,
+    onFlagsChange: Function,
     onSendClicked: Function,
     showLoading: boolean,
     value: string,
+    flags: string,
     showMenu: boolean,
     editClicked: Function,
     deleteClicked: Function,
@@ -49,6 +51,8 @@ export default function EditPair( props: EditPairProps) {
             value={props.value}
             onSendClicked={props.onSendClicked}
             onChange={props.onChange}
+            onFlagsChange={props.onFlagsChange}
+            flags={props.flags}
             hideable={props.editorHideable}
             url={props.url}
             hideClicked={props.hideClicked}
@@ -79,6 +83,7 @@ export default function EditPair( props: EditPairProps) {
             <div
             className="flex flex-col items-center w-full">
             <Tweet
+            flags={props.flags}
             url={props.url}
             visible={props.visible}
             tweet_id={props.tweet?.id?props.tweet.id:""}

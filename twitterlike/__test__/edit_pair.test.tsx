@@ -36,12 +36,18 @@ Used to be called **micro-blogging** until twitter
         <div
           class="bg-sky-200 w-[96%] md:w-[510px] rounded mb-[10px]"
         >
-          <textarea
-            class="block dark:bg-slate-700 w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black dark:text-slate-100"
-            placeholder="What are you thinking about ?"
-          >
-            Hello World
-          </textarea>
+          <div>
+            <textarea
+              class="block dark:bg-slate-700 w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black dark:text-slate-100"
+              placeholder="What are you thinking about ?"
+            >
+              Hello World
+            </textarea>
+            <textarea
+              class="block dark:bg-slate-700 w-[96%] md:w-[500px] h-[50px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black dark:text-slate-100"
+              placeholder="display tags..."
+            />
+          </div>
           <div
             class="block pt-[5px]"
           >
@@ -93,32 +99,41 @@ Used to be called **micro-blogging** until twitter
                 />
               </span>
             </div>
-            <button
-              class="px-[10px] float-right"
+            <div
+              class="inline-block float-right"
             >
-              <svg
-                class="text-indigo-800"
-                fill="none"
-                height="30"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                width="30"
-                xmlns="http://www.w3.org/2000/svg"
+              <button
+                class="px-[10px] float-right"
               >
-                <line
-                  x1="22"
-                  x2="11"
-                  y1="2"
-                  y2="13"
-                />
-                <polygon
-                  points="22 2 15 22 11 13 2 9 22 2"
-                />
-              </svg>
-            </button>
+                <svg
+                  class="text-indigo-800"
+                  fill="none"
+                  height="30"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="30"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <line
+                    x1="22"
+                    x2="11"
+                    y1="2"
+                    y2="13"
+                  />
+                  <polygon
+                    points="22 2 15 22 11 13 2 9 22 2"
+                  />
+                </svg>
+              </button>
+              <span
+                class="text-indigo-800 text-lg float-right items-center px-[10px]"
+              >
+                489
+              </span>
+            </div>
           </div>
         </div>
         <div
@@ -167,12 +182,18 @@ Used to be called **micro-blogging** until twitter
       <div
         class="bg-sky-200 w-[96%] md:w-[510px] rounded mb-[10px]"
       >
-        <textarea
-          class="block dark:bg-slate-700 w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black dark:text-slate-100"
-          placeholder="What are you thinking about ?"
-        >
-          Hello World
-        </textarea>
+        <div>
+          <textarea
+            class="block dark:bg-slate-700 w-[96%] md:w-[500px] h-[150px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black dark:text-slate-100"
+            placeholder="What are you thinking about ?"
+          >
+            Hello World
+          </textarea>
+          <textarea
+            class="block dark:bg-slate-700 w-[96%] md:w-[500px] h-[50px] resize-none caret-red-500 mt-[5px] mx-[2%] md:mx-[5px] pl-[10px] pr-[5px] py-[5px] rounded focus:outline-none text-black dark:text-slate-100"
+            placeholder="display tags..."
+          />
+        </div>
         <div
           class="block pt-[5px]"
         >
@@ -224,32 +245,41 @@ Used to be called **micro-blogging** until twitter
               />
             </span>
           </div>
-          <button
-            class="px-[10px] float-right"
+          <div
+            class="inline-block float-right"
           >
-            <svg
-              class="text-indigo-800"
-              fill="none"
-              height="30"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="30"
-              xmlns="http://www.w3.org/2000/svg"
+            <button
+              class="px-[10px] float-right"
             >
-              <line
-                x1="22"
-                x2="11"
-                y1="2"
-                y2="13"
-              />
-              <polygon
-                points="22 2 15 22 11 13 2 9 22 2"
-              />
-            </svg>
-          </button>
+              <svg
+                class="text-indigo-800"
+                fill="none"
+                height="30"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="30"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <line
+                  x1="22"
+                  x2="11"
+                  y1="2"
+                  y2="13"
+                />
+                <polygon
+                  points="22 2 15 22 11 13 2 9 22 2"
+                />
+              </svg>
+            </button>
+            <span
+              class="text-indigo-800 text-lg float-right items-center px-[10px]"
+            >
+              489
+            </span>
+          </div>
         </div>
       </div>
       <div
