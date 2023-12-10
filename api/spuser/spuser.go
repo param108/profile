@@ -114,11 +114,34 @@ type GetPutImageUrlResponse struct {
 	Headers map[string]string `json:"headers"`
 }
 
+type GetPutImageUrlRequest struct {
+	APIToken string           `json:"api_token"`
+	Suffix string `json:"suffix"`
+}
+
+
 func CreatePutImageSignedUrlHandler(db store.Store, aws *utils.AWS) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		userID := r.Header.Get("SP_USERID")
 		if len(userID) == 0 {
 			utils.WriteError(rw, http.StatusForbidden, "unknown user")
+			return
+		}
+
+		data, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "couldnt read:"+err.Error())
+			return
+		}
+
+		req := models.GetPutImageUrlRequest{}
+		if err := json.Unmarshal(data, &req); err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "couldnt parse:"+err.Error())
+			return
+		}
+
+		if req.APIToken != os.Getenv("IMAGE_UPLOAD_API_KEY") {
+			utils.WriteError(rw, http.StatusForbidden, "invalid API Key")
 			return
 		}
 
@@ -139,7 +162,7 @@ func CreatePutImageSignedUrlHandler(db store.Store, aws *utils.AWS) http.Handler
 			}
 		}
 
-		suffix := strings.TrimSpace(r.URL.Query().Get("suffix"))
+		suffix := strings.TrimSpace(req.Suffix)
 		// add .<suffix> to the key if a suffix is provided.
 		if len(suffix) > 0 {
 			suffix = "." + suffix

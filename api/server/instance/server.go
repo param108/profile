@@ -177,6 +177,6 @@ func (s *Server) RegisterHandlers() {
 
 	s.r.HandleFunc("/sp/upload_url", utils.AuthRefreshSP(
 		spuser.CreatePutImageSignedUrlHandler(s.DB, s.aws)).ServeHTTP).
-		Methods(http.MethodGet)
+		Methods(http.MethodPost)
 
 }
