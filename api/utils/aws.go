@@ -2,7 +2,6 @@ package utils
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -73,7 +72,7 @@ func (awsMgr *AWS) CreateSignedGetUrl(bucket, name string,
 	return request.URL, headers, nil
 }
 
-func (awsMgr *AWS) GetSPBucketSize(bucket, userID string) (uint64, int) {
+func (awsMgr *AWS) GetSPBucketSize(bucket, userID string) (uint64, int, error) {
 
 	prefix := "sp_data_" + userID
 
@@ -108,7 +107,7 @@ func (awsMgr *AWS) GetSPBucketSize(bucket, userID string) (uint64, int) {
 		// you could add timeouts or deadlines.
 		page, err := p.NextPage(context.TODO())
 		if err != nil {
-			log.Fatalf("failed to get page %v, %v", i, err)
+			return 0, 0, err
 		}
 
 		// Log the objects found
@@ -118,5 +117,5 @@ func (awsMgr *AWS) GetSPBucketSize(bucket, userID string) (uint64, int) {
 		}
 	}
 
-	return totalSize, itemCount
+	return totalSize, itemCount, nil
 }

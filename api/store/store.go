@@ -129,6 +129,9 @@ type Store interface {
 
 	// GetResources get resource count
 	GetResources(userID, writer string) ([]*models.Resource, error)
+
+	// SetResources get resource count
+	SetResources(userID, t string, value int, writer string) (*models.Resource, error)
 }
 
 func Periodic(s Store, writer string) {

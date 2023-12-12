@@ -115,10 +115,27 @@ type GetPutImageUrlResponse struct {
 }
 
 type GetPutImageUrlRequest struct {
-	APIToken string           `json:"api_token"`
-	Suffix string `json:"suffix"`
+	APIToken string `json:"api_token"`
+	Suffix   string `json:"suffix"`
 }
 
+func CanAllocateResources(userID string, db store.Store, aws *utils.AWS) (bool, error) {
+	totalSize, _, err := aws.GetSPBucketSize(os.Getenv("AWS_IMAGE_BUCKET"), userID)
+	if err != nil {
+		return false, err
+	}
+
+	res, err := db.SetResources(userID, "images", int(totalSize), os.Getenv("WRITER"))
+	if err != nil {
+		return false, err
+	}
+
+	if res.Value >= res.Max {
+		return false, nil
+	}
+
+	return true, nil
+}
 
 func CreatePutImageSignedUrlHandler(db store.Store, aws *utils.AWS) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
@@ -134,7 +151,7 @@ func CreatePutImageSignedUrlHandler(db store.Store, aws *utils.AWS) http.Handler
 			return
 		}
 
-		req := models.GetPutImageUrlRequest{}
+		req := GetPutImageUrlRequest{}
 		if err := json.Unmarshal(data, &req); err != nil {
 			utils.WriteError(rw, http.StatusBadRequest, "couldnt parse:"+err.Error())
 			return
@@ -145,20 +162,15 @@ func CreatePutImageSignedUrlHandler(db store.Store, aws *utils.AWS) http.Handler
 			return
 		}
 
-		// Check if this user is allowed to upload images
-		resources, err := db.GetResources(userID, os.Getenv("WRITER"))
-		if err != nil {
-			utils.WriteError(rw, http.StatusInternalServerError, "couldnt check limits")
-			return
-		}
+		if allowed, err := CanAllocateResources(userID, db, aws); (err != nil) || !allowed {
+			if err != nil {
+				utils.WriteError(rw, http.StatusInternalServerError, "couldnt check resources")
+				return
+			}
 
-		for _, res := range resources {
-			if res.T == "image" {
-				if res.Value >= res.Max {
-					utils.WriteError(rw, http.StatusTooManyRequests, "too many images")
-					return
-				}
-				break
+			if !allowed {
+				utils.WriteError(rw, http.StatusTooManyRequests, "too many resources")
+				return
 			}
 		}
 

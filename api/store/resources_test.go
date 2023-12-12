@@ -26,25 +26,26 @@ func TestIncrDecrResources(t *testing.T) {
 		res, err := testDB.LockResource(resourceUserID, "image", resourceWriter)
 		assert.Nil(t, err, "failed to lock resource")
 		assert.Equal(t, 1, res.Value, "wrong resource count")
-		assert.Equal(t, 10, res.Max, "wrong resource max")
+		assert.Equal(t, 10000000, res.Max, "wrong resource max")
 	})
 
 	t.Run("Incr existing resource", func(t *testing.T) {
 		res, err := testDB.LockResource(resourceUserID, "image", resourceWriter)
 		assert.Nil(t, err, "failed to lock resource")
 		assert.Equal(t, 2, res.Value, "wrong resource count")
-		assert.Equal(t, 10, res.Max, "wrong resource max")
+		assert.Equal(t, 10000000, res.Max, "wrong resource max")
 	})
 
 	t.Run("Incr new resource", func(t *testing.T) {
 		res, err := testDB.LockResource(resourceUserID, "image", resourceWriter)
 		assert.Nil(t, err, "failed to lock resource")
 		assert.Equal(t, 3, res.Value, "wrong resource count")
-		assert.Equal(t, 10, res.Max, "wrong resource max")
+		assert.Equal(t, 10000000, res.Max, "wrong resource max")
 	})
 
 	t.Run("Try and incr more than maximum", func(t *testing.T) {
 		var err error
+		testDB.SetResources(resourceUserID, "image", 9999995, resourceWriter)
 		for i := 0; i < 10; i++ {
 			_, err = testDB.LockResource(resourceUserID, "image", resourceWriter)
 			if err != nil {
@@ -58,7 +59,7 @@ func TestIncrDecrResources(t *testing.T) {
 		assert.Nil(t, err, "failed to get resources")
 		for _, res := range resources {
 			if res.T == "image" {
-				assert.Equal(t, 10, res.Value)
+				assert.Equal(t, 10000000, res.Value)
 			}
 		}
 	})
@@ -73,19 +74,21 @@ func TestIncrDecrResources(t *testing.T) {
 	t.Run("decr existing resource", func(t *testing.T) {
 		res, err := testDB.UnlockResource(resourceUserID, "image", resourceWriter)
 		assert.Nil(t, err, "failed to lock resource")
-		assert.Equal(t, 9, res.Value, "wrong resource count")
-		assert.Equal(t, 10, res.Max, "wrong resource max")
+		assert.Equal(t, 9999999, res.Value, "wrong resource count")
+		assert.Equal(t, 10000000, res.Max, "wrong resource max")
 	})
 
 	t.Run("decr existing resource", func(t *testing.T) {
 		res, err := testDB.UnlockResource(resourceUserID, "image", resourceWriter)
 		assert.Nil(t, err, "failed to lock resource")
-		assert.Equal(t, 8, res.Value, "wrong resource count")
-		assert.Equal(t, 10, res.Max, "wrong resource max")
+		assert.Equal(t, 9999998, res.Value, "wrong resource count")
+		assert.Equal(t, 10000000, res.Max, "wrong resource max")
 	})
 
 	t.Run("Try and decr less than 0", func(t *testing.T) {
 		var err error
+		testDB.SetResources(resourceUserID, "image", 5, resourceWriter)
+
 		for i := 0; i < 10; i++ {
 			_, err = testDB.UnlockResource(resourceUserID, "image", resourceWriter)
 			if err != nil {
@@ -102,4 +105,16 @@ func TestIncrDecrResources(t *testing.T) {
 		}
 	})
 
+	t.Run("Set the value correctly", func(t *testing.T) {
+		res, err := testDB.SetResources(
+			resourceUserID, "image", 3, resourceWriter)
+		assert.Nil(t, err, "failed")
+		assert.Equal(t, 3, res.Value, "wrong value")
+	})
+
+	t.Run("Cant update greater than limit", func(t *testing.T) {
+		_, err := testDB.SetResources(
+			resourceUserID, "image", 10000005, resourceWriter)
+		assert.NotNil(t, err, "incorrectly succeeded")
+	})
 }

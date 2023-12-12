@@ -7,6 +7,31 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+func (db *PostgresDB) SetResources(
+	req *models.Resource, value int, writer string) (*models.Resource, error) {
+	err := db.db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "user_id"}, {Name: "writer"}, {Name: "t"}},
+		DoUpdates: clause.Assignments(map[string]interface{}{"value": value}),
+	}).Create(req).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	res := []*models.Resource{}
+	err = db.db.Where("user_id = ? and writer = ? and t = ?",
+		req.UserID, req.Writer, req.T).Find(&res).Error
+	if err != nil {
+		return nil, err
+	}
+
+	if len(res) == 0 {
+		return nil, errors.New("not found")
+	}
+
+	return res[0], nil
+}
+
 func (db *PostgresDB) LockResource(req *models.Resource) (*models.Resource, error) {
 	err := db.db.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "user_id"}, {Name: "writer"}, {Name: "t"}},
