@@ -120,6 +120,18 @@ type Store interface {
 
 	// UpdateSPUser update a spUser
 	UpdateSPUser(user *models.SpUser) (*models.SpUser, error)
+
+	// LockResource incr a resource count
+	LockResource(userID, t, writer string) (*models.Resource, error)
+
+	// UnlockResource decr a resource count
+	UnlockResource(userID, t, writer string) (*models.Resource, error)
+
+	// GetResources get resource count
+	GetResources(userID, writer string) ([]*models.Resource, error)
+
+	// SetResources get resource count
+	SetResources(userID, t string, value int, writer string) (*models.Resource, error)
 }
 
 func Periodic(s Store, writer string) {

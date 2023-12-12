@@ -2,11 +2,15 @@ package spuser
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"strings"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/param108/profile/api/models"
 	"github.com/param108/profile/api/store"
 	"github.com/param108/profile/api/utils"
@@ -102,5 +106,101 @@ func CreateRefreshSPUserTokenHandler(db store.Store) http.HandlerFunc {
 			RefreshToken: refreshToken,
 		}
 		utils.WriteData(rw, http.StatusOK, resp)
+	}
+}
+
+type GetPutImageUrlResponse struct {
+	URL     string            `json:"url"`
+	Headers map[string]string `json:"headers"`
+}
+
+type GetPutImageUrlRequest struct {
+	APIToken string `json:"api_token"`
+	Suffix   string `json:"suffix"`
+}
+
+func CanAllocateResources(userID string, db store.Store, aws *utils.AWS) (bool, error) {
+	totalSize, _, err := aws.GetSPBucketSize(os.Getenv("AWS_IMAGE_BUCKET"), userID)
+	if err != nil {
+		return false, err
+	}
+
+	res, err := db.SetResources(userID, "images", int(totalSize), os.Getenv("WRITER"))
+	if err != nil {
+		return false, err
+	}
+
+	if res.Value >= res.Max {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func CreatePutImageSignedUrlHandler(db store.Store, aws *utils.AWS) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		userID := r.Header.Get("SP_USERID")
+		if len(userID) == 0 {
+			utils.WriteError(rw, http.StatusForbidden, "unknown user")
+			return
+		}
+
+		data, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "couldnt read:"+err.Error())
+			return
+		}
+
+		req := GetPutImageUrlRequest{}
+		if err := json.Unmarshal(data, &req); err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "couldnt parse:"+err.Error())
+			return
+		}
+
+		if req.APIToken != os.Getenv("IMAGE_UPLOAD_API_KEY") {
+			utils.WriteError(rw, http.StatusForbidden, "invalid API Key")
+			return
+		}
+
+		if allowed, err := CanAllocateResources(userID, db, aws); (err != nil) || !allowed {
+			if err != nil {
+				utils.WriteError(rw, http.StatusInternalServerError, "couldnt check resources")
+				return
+			}
+
+			if !allowed {
+				utils.WriteError(rw, http.StatusTooManyRequests, "too many resources")
+				return
+			}
+		}
+
+		suffix := strings.TrimSpace(req.Suffix)
+		// add .<suffix> to the key if a suffix is provided.
+		if len(suffix) > 0 {
+			suffix = "." + suffix
+		}
+
+		bucket := os.Getenv("AWS_IMAGE_BUCKET")
+		u, err := uuid.NewUUID()
+		if err != nil {
+			utils.WriteError(rw, http.StatusInternalServerError, "failed to create uuid")
+			return
+		}
+		url, headers, err := aws.CreateSignedPutUrl(
+			bucket,
+			"sp_data_"+userID+"_"+u.String()+suffix,
+			time.Second*600)
+		if err != nil {
+			fmt.Println("failed to create url", err.Error())
+			utils.WriteError(rw, http.StatusInternalServerError, "failed to create url")
+			return
+		}
+
+		ret := GetPutImageUrlResponse{
+			URL:     url,
+			Headers: headers,
+		}
+
+		utils.WriteData(rw, http.StatusOK, ret)
 	}
 }

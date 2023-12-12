@@ -27,7 +27,7 @@ type Server struct {
 	r    *mux.Router
 	s    *http.Server
 	DB   store.Store
-
+	aws  *utils.AWS
 	// periodicQuit External call to quit
 	periodicQuit chan struct{}
 
@@ -173,6 +173,10 @@ func (s *Server) RegisterHandlers() {
 		Methods(http.MethodPost)
 
 	s.r.HandleFunc("/sp/refresh", utils.AuthRefreshSP(spuser.CreateRefreshSPUserTokenHandler(s.DB)).ServeHTTP).
+		Methods(http.MethodPost)
+
+	s.r.HandleFunc("/sp/upload_url", utils.AuthRefreshSP(
+		spuser.CreatePutImageSignedUrlHandler(s.DB, s.aws)).ServeHTTP).
 		Methods(http.MethodPost)
 
 }
