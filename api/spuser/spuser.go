@@ -62,11 +62,6 @@ func CreateUpdateSPUserHandler(db store.Store) http.HandlerFunc {
 
 		writer := os.Getenv("WRITER")
 
-		if writer != req.Writer {
-			utils.WriteError(rw, http.StatusForbidden, "wrong writer")
-			return
-		}
-
 		user, err := db.GetSPUserByID(userID, writer)
 		if err != nil {
 			utils.WriteError(rw, http.StatusBadRequest, "bad request: "+err.Error())
