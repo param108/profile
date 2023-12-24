@@ -67,6 +67,21 @@ func CreateUpdateSPUserHandler(db store.Store) http.HandlerFunc {
 			return
 		}
 
+		user, err := db.GetSPUserByID(userID, writer)
+		if err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "bad request: "+err.Error())
+			return
+		}
+
+		if req.Name == "" || req.PhotoURL == "" {
+			utils.WriteError(rw, http.StatusBadRequest, "name and photoURL cannot be empty")
+			return
+		}
+
+		user.Name = req.Name
+		user.PhotoURL = req.PhotoURL
+		user.ProfileUpdated = true
+
 		spUser, err := db.UpdateSPUser(&req)
 		if err != nil {
 			log.Printf("failed to update user" + err.Error())
