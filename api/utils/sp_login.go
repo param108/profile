@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -117,12 +118,19 @@ func AuthSP(next http.Handler) http.Handler {
 
 		claims, err := parseSPToken(jwtStr)
 		if err != nil {
+			ret := map[string]interface{}{
+				"success": false,
+			}
 			if err.Error() == "unauthorized" {
-				http.Error(w, "unauthorized", http.StatusUnauthorized)
+				ret["error"] = "unauthorized"
+				b, _ := json.Marshal(ret)
+				http.Error(w, string(b), http.StatusUnauthorized)
 			}
 
 			if err.Error() == "forbidden" {
-				http.Error(w, "forbidden", http.StatusForbidden)
+				ret["error"] = "forbidden"
+				b, _ := json.Marshal(ret)
+				http.Error(w, string(b), http.StatusForbidden)
 			}
 			return
 		}
