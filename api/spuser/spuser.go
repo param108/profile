@@ -135,7 +135,7 @@ func CanAllocateResources(userID string, db store.Store, aws *utils.AWS) (bool, 
 		return false, err
 	}
 
-	res, err := db.SetResources(userID, "images", int(totalSize), os.Getenv("WRITER"))
+	res, err := db.SetResources(userID, store.ImageType, int(totalSize), os.Getenv("WRITER"))
 	if err != nil {
 		return false, err
 	}

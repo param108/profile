@@ -2,8 +2,10 @@ package store
 
 import "github.com/param108/profile/api/models"
 
+const ImageType = "image"
+
 var DefaultMaxResources = map[string]int{
-	"image": 10000000, // 10 Megabytes
+	ImageType: 10000000, // 10 Megabytes
 }
 
 var DEFAULT_MAX_RESOURCE = 10
