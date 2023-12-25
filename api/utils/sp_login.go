@@ -115,12 +115,12 @@ func AuthSP(next http.Handler) http.Handler {
 		r.Header.Del("SP_USERID")
 
 		jwtStr := r.Header.Get("TRIBIST_JWT")
+		ret := map[string]interface{}{
+			"success": false,
+		}
 
 		claims, err := parseSPToken(jwtStr)
 		if err != nil {
-			ret := map[string]interface{}{
-				"success": false,
-			}
 			if err.Error() == "unauthorized" {
 				ret["error"] = "unauthorized"
 				b, _ := json.Marshal(ret)
@@ -137,7 +137,9 @@ func AuthSP(next http.Handler) http.Handler {
 
 		// refresh token cannot be used for normal APIs
 		if claims.Subject == "refresh" {
-			http.Error(w, "forbidden", http.StatusForbidden)
+			ret["error"] = "forbidden"
+			b, _ := json.Marshal(ret)
+			http.Error(w, string(b), http.StatusForbidden)
 			return
 		}
 
@@ -158,22 +160,34 @@ func AuthRefreshSP(next http.Handler) http.Handler {
 		r.Header.Del("SP_USERID")
 
 		jwtStr := r.Header.Get("TRIBIST_JWT")
+		ret := map[string]interface{}{
+			"success": false,
+		}
 
 		claims, err := parseSPToken(jwtStr)
 		if err != nil {
 			if err.Error() == "unauthorized" {
-				http.Error(w, "unauthorized", http.StatusUnauthorized)
+				ret["error"] = err.Error()
+				b, _ := json.Marshal(ret)
+
+				http.Error(w, string(b), http.StatusUnauthorized)
 			}
 
 			if err.Error() == "forbidden" {
-				http.Error(w, "forbidden", http.StatusForbidden)
+				ret["error"] = err.Error()
+				b, _ := json.Marshal(ret)
+
+				http.Error(w, string(b), http.StatusForbidden)
 			}
 			return
 		}
 
 		// access token cannot be used for refresh
 		if claims.Subject == "access" {
-			http.Error(w, "forbidden", http.StatusForbidden)
+			ret["error"] = "forbidden"
+			b, _ := json.Marshal(ret)
+
+			http.Error(w, string(b), http.StatusForbidden)
 			return
 		}
 

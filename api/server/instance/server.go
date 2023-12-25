@@ -175,7 +175,7 @@ func (s *Server) RegisterHandlers() {
 	s.r.HandleFunc("/sp/refresh", utils.AuthRefreshSP(spuser.CreateRefreshSPUserTokenHandler(s.DB)).ServeHTTP).
 		Methods(http.MethodPost)
 
-	s.r.HandleFunc("/sp/upload_url", utils.AuthRefreshSP(
+	s.r.HandleFunc("/sp/upload_url", utils.AuthSP(
 		spuser.CreatePutImageSignedUrlHandler(s.DB, s.aws)).ServeHTTP).
 		Methods(http.MethodPost)
 
