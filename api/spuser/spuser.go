@@ -77,7 +77,7 @@ func CreateUpdateSPUserHandler(db store.Store) http.HandlerFunc {
 		user.PhotoURL = req.PhotoURL
 		user.ProfileUpdated = true
 
-		spUser, err := db.UpdateSPUser(&req)
+		spUser, err := db.UpdateSPUser(user)
 		if err != nil {
 			log.Printf("failed to update user" + err.Error())
 			utils.WriteError(rw, http.StatusBadRequest, "Error saving")
