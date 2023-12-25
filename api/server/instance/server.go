@@ -65,6 +65,12 @@ func NewServer(port int) (*Server, error) {
 		server.DB = db
 	}
 
+	if aws, err := utils.NewAWS(); err != nil {
+		return nil, err
+	} else {
+		server.aws = aws
+	}
+
 	// Must be done at the end
 	server.RegisterHandlers()
 
