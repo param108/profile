@@ -132,6 +132,39 @@ type Store interface {
 
 	// SetResources get resource count
 	SetResources(userID, t string, value int, writer string) (*models.Resource, error)
+
+	/* TBD
+	// GetSPGroupMessages return messages (created <= start) with limit
+	// for a group
+	GetSPGroupMessages(
+		groupID string, start time.Time, limit int,
+		writer string)([]*models.SpGroupMsgSend, error)
+
+	// GetSPUserMessages return messages (created <= start) with limit
+	// for a user, SpGroupID will be empty string.
+	GetSPUserMessages(userID string, start time.Time, limit int,
+		writer string)([]*models.SpGroupMsgSend, error)
+
+	// GetSPGroupsForUser get all groups a user belongs to
+	GetSPGroupsForUser(userID string, writer string) ([]*models.SpGroup, error)
+
+	// GetSPGroupMessages return messages (created <= start) with limit
+	// grouped by day. The key of the returned map will be the date.
+	// for a group. Assumes India tz.
+	GetSPGroupMessagesByDay(
+		groupID string, start time.Time, limit int,
+		writer string)(map[string][]*models.SpGroupMsgSend, error)
+	*/
+	// GetSPUserMessagesByDay return messages (created <= start) with limit
+	// grouped by day. The key of the returned map will be the date.
+	// for a user, SpGroupID will be empty string. Assumes India tz.
+	GetSPUserMessagesByDay(userID string, start time.Time, limit int,
+		writer string) (map[string][]*models.SpGroupMsgSend, error)
+
+	// AddSpMessage
+	// Adds a message for a user and updates the message into each of
+	// the groups the user is part of.
+	AddSpMessage(msg *models.SpMessage, writer string) (*models.SpMessage, error)
 }
 
 func Periodic(s Store, writer string) {

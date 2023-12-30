@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.9 (Ubuntu 14.9-0ubuntu0.22.04.1)
--- Dumped by pg_dump version 14.9 (Ubuntu 14.9-0ubuntu0.22.04.1)
+-- Dumped from database version 14.10 (Ubuntu 14.10-0ubuntu0.22.04.1)
+-- Dumped by pg_dump version 14.10 (Ubuntu 14.10-0ubuntu0.22.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -154,7 +154,8 @@ CREATE TABLE public.sp_messages (
     msg_value integer DEFAULT 0 NOT NULL,
     msg_text text DEFAULT ''::text NOT NULL,
     created_at timestamp with time zone DEFAULT now(),
-    writer uuid NOT NULL
+    writer uuid NOT NULL,
+    sp_user_photo_url character varying(500) DEFAULT ''::character varying NOT NULL
 );
 
 
