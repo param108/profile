@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/param108/profile/api/common"
+	"github.com/param108/profile/api/spmsg"
 	"github.com/param108/profile/api/spotps"
 	"github.com/param108/profile/api/spuser"
 	"github.com/param108/profile/api/store"
@@ -184,5 +185,11 @@ func (s *Server) RegisterHandlers() {
 	s.r.HandleFunc("/sp/upload_url", utils.AuthSP(
 		spuser.CreatePutImageSignedUrlHandler(s.DB, s.aws)).ServeHTTP).
 		Methods(http.MethodPost)
+
+	s.r.HandleFunc("/sp/users/messages", utils.AuthSP(
+		spmsg.CreateGetUserMessages(s.DB)).ServeHTTP).Methods(http.MethodGet)
+
+	s.r.HandleFunc("/sp/users/messages", utils.AuthSP(
+		spmsg.CreatePostUserMessages(s.DB)).ServeHTTP).Methods(http.MethodPost)
 
 }

@@ -1,13 +1,12 @@
 package postgres
 
 import (
-	"errors"
 	"time"
 
 	"github.com/param108/profile/api/models"
 )
 
-func (db *PostgresDB) GetSPUserMessagesByDay(userID string, start time.Time, limit int,
+func (db *PostgresDB) GetSPUserMessagesByDay(userID string, start time.Time, tz string, limit int,
 	writer string) (map[string][]*models.SpGroupMsgSend, error) {
 	msgs := []*models.SpMessage{}
 	err := db.db.Where(
@@ -17,13 +16,21 @@ func (db *PostgresDB) GetSPUserMessagesByDay(userID string, start time.Time, lim
 		return nil, err
 	}
 
+	ret := map[string][]*models.SpGroupMsgSend{}
+
 	if len(msgs) == 0 {
-		return nil, errors.New("not found")
+		return ret, nil
 	}
 
-	ret := map[string][]*models.SpGroupMsgSend{}
+	loc, err := time.LoadLocation(tz)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, m := range msgs {
-		d := m.CreatedAt.Format("02-Jan-06")
+		createdAt := m.CreatedAt.In(loc)
+
+		d := createdAt.Format("Mon,02-Jan-06")
 		if _, ok := ret[d]; !ok {
 			ret[d] = []*models.SpGroupMsgSend{}
 		}
@@ -34,12 +41,12 @@ func (db *PostgresDB) GetSPUserMessagesByDay(userID string, start time.Time, lim
 			MsgType:        m.MsgType,
 			MsgValue:       m.MsgValue,
 			MsgText:        m.MsgText,
-			CreatedAt:      m.CreatedAt,
+			CreatedAt:      createdAt,
 			Writer:         m.Writer,
 			SpUserPhotoURL: m.SpUserPhotoURL,
 		})
 	}
-	return nil, nil
+	return ret, nil
 }
 
 func (db *PostgresDB) AddSpMessage(

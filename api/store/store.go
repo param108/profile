@@ -158,7 +158,7 @@ type Store interface {
 	// GetSPUserMessagesByDay return messages (created <= start) with limit
 	// grouped by day. The key of the returned map will be the date.
 	// for a user, SpGroupID will be empty string. Assumes India tz.
-	GetSPUserMessagesByDay(userID string, start time.Time, limit int,
+	GetSPUserMessagesByDay(userID string, start time.Time, tz string, limit int,
 		writer string) (map[string][]*models.SpGroupMsgSend, error)
 
 	// AddSpMessage
