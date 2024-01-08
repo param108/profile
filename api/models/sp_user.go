@@ -63,6 +63,12 @@ type SpGroupMsgSend struct {
 	SpUserPhotoURL string    `json:"sp_user_photo_url"`
 }
 
+type SpGroupMsgData struct {
+	Day  string            `json:"day"`
+	Date string            `json:"date"`
+	Msgs []*SpGroupMsgSend `json:"msgs"`
+}
+
 type SpMsgComment struct {
 	ID          string    `json:"id" gorm:"default:uuid_generate_v4()"`
 	SpUserID    string    `json:"sp_user_id"`

@@ -7,7 +7,7 @@ import (
 )
 
 func (s *StoreImpl) GetSPUserMessagesByDay(userID string, start time.Time,
-	tz string, limit int, writer string) (map[string][]*models.SpGroupMsgSend, error) {
+	tz string, limit int, writer string) ([]*models.SpGroupMsgData, error) {
 	return s.db.GetSPUserMessagesByDay(userID, start, tz, limit, writer)
 }
 

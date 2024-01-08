@@ -1,13 +1,14 @@
 package postgres
 
 import (
+	"strings"
 	"time"
 
 	"github.com/param108/profile/api/models"
 )
 
 func (db *PostgresDB) GetSPUserMessagesByDay(userID string, start time.Time, tz string, limit int,
-	writer string) (map[string][]*models.SpGroupMsgSend, error) {
+	writer string) ([]*models.SpGroupMsgData, error) {
 	msgs := []*models.SpMessage{}
 	err := db.db.Where(
 		"sp_user_id = ? and writer = ? and created_at < ?",
@@ -16,7 +17,7 @@ func (db *PostgresDB) GetSPUserMessagesByDay(userID string, start time.Time, tz 
 		return nil, err
 	}
 
-	ret := map[string][]*models.SpGroupMsgSend{}
+	ret := []*models.SpGroupMsgData{}
 
 	if len(msgs) == 0 {
 		return ret, nil
@@ -27,14 +28,28 @@ func (db *PostgresDB) GetSPUserMessagesByDay(userID string, start time.Time, tz 
 		return nil, err
 	}
 
+	found := map[string]bool{}
+
+	data := &models.SpGroupMsgData{}
+
 	for _, m := range msgs {
 		createdAt := m.CreatedAt.In(loc)
 
 		d := createdAt.Format("Mon,02-Jan-06")
-		if _, ok := ret[d]; !ok {
-			ret[d] = []*models.SpGroupMsgSend{}
+		info := strings.Split(d, ",")
+
+		if _, ok := found[d]; !ok {
+			if len(found) != 0 {
+				ret = append(ret, data)
+				data = &models.SpGroupMsgData{}
+			}
+
+			found[d] = true
+			data.Date = info[1]
+			data.Day = info[0]
 		}
-		ret[d] = append(ret[d], &models.SpGroupMsgSend{
+
+		data.Msgs = append(data.Msgs, &models.SpGroupMsgSend{
 			ID:             m.ID,
 			SpGroupID:      "",
 			SpUserID:       m.SpUserID,
@@ -46,6 +61,11 @@ func (db *PostgresDB) GetSPUserMessagesByDay(userID string, start time.Time, tz 
 			SpUserPhotoURL: m.SpUserPhotoURL,
 		})
 	}
+
+	if len(msgs) > 0 {
+		ret = append(ret, data)
+	}
+
 	return ret, nil
 }
 

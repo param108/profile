@@ -174,6 +174,22 @@ CREATE TABLE public.sp_otps (
 
 
 --
+-- Name: sp_services; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sp_services (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    code character varying(100) NOT NULL,
+    name text NOT NULL,
+    category character varying(100) NOT NULL,
+    unit character varying(50) NOT NULL,
+    description text NOT NULL,
+    short_description text NOT NULL,
+    question text NOT NULL
+);
+
+
+--
 -- Name: sp_users; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -439,6 +455,14 @@ ALTER TABLE ONLY public.sp_otps
 
 
 --
+-- Name: sp_services sp_services_code_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sp_services
+    ADD CONSTRAINT sp_services_code_key UNIQUE (code);
+
+
+--
 -- Name: sp_users sp_users_phone_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -594,6 +618,20 @@ CREATE INDEX idx_sp_messages_msg_type ON public.sp_messages USING btree (msg_typ
 --
 
 CREATE INDEX idx_sp_messages_user_id ON public.sp_messages USING btree (sp_user_id, created_at, writer);
+
+
+--
+-- Name: idx_sp_services_category; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_sp_services_category ON public.sp_services USING btree (category);
+
+
+--
+-- Name: idx_sp_services_code; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_sp_services_code ON public.sp_services USING btree (code);
 
 
 --

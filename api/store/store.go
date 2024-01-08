@@ -159,7 +159,7 @@ type Store interface {
 	// grouped by day. The key of the returned map will be the date.
 	// for a user, SpGroupID will be empty string. Assumes India tz.
 	GetSPUserMessagesByDay(userID string, start time.Time, tz string, limit int,
-		writer string) (map[string][]*models.SpGroupMsgSend, error)
+		writer string) ([]*models.SpGroupMsgData, error)
 
 	// AddSpMessage
 	// Adds a message for a user and updates the message into each of
