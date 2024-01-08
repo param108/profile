@@ -14,6 +14,7 @@ import (
 	"github.com/param108/profile/api/common"
 	"github.com/param108/profile/api/spmsg"
 	"github.com/param108/profile/api/spotps"
+	"github.com/param108/profile/api/spservices"
 	"github.com/param108/profile/api/spuser"
 	"github.com/param108/profile/api/store"
 	"github.com/param108/profile/api/threads"
@@ -191,5 +192,8 @@ func (s *Server) RegisterHandlers() {
 
 	s.r.HandleFunc("/sp/users/messages", utils.AuthSP(
 		spmsg.CreatePostUserMessages(s.DB)).ServeHTTP).Methods(http.MethodPost)
+
+	s.r.HandleFunc("/sp/services", utils.AuthSP(
+		spservices.CreateGetServices(s.DB)).ServeHTTP).Methods(http.MethodGet)
 
 }

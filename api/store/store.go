@@ -165,6 +165,10 @@ type Store interface {
 	// Adds a message for a user and updates the message into each of
 	// the groups the user is part of.
 	AddSpMessage(msg *models.SpMessage, writer string) (*models.SpMessage, error)
+
+	// GetSPServices
+	// Return array of services ordered by category
+	GetSPServices(writer string) ([]*models.SpService, error)
 }
 
 func Periodic(s Store, writer string) {
