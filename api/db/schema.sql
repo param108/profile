@@ -185,7 +185,8 @@ CREATE TABLE public.sp_services (
     unit character varying(50) NOT NULL,
     description text NOT NULL,
     short_description text NOT NULL,
-    question text NOT NULL
+    question text NOT NULL,
+    photo_url text DEFAULT ''::text NOT NULL
 );
 
 
