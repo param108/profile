@@ -9,5 +9,5 @@ type SpService struct {
 	Description      string `json:"description"`
 	ShortDescription string `json:"short_description"`
 	Question         string `json:"question"`
-	PhotoURL         string  `json:"photo_url"`
+	PhotoURL         string `json:"photo_url"`
 }
