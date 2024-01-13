@@ -1,3 +1,4 @@
+/* remember to update the writer to the correct value after running this script */
 INSERT INTO sp_services (id, code, name, category, unit, description, short_description, question)
 VALUES ('b30ffba1-279b-4825-b349-b57103f3d896', 'MAHAMANTRA', 'Chanting Mahamantra', 'Shravanam', 'rounds', 'Chanting Hare Krsna Mahamantra', 'Chanted {value} rounds of Mahamantra', 'How many rounds?');
 
