@@ -35,7 +35,7 @@ func (db *PostgresDB) GetSPUserMessagesByDay(userID string, start time.Time, tz 
 	for _, m := range msgs {
 		createdAt := m.CreatedAt.In(loc)
 
-		d := createdAt.Format("Mon,02-Jan-06")
+		d := createdAt.Format("Mon,02-Jan-2006")
 		info := strings.Split(d, ",")
 
 		if _, ok := found[d]; !ok {
@@ -86,7 +86,7 @@ func (db *PostgresDB) AddSpMessage(
 
 	createdAt := msg.CreatedAt.In(loc)
 
-	d := createdAt.Format("Mon,02-Jan-06")
+	d := createdAt.Format("Mon,02-Jan-2006")
 	info := strings.Split(d, ",")
 
 	ret.Date = info[1]
