@@ -109,17 +109,20 @@ func CreatePostUserMessages(db store.Store) http.HandlerFunc {
 			return
 		}
 
+		var tz = "Asia/Kolkata"
+
 		req.Writer = os.Getenv("WRITER")
 
 		req.CreatedAt = time.Now().UTC()
 		// FIXME validate
 
-		msg, err := db.AddSpMessage(&req, req.Writer)
+		msg, err := db.AddSpMessage(&req, tz, req.Writer)
 		if err != nil {
 			utils.WriteError(rw, http.StatusBadRequest, "couldnt save msg:"+err.Error())
 			return
 		}
 
-		utils.WriteData(rw, http.StatusOK, msg)
+		ret := []*models.SpGroupMsgData{msg}
+		utils.WriteData(rw, http.StatusOK, ret)
 	}
 }

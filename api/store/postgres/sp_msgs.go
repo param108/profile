@@ -70,12 +70,38 @@ func (db *PostgresDB) GetSPUserMessagesByDay(userID string, start time.Time, tz 
 }
 
 func (db *PostgresDB) AddSpMessage(
-	msg *models.SpMessage, writer string) (*models.SpMessage, error) {
-
+	msg *models.SpMessage, tz, writer string) (*models.SpGroupMsgData, error) {
+	ret := &models.SpGroupMsgData{}
 	msg.Writer = writer
 
 	if err := db.db.Create(msg).Error; err != nil {
 		return nil, err
 	}
-	return msg, nil
+
+	loc, err := time.LoadLocation(tz)
+	if err != nil {
+		return nil, err
+	}
+
+	createdAt := msg.CreatedAt.In(loc)
+
+	d := createdAt.Format("Mon,02-Jan-06")
+	info := strings.Split(d, ",")
+
+	ret.Date = info[1]
+	ret.Day = info[0]
+
+	ret.Msgs = append(ret.Msgs, &models.SpGroupMsgSend{
+		ID:             msg.ID,
+		SpGroupID:      "",
+		SpUserID:       msg.SpUserID,
+		MsgType:        msg.MsgType,
+		MsgValue:       msg.MsgValue,
+		MsgText:        msg.MsgText,
+		CreatedAt:      createdAt,
+		Writer:         msg.Writer,
+		SpUserPhotoURL: msg.SpUserPhotoURL,
+	})
+
+	return ret, nil
 }

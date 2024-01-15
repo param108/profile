@@ -164,7 +164,7 @@ type Store interface {
 	// AddSpMessage
 	// Adds a message for a user and updates the message into each of
 	// the groups the user is part of.
-	AddSpMessage(msg *models.SpMessage, writer string) (*models.SpMessage, error)
+	AddSpMessage(msg *models.SpMessage, tz, writer string) (*models.SpGroupMsgData, error)
 
 	// GetSPServices
 	// Return array of services ordered by category
