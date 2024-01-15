@@ -155,7 +155,8 @@ CREATE TABLE public.sp_messages (
     msg_text text DEFAULT ''::text NOT NULL,
     created_at timestamp with time zone DEFAULT now(),
     writer uuid NOT NULL,
-    sp_user_photo_url character varying(500) DEFAULT ''::character varying NOT NULL
+    sp_user_photo_url character varying(500) DEFAULT ''::character varying NOT NULL,
+    username character varying(100) DEFAULT ''::character varying NOT NULL
 );
 
 

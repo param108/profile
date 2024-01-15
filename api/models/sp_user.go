@@ -46,6 +46,7 @@ type SpMessage struct {
 	CreatedAt      time.Time `json:"created_at" gorm:"default:NOW()"`
 	Writer         string    `json:"writer"`
 	SpUserPhotoURL string    `json:"sp_user_photo_url"`
+	Username       string    `json:"username"`
 }
 
 // Data structure for sending back messages.
@@ -61,6 +62,7 @@ type SpGroupMsgSend struct {
 	CreatedAt      time.Time `json:"created_at" gorm:"default:NOW()"`
 	Writer         string    `json:"writer"`
 	SpUserPhotoURL string    `json:"sp_user_photo_url"`
+	Username       string    `json:"username"`
 }
 
 type SpGroupMsgData struct {
