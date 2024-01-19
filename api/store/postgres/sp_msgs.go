@@ -60,6 +60,7 @@ func (db *PostgresDB) GetSPUserMessagesByDay(userID string, start time.Time, tz 
 			Writer:         m.Writer,
 			SpUserPhotoURL: m.SpUserPhotoURL,
 			Username:       m.Username,
+			PhotoURL:       m.PhotoURL,
 		})
 	}
 
@@ -103,6 +104,7 @@ func (db *PostgresDB) AddSpMessage(
 		Writer:         msg.Writer,
 		SpUserPhotoURL: msg.SpUserPhotoURL,
 		Username:       msg.Username,
+		PhotoURL:       msg.PhotoURL,
 	})
 
 	return ret, nil
