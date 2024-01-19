@@ -1,0 +1,2 @@
+ALTER TABLE sp_messages
+ADD COLUMN photo_url TEXT NOT NULL DEFAULT '';
