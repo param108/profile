@@ -1,0 +1,2 @@
+ALTER TABLE sp_group_users
+ADD COLUMN role VARCHAR(10) NOT NULL DEFAULT 'user';
