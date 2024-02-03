@@ -140,21 +140,15 @@ type Store interface {
 		groupID string, start time.Time, limit int,
 		writer string)([]*models.SpGroupMsgSend, error)
 
-	// GetSPUserMessages return messages (created <= start) with limit
-	// for a user, SpGroupID will be empty string.
-	GetSPUserMessages(userID string, start time.Time, limit int,
-		writer string)([]*models.SpGroupMsgSend, error)
-
-	// GetSPGroupsForUser get all groups a user belongs to
-	GetSPGroupsForUser(userID string, writer string) ([]*models.SpGroup, error)
-
 	// GetSPGroupMessages return messages (created <= start) with limit
 	// grouped by day. The key of the returned map will be the date.
 	// for a group. Assumes India tz.
 	GetSPGroupMessagesByDay(
 		groupID string, start time.Time, limit int,
 		writer string)(map[string][]*models.SpGroupMsgSend, error)
+
 	*/
+
 	// GetSPUserMessagesByDay return messages (created <= start) with limit
 	// grouped by day. The key of the returned map will be the date.
 	// for a user, SpGroupID will be empty string. Assumes India tz.
@@ -169,6 +163,20 @@ type Store interface {
 	// GetSPServices
 	// Return array of services ordered by category
 	GetSPServices(writer string) ([]*models.SpService, error)
+
+	// AddGroup
+	AddSPGroup(group *models.SpGroup, writer string) (*models.SpGroup, error)
+
+	// GetSPGroupsForUser get all groups a user belongs to
+	GetSPGroupsForUser(userID string, writer string) ([]*models.SpGroupSend, error)
+
+	// GetSPGroupUser get the group details of a group for user
+	GetSPGroupUser(userID string, groupID string, writer string) (*models.SpGroupUser, error)
+
+	// AddSPUserToGroup add a user to a group with role
+	AddSPUserToGroup(spGroupUser *models.SpGroupUser, writer string) (*models.SpGroupUser, error)
+
+	GetSPGroupUsers(groupID string, writer string) ([]*models.SpUser, error)
 }
 
 func Periodic(s Store, writer string) {

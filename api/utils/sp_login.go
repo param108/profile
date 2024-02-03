@@ -149,6 +149,49 @@ func AuthSP(next http.Handler) http.Handler {
 	})
 }
 
+// AdminSP delete SP_USER header and then
+// repopulate with an empty value if unauthenticated,
+// returns 401 or 403 if failure and does not proceed to handler.
+func AdminSP(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.Header.Del("SP_PHONE")
+		r.Header.Del("SP_USERID")
+
+		jwtStr := r.Header.Get("TRIBIST_JWT")
+		ret := map[string]interface{}{
+			"success": false,
+		}
+
+		claims, err := parseSPToken(jwtStr)
+		if err != nil {
+			if err.Error() == "unauthorized" {
+				ret["error"] = "unauthorized"
+				b, _ := json.Marshal(ret)
+				http.Error(w, string(b), http.StatusUnauthorized)
+			}
+
+			if err.Error() == "forbidden" {
+				ret["error"] = "forbidden"
+				b, _ := json.Marshal(ret)
+				http.Error(w, string(b), http.StatusForbidden)
+			}
+			return
+		}
+
+		// refresh token cannot be used for normal APIs
+		if claims.Subject == "refresh" {
+			ret["error"] = "forbidden"
+			b, _ := json.Marshal(ret)
+			http.Error(w, string(b), http.StatusForbidden)
+			return
+		}
+
+		r.Header.Set("SP_USERID", claims.UserID)
+		r.Header.Set("SP_PHONE", claims.Phone)
+		next.ServeHTTP(w, r)
+	})
+}
+
 // AuthRefreshSP delete SP_USER header and then
 // repopulate with an empty value if unauthenticated,
 // returns 401 or 403 if failure and does not proceed to handler.

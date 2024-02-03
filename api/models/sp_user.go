@@ -27,10 +27,26 @@ type SpGroup struct {
 	Writer      string    `json:"writer"`
 }
 
+type SpGroupSend struct {
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	Parent      string    `json:"parent"`
+	Deleted     bool      `json:"deleted"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	DeletedAt   time.Time `json:"deleted_at"`
+	Writer      string    `json:"writer"`
+	UserID      string    `json:"user_id"`
+	Username    string    `json:"username"`
+	Role        string    `json:"role"`
+}
+
 type SpGroupUser struct {
 	ID        string    `json:"id" gorm:"default:uuid_generate_v4()"`
 	SpGroupID string    `json:"sp_group_id"`
 	SpUserID  string    `json:"sp_user_id"`
+	Role      string    `json:"role"`
 	Deleted   bool      `json:"deleted"`
 	CreatedAt time.Time `json:"created_at" gorm:"default:NOW()"`
 	DeletedAt time.Time `json:"deleted_at" gorm:"default:NOW()"`

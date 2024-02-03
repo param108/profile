@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/param108/profile/api/models"
+	"gorm.io/gorm"
 )
 
 func (db *PostgresDB) GetSPUserMessagesByDay(userID string, start time.Time, tz string, limit int,
@@ -76,7 +77,35 @@ func (db *PostgresDB) AddSpMessage(
 	ret := &models.SpGroupMsgData{}
 	msg.Writer = writer
 
-	if err := db.db.Create(msg).Error; err != nil {
+	err := db.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(msg).Error; err != nil {
+			return err
+		}
+
+		spGroups := []*models.SpGroup{}
+
+		if err := tx.Where(
+			"sp_user_id = ? and writer = ?",
+			msg.SpUserID, writer).Find(&spGroups).Error; err != nil {
+			return err
+		}
+
+		for _, group := range spGroups {
+			if err := tx.Create(&models.SpGroupMessage{
+				SpGroupID:   group.ID,
+				SpUserID:    msg.SpUserID,
+				SpMessageID: msg.ID,
+				CreatedAt:   msg.CreatedAt,
+				Writer:      msg.Writer,
+			}).Error; err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
 	}
 
