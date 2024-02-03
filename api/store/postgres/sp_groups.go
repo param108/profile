@@ -19,7 +19,7 @@ func (db *PostgresDB) AddSPGroup(group *models.SpGroup, writer string) (*models.
 func (db *PostgresDB) GetSPGroupsForUser(userID, writer string) ([]*models.SpGroupSend, error) {
 	groups := []*models.SpGroupSend{}
 	err := db.db.Model(&models.SpGroupUser{}).Where(
-		"sp_group_users.sp_user_id = ? and sp_group_users.writer = ? and deleted = false",
+		"sp_group_users.sp_user_id = ? and sp_group_users.writer = ? and sp_group_users.deleted = false",
 		userID, writer).Joins(
 		"left join sp_groups on sp_group_users.sp_group_id = sp_groups.id",
 	).Joins(
