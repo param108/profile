@@ -49,8 +49,8 @@ type SpGroupUser struct {
 	Role      string    `json:"role"`
 	Deleted   bool      `json:"deleted"`
 	CreatedAt time.Time `json:"created_at" gorm:"default:NOW()"`
-	DeletedAt time.Time `json:"deleted_at" gorm:"default:null"`
-	Writer    string    `json:"writer"`
+	//DeletedAt time.Time `json:"deleted_at" gorm:"default:null"`
+	Writer string `json:"writer"`
 }
 
 type RefreshTokenResponse struct {
