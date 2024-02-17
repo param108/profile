@@ -19,12 +19,12 @@ type SpUser struct {
 type SpGroup struct {
 	ID          string    `json:"id" gorm:"default:uuid_generate_v4()"`
 	Name        string    `json:"name"`
-	Parent      string    `json:"parent" gorm:"default:null"`
+	//Parent      string    `json:"parent" gorm:"default:null"`
 	Deleted     bool      `json:"deleted"`
 	Description string    `json:"description"`
 	CreatedAt   time.Time `json:"created_at" gorm:"default:NOW()"`
 	UpdatedAt   time.Time `json:"updated_at" gorm:"default:NOW()"`
-	DeletedAt   time.Time `json:"deleted_at" gorm:"default:null"`
+	//DeletedAt   time.Time `json:"deleted_at" gorm:"default:null"`
 	Writer      string    `json:"writer"`
 }
 
