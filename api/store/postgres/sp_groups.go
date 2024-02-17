@@ -25,7 +25,6 @@ func (db *PostgresDB) GetSPGroupsForUser(userID, writer string) ([]*models.SpGro
 	).Joins(
 		"left join sp_users on sp_group_users.sp_user_id = sp_users.id",
 	).Select("sp_groups.id as id, " +
-		" sp_groups.parent as parent," +
 		" sp_groups.name as name," +
 		" sp_groups.description as description," +
 		" sp_groups.created_at as created_at," +
