@@ -82,17 +82,17 @@ func (db *PostgresDB) AddSpMessage(
 			return err
 		}
 
-		spGroups := []*models.SpGroup{}
+		spGroupUsers := []*models.SpGroupUser{}
 
 		if err := tx.Where(
 			"sp_user_id = ? and writer = ?",
-			msg.SpUserID, writer).Find(&spGroups).Error; err != nil {
+			msg.SpUserID, writer).Find(&spGroupUsers).Error; err != nil {
 			return err
 		}
 
-		for _, group := range spGroups {
+		for _, group := range spGroupUsers {
 			if err := tx.Create(&models.SpGroupMessage{
-				SpGroupID:   group.ID,
+				SpGroupID:   group.SpGroupID,
 				SpUserID:    msg.SpUserID,
 				SpMessageID: msg.ID,
 				CreatedAt:   msg.CreatedAt,
