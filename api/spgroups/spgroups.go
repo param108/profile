@@ -26,13 +26,13 @@ func CreatePostSPGroupHandler(db store.Store) http.HandlerFunc {
 		}
 
 		writer := os.Getenv("WRITER")
-		user, err := db.GetUser(userID, writer)
+		user, err := db.GetSPUserByID(userID, writer)
 		if err != nil {
 			utils.WriteError(rw, http.StatusBadRequest, "unknown user")
 			return
 		}
 
-		if user.Role != models.RoleAdmin {
+		if user.Role != "admin" {
 			utils.WriteError(rw, http.StatusForbidden, "forbidden")
 			return
 		}
@@ -139,12 +139,12 @@ func CreateAddGroupUserHandler(db store.Store) http.HandlerFunc {
 
 		// check if the user is a superadmin
 
-		reqUser, err := db.GetUser(userID, writer)
+		reqUser, err := db.GetSPUserByID(userID, writer)
 		if err != nil {
 			utils.WriteError(rw, http.StatusBadRequest, "unknown user")
 		}
 
-		if reqUser.Role != models.RoleAdmin {
+		if reqUser.Role != "admin" {
 			// check if the requester is admin of the group
 			grpUser, err := db.GetSPGroupUser(userID, req.GroupID, writer)
 			if err != nil {
