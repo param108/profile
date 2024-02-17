@@ -13,6 +13,7 @@ type SpUser struct {
 	Writer         string    `json:"writer"`
 	DeletedAt      time.Time `json:"deleted_at"`
 	ProfileUpdated bool      `json:"profile_updated"`
+	Role           string    `json:"role"`
 }
 
 type SpGroup struct {

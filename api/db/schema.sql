@@ -108,7 +108,8 @@ CREATE TABLE public.sp_group_users (
     deleted boolean DEFAULT false NOT NULL,
     created_at timestamp with time zone DEFAULT now(),
     deleted_at timestamp with time zone,
-    writer uuid NOT NULL
+    writer uuid NOT NULL,
+    role character varying(10) DEFAULT 'user'::character varying NOT NULL
 );
 
 
@@ -156,7 +157,8 @@ CREATE TABLE public.sp_messages (
     created_at timestamp with time zone DEFAULT now(),
     writer uuid NOT NULL,
     sp_user_photo_url character varying(500) DEFAULT ''::character varying NOT NULL,
-    username character varying(100) DEFAULT ''::character varying NOT NULL
+    username character varying(100) DEFAULT ''::character varying NOT NULL,
+    photo_url text DEFAULT ''::text NOT NULL
 );
 
 
@@ -206,7 +208,8 @@ CREATE TABLE public.sp_users (
     deleted boolean DEFAULT false NOT NULL,
     writer uuid NOT NULL,
     deleted_at timestamp with time zone,
-    profile_updated boolean DEFAULT false NOT NULL
+    profile_updated boolean DEFAULT false NOT NULL,
+    role character varying(8) DEFAULT 'user'::character varying NOT NULL
 );
 
 
