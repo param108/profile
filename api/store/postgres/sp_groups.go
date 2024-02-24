@@ -78,7 +78,7 @@ func (db *PostgresDB) GetSPGroupUsers(
 	groupID, writer string) ([]*models.SpUser, error) {
 	users := []*models.SpUser{}
 
-	if err := db.db.Where(
+	if err := db.db.Table("sp_group_users").Where(
 		"sp_group_users.sp_group_id = ? and sp_group_users.writer = ? and sp_group_users.deleted = false",
 		groupID, writer).Joins(
 		"left join sp_users on sp_users.id = sp_group_user.sp_user_id").Select(
