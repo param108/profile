@@ -30,7 +30,7 @@ func (db *PostgresDB) GetSPGroupMessagesByDay(
 			"sp_messages.writer as writer," +
 			"sp_messages.sp_user_photo_url as sp_user_photo_url," +
 			"sp_messages.username as username," +
-			"sp_messages.photo_url as photo_url,").Order(
+			"sp_messages.photo_url as photo_url").Order(
 		"sp_messages.created_at DESC").Scan(&retData).Error; err != nil {
 		return nil, err
 	}
