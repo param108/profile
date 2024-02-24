@@ -209,4 +209,7 @@ func (s *Server) RegisterHandlers() {
 	s.r.HandleFunc("/sp/group/{group_id}/users", utils.AuthSP(
 		spgroups.CreateGetSPGroupUsersHandler(s.DB)).ServeHTTP).Methods(http.MethodGet)
 
+	s.r.HandleFunc("/sp/group/{group_id}/messages", utils.AuthSP(
+		spmsg.CreateGetSPGroupMessagesHandler(s.DB)).ServeHTTP).Methods(http.MethodGet)
+
 }

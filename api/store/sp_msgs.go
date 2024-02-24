@@ -11,6 +11,11 @@ func (s *StoreImpl) GetSPUserMessagesByDay(userID string, start time.Time,
 	return s.db.GetSPUserMessagesByDay(userID, start, tz, limit, writer)
 }
 
+func (s *StoreImpl) GetSPGroupMessagesByDay(userID string, start time.Time,
+	tz string, limit int, writer string) ([]*models.SpGroupMsgData, error) {
+	return s.db.GetSPGroupMessagesByDay(userID, start, tz, limit, writer)
+}
+
 func (s *StoreImpl) AddSpMessage(
 	msg *models.SpMessage, tz, writer string) (*models.SpGroupMsgData, error) {
 	return s.db.AddSpMessage(msg, tz, writer)

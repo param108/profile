@@ -139,15 +139,13 @@ type Store interface {
 	GetSPGroupMessages(
 		groupID string, start time.Time, limit int,
 		writer string)([]*models.SpGroupMsgSend, error)
-
+	*/
 	// GetSPGroupMessages return messages (created <= start) with limit
 	// grouped by day. The key of the returned map will be the date.
 	// for a group. Assumes India tz.
 	GetSPGroupMessagesByDay(
-		groupID string, start time.Time, limit int,
-		writer string)(map[string][]*models.SpGroupMsgSend, error)
-
-	*/
+		groupID string, start time.Time, tz string, limit int,
+		writer string) ([]*models.SpGroupMsgData, error)
 
 	// GetSPUserMessagesByDay return messages (created <= start) with limit
 	// grouped by day. The key of the returned map will be the date.
