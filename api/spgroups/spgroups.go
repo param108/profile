@@ -203,15 +203,16 @@ func CreateGetSPGroupUsersHandler(db store.Store) http.HandlerFunc {
 			return
 		}
 
-		reqUser, err := db.GetUser(userID, writer)
+		reqUser, err := db.GetSPUserByID(userID, writer)
 		if err != nil {
 			utils.WriteError(rw, http.StatusBadRequest, "unknown user")
+			return
 		}
 
 		// check if this user is part of this group
 		// OR
 		// user is superadmin
-		if reqUser.Role != models.RoleAdmin {
+		if reqUser.Role != "admin" {
 			// check if the requester is admin of the group
 			_, err := db.GetSPGroupUser(userID, groupID, writer)
 			if err != nil {
