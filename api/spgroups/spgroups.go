@@ -167,6 +167,12 @@ func CreateAddGroupUserHandler(db store.Store) http.HandlerFunc {
 			return
 		}
 
+		// If the user doesnt exist just save the phone number as the name
+		if user.Name == "" {
+			user.Name = req.Phone
+			db.UpdateSPUser(user)
+		}
+
 		newGrpUser := models.SpGroupUser{
 			SpGroupID: req.GroupID,
 			SpUserID:  user.ID,
