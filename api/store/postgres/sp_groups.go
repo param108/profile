@@ -74,6 +74,8 @@ func (db *PostgresDB) GetSPGroupUser(
 	return grpUsers[0], nil
 }
 
+// GetSPGroupUsers
+// user.Role is overwritten to the role in the group
 func (db *PostgresDB) GetSPGroupUsers(
 	groupID, writer string) ([]*models.SpUser, error) {
 	users := []*models.SpUser{}
@@ -86,6 +88,7 @@ func (db *PostgresDB) GetSPGroupUsers(
 			"sp_users.name as name," +
 			"sp_users.photo_url as photo_url," +
 			"sp_users.created_at as created_at," +
+			"sp_group_users.role as role," +
 			"sp_users.writer as writer," +
 			"sp_users.profile_updated as profile_updated").Find(
 		&users).Error; err != nil {
