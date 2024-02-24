@@ -20,16 +20,16 @@ func (db *PostgresDB) GetSPGroupMessagesByDay(
 		"sp_group_messages").Joins(
 		"left join sp_messages on sp_group_messages.sp_message_id = sp_messages.id").Joins(
 		"left join sp_groups on sp_group_messages.sp_group_id = sp_groups.id").Select(
-		"sp_messages.id as id," +
-			"sp_groups.id as sp_group_id," +
-			"sp_messages.sp_user_id as sp_user_id," +
-			"sp_messages.msg_type as msg_type," +
-			"sp_messages.msg_value as msg_value," +
-			"sp_messages.msg_text as msg_text," +
-			"sp_messages.created_at as created_at," +
-			"sp_messages.writer as writer," +
-			"sp_messages.sp_user_photo_url as sp_user_photo_url," +
-			"sp_messages.username as username," +
+		"sp_messages.id as id,"+
+			"sp_groups.id as sp_group_id,"+
+			"sp_messages.sp_user_id as sp_user_id,"+
+			"sp_messages.msg_type as msg_type,"+
+			"sp_messages.msg_value as msg_value,"+
+			"sp_messages.msg_text as msg_text,"+
+			"sp_messages.created_at as created_at,"+
+			"sp_messages.writer as writer,"+
+			"sp_messages.sp_user_photo_url as sp_user_photo_url,"+
+			"sp_messages.username as username,"+
 			"sp_messages.photo_url as photo_url").Where(
 		"sp_group_messages.sp_group_id = ?", groupID).Order(
 		"sp_messages.created_at DESC").Scan(&retData).Error; err != nil {
