@@ -215,4 +215,7 @@ func (s *Server) RegisterHandlers() {
 	s.r.HandleFunc("/sp/group/{group_id}/user/{user_id}/messages", utils.AuthSP(
 		spmsg.CreateGetSPGroupUserMessagesHandler(s.DB)).ServeHTTP).Methods(http.MethodGet)
 
+	s.r.HandleFunc("/sp/group/{group_id}/user/{user_id}/otp", utils.AuthSP(
+		spmsg.CreateGetSPGroupUserOTPHandler(s.DB)).ServeHTTP).Methods(http.MethodGet)
+
 }

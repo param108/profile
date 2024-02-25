@@ -282,6 +282,81 @@ func CreateGetSPGroupUserMessagesHandler(db store.Store) http.HandlerFunc {
 	}
 }
 
+func CreateGetSPGroupUserOTPHandler(db store.Store) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		// First check if the user is an admin
+		userID := r.Header.Get("SP_USERID")
+		if len(userID) == 0 {
+			utils.WriteError(rw, http.StatusForbidden, "forbidden")
+			return
+		}
+
+		writer := os.Getenv("WRITER")
+
+		v := mux.Vars(r)
+
+		groupID := strings.TrimSpace(v["group_id"])
+
+		if len(groupID) == 0 {
+			utils.WriteError(rw, http.StatusBadRequest, "invalid group")
+			return
+		}
+
+		reqUserID := strings.TrimSpace(v["user_id"])
+
+		if len(reqUserID) == 0 {
+			utils.WriteError(rw, http.StatusBadRequest, "invalid user id")
+			return
+		}
+
+		// check if user is part of this group
+		groupUser, err := db.GetSPGroupUser(userID, groupID, writer)
+		if err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "invalid user")
+			return
+		}
+
+		// check if reqUser is part of the group
+		_, err = db.GetSPGroupUser(reqUserID, groupID, writer)
+		if err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "invalid request user")
+			return
+		}
+
+		if groupUser.Deleted {
+			utils.WriteError(rw, http.StatusBadRequest, "invalid user")
+			return
+		}
+
+		if groupUser.Role != "admin" {
+			utils.WriteError(rw, http.StatusForbidden, "must be admin")
+			return
+		}
+
+		reqUser, err := db.GetSPUserByID(reqUserID, writer)
+		if err != nil {
+			utils.WriteError(rw, http.StatusBadRequest, "invalid user")
+			return
+		}
+
+		err = db.CreateOTP(reqUser.Phone, time.Now(), writer)
+		if err != nil {
+			utils.WriteError(rw, http.StatusInternalServerError,
+				fmt.Sprintf("didnt get data %s", err))
+			return
+		}
+
+		otp, err := db.GetOTP(reqUser.Phone, writer)
+		if err != nil {
+			utils.WriteError(rw, http.StatusInternalServerError,
+				fmt.Sprintf("didnt get data %s", err))
+			return
+		}
+
+		utils.WriteData(rw, http.StatusOK, otp.Code)
+	}
+}
+
 func CreatePostUserMessages(db store.Store) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		userID := r.Header.Get("SP_USERID")
