@@ -176,7 +176,7 @@ func CreateAddGroupUserHandler(db store.Store) http.HandlerFunc {
 		newGrpUser := models.SpGroupUser{
 			SpGroupID: req.GroupID,
 			SpUserID:  user.ID,
-			Role: req.Role,
+			Role:      req.Role,
 		}
 
 		_, err = db.AddSPUserToGroup(&newGrpUser, writer)
