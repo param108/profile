@@ -11,6 +11,7 @@ import (
 )
 
 const OTP_EXPIRY_MINUTES = 20
+const OTP_MAX_RETRIES = 3
 
 func generateCode() string {
 	seq := []int{}
@@ -23,6 +24,21 @@ func generateCode() string {
 }
 
 func (db *PostgresDB) CreateOTP(phone string, now time.Time, writer string) error {
+
+	// if there is an existing valid otp don't create a new one.
+
+	oldSpOtps := []*models.SpOtp{}
+
+	err := db.db.Where("phone = ? AND writer = ?", phone, writer).Find(&oldSpOtps).Error
+	if err == nil && len(oldSpOtps) > 0 {
+		// the inserted time is local time of the server
+		// so we can check with time.Now()
+		if oldSpOtps[0].Expiry.After(time.Now()) && oldSpOtps[0].Retries < OTP_MAX_RETRIES {
+			return nil
+		}
+	}
+
+	// no valid old expiry so create a new one.
 	spOtp := &models.SpOtp{
 		Phone:  phone,
 		Writer: writer,
@@ -69,7 +85,7 @@ func (db *PostgresDB) CheckOTP(
 		return nil, errors.New("Not Found")
 	}
 
-	if spOtps[0].Retries == 3 {
+	if spOtps[0].Retries == OTP_MAX_RETRIES {
 		return nil, errors.New("Expired")
 	}
 
