@@ -62,7 +62,7 @@ jobs:
           cd ${{ github.workspace }}/api; tar -zcvf server.tgz build
 
     - name: upload server.tgz artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: server.tgz
         path: ${{ github.workspace }}/api/server.tgz
