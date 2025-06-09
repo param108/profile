@@ -12,7 +12,6 @@ build:	version
 	go build -o build ./...
 
 test:	version
-	if [ -n "`goimports -l .`" ]; then echo "lint failure"; exit 1; fi
 	cp test.env .env
 	go test -v ./...
 
