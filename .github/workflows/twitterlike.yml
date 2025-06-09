@@ -1,6 +1,7 @@
 name: twitterlike
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main ]
     paths:
