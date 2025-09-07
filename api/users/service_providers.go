@@ -10,6 +10,7 @@ import (
 	"github.com/param108/profile/api/models"
 	"github.com/param108/profile/api/store"
 	"github.com/param108/profile/api/users/login/common"
+	"github.com/param108/profile/api/users/login/email"
 	"github.com/param108/profile/api/users/login/twitter"
 )
 
@@ -51,6 +52,10 @@ func CreateServiceProviderLoginRedirect(db store.Store) http.HandlerFunc {
 			tlp := twitter.NewTwitterLoginProvider(db)
 			tlp.HandleLogin(rw, r)
 			return
+		case "email":
+			epp := email.NewEmailPasswordProvider(db)
+			epp.HandleLogin(rw, r)
+			return
 		default:
 			rw.WriteHeader(http.StatusBadRequest)
 			resp.Success = false
@@ -75,6 +80,10 @@ func CreateServiceProviderAuthorizeRedirect(db store.Store) http.HandlerFunc {
 		case "twitter":
 			tlp := twitter.NewTwitterLoginProvider(db)
 			tlp.HandleAuthorize(rw, r)
+			return
+		case "email":
+			epp := email.NewEmailPasswordProvider(db)
+			epp.HandleAuthorize(rw, r)
 			return
 		default:
 			rw.WriteHeader(http.StatusBadRequest)

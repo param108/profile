@@ -175,6 +175,10 @@ type Store interface {
 	AddSPUserToGroup(spGroupUser *models.SpGroupUser, writer string) (*models.SpGroupUser, error)
 
 	GetSPGroupUsers(groupID string, writer string) ([]*models.SpUser, error)
+
+	// Email User methods
+	CreateEmailUser(username, passwordHash, writer string) (*models.EmailUser, error)
+	GetEmailUserByUserName(username, writer string) (*models.EmailUser, error)
 }
 
 func Periodic(s Store, writer string) {
