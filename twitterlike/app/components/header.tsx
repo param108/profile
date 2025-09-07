@@ -92,7 +92,7 @@ export default function Header(props:HeaderProps) {
             <div className="relative top-[50%] w-full flex flex-col items-center -translate-y-1/2 text-gray-50">
                 <span>If you are already signed up, this will log you in. </span>
                 <span>If not, this will <b>sign you up</b></span>
-                <span><a href={`${process.env.NEXT_PUBLIC_BE_URL}/users/login?source=email`} className="text-blue-400 underline">Login with Username and Password</a></span>
+                <span><a href={`${process.env.NEXT_PUBLIC_BE_URL}/users/login?source=email&redirect_url=${path}`} className="text-blue-400 underline">Login with Username and Password</a></span>
                 <span>Or login as <b>guest</b> to play around.</span>
                 <span>
                     <a
