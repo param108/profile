@@ -55,7 +55,10 @@ func LoginUser(rw http.ResponseWriter, r *http.Request, db store.Store,
 	params.Set("redirect_url", savedRedirect)
 	redirectURL.RawQuery = params.Encode()
 
-	// Set CORS header before redirecting
+	// Add CORS headers for cross-origin redirects
 	rw.Header().Set("Access-Control-Allow-Origin", "*")
+	rw.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, OPTIONS")
+	rw.Header().Set("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, TRIBIST_JWT")
+
 	http.Redirect(rw, r, redirectURL.String(), http.StatusFound)
 }
