@@ -3,6 +3,7 @@ package email
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -197,41 +198,65 @@ func (epp *EmailPasswordProvider) handleRegistration(rw http.ResponseWriter, r *
 }
 
 func (epp *EmailPasswordProvider) handleEmailLoginAuthorize(rw http.ResponseWriter, r *http.Request, key, code string) {
+
 	// Get the original redirect URL using the key
 	keyOneTime, err := epp.DB.GetOneTime(key, time.Hour, os.Getenv("WRITER"))
 	if err != nil {
-		http.Redirect(rw, r, "/", http.StatusTemporaryRedirect)
+		log.Println("couldnt get key %v", err)
+		rw.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(rw).Encode(models.Response{
+			Success: false,
+			Errors:  []string{"Cant get key" + err.Error()},
+		})
 		return
 	}
 
 	redirectURL := keyOneTime.Data
 
-	defaultRedirect := os.Getenv("AUTH_REDIRECT_URL")
-
 	// Get the user info using the code
 	codeOneTime, err := epp.DB.GetOneTime(code, time.Hour, os.Getenv("WRITER"))
 	if err != nil {
-		http.Redirect(rw, r, defaultRedirect, http.StatusTemporaryRedirect)
+		log.Println("couldnt get code %v", err)
+		rw.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(rw).Encode(models.Response{
+			Success: false,
+			Errors:  []string{"Cant get code" + err.Error()},
+		})
 		return
 	}
 
 	// Parse the user JSON from the code
 	var userPayload map[string]string
 	if err := json.Unmarshal([]byte(codeOneTime.Data), &userPayload); err != nil {
-		http.Redirect(rw, r, defaultRedirect, http.StatusTemporaryRedirect)
+		log.Println("couldnt get payload %v", err)
+		rw.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(rw).Encode(models.Response{
+			Success: false,
+			Errors:  []string{"Cant get payload" + err.Error()},
+		})
 		return
 	}
 
 	username, ok := userPayload["user"]
 	if !ok {
-		http.Redirect(rw, r, defaultRedirect, http.StatusTemporaryRedirect)
+		log.Println("couldnt get user")
+		rw.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(rw).Encode(models.Response{
+			Success: false,
+			Errors:  []string{"Cant get user"},
+		})
 		return
 	}
 
 	// Find or create user with username as handle
 	user, err := common.FindOrCreateTPUser(epp.DB, username, "email", os.Getenv("WRITER"))
 	if err != nil {
-		http.Redirect(rw, r, defaultRedirect, http.StatusTemporaryRedirect)
+		log.Println("couldnt create TP User %v", err)
+		rw.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(rw).Encode(models.Response{
+			Success: false,
+			Errors:  []string{"Cant get TP user"},
+		})
 		return
 	}
 
