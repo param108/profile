@@ -46,6 +46,11 @@ func (epp *EmailPasswordProvider) HandleLogin(rw http.ResponseWriter, r *http.Re
 	// If user is already logged in
 	if len(userID) > 0 {
 		if isValidRedirectURL(redirectURL) {
+			// Add CORS headers for cross-origin redirects
+			rw.Header().Set("Access-Control-Allow-Origin", "*")
+			rw.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, OPTIONS")
+			rw.Header().Set("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, TRIBIST_JWT")
+			
 			http.Redirect(rw, r, redirectURL, http.StatusTemporaryRedirect)
 			return
 		}
@@ -63,6 +68,12 @@ func (epp *EmailPasswordProvider) HandleLogin(rw http.ResponseWriter, r *http.Re
 	}
 
 	loginURL := fmt.Sprintf("https://ui.tribist.com/login?key=%s", oneTime.ID)
+	
+	// Add CORS headers for cross-origin redirects
+	rw.Header().Set("Access-Control-Allow-Origin", "*")
+	rw.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, OPTIONS")
+	rw.Header().Set("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, TRIBIST_JWT")
+	
 	http.Redirect(rw, r, loginURL, http.StatusTemporaryRedirect)
 }
 
@@ -72,6 +83,11 @@ func (epp *EmailPasswordProvider) HandleAuthorize(rw http.ResponseWriter, r *htt
 
 	// If key or code are empty, redirect to home
 	if key == "" || code == "" {
+		// Add CORS headers for cross-origin redirects
+		rw.Header().Set("Access-Control-Allow-Origin", "*")
+		rw.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, OPTIONS")
+		rw.Header().Set("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, TRIBIST_JWT")
+		
 		http.Redirect(rw, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
@@ -347,5 +363,11 @@ func (epp *EmailPasswordProvider) HandleEmailLogin(rw http.ResponseWriter, r *ht
 
 	// Redirect to /users/authorize/email with key and code parameters
 	redirectURL := fmt.Sprintf("/users/authorize/email?key=%s&code=%s", key, codeOneTime.ID)
+	
+	// Add CORS headers for cross-origin redirects
+	rw.Header().Set("Access-Control-Allow-Origin", "*")
+	rw.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, OPTIONS")
+	rw.Header().Set("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, TRIBIST_JWT")
+	
 	http.Redirect(rw, r, redirectURL, http.StatusTemporaryRedirect)
 }
