@@ -21,6 +21,16 @@ type Profile = {
     success: boolean
 }
 
+type LoginRequest = {
+    username: string,
+    password: string
+}
+
+type LoginResponse = {
+    success: boolean,
+    errors?: string[]
+}
+
 function getConfig(cfg: any): AxiosRequestConfig {
     return cfg
 }
@@ -46,7 +56,23 @@ export const getProfile = async (token:string) => {
 
     const res = await axios.get<Profile>(
        `${process.env.NEXT_PUBLIC_BE_URL}/profile`,
-        config
+        getConfig(config)
+    );
+    return res;
+}
+
+export const emailLogin = async (username: string, password: string, key: string) => {
+    const config = {
+        retry: 3
+    };
+
+    const res = await axios.post<LoginResponse>(
+        `${process.env.NEXT_PUBLIC_BE_URL}/email/login?key=${key}`,
+        {
+            username: username,
+            password: password
+        },
+        getConfig(config)
     );
     return res;
 }
