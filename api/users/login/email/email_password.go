@@ -39,7 +39,7 @@ func isValidRedirectURL(redirectURL string) bool {
 func (epp *EmailPasswordProvider) HandleLogin(rw http.ResponseWriter, r *http.Request) {
 	user := strings.Split(r.Header.Get("TRIBIST_USER"), ":")
 	userID := user[0]
-	
+
 	redirectURL := r.URL.Query().Get("redirect_url")
 
 	// If user is already logged in
@@ -68,10 +68,10 @@ func (epp *EmailPasswordProvider) HandleLogin(rw http.ResponseWriter, r *http.Re
 func (epp *EmailPasswordProvider) HandleAuthorize(rw http.ResponseWriter, r *http.Request) {
 	key := r.URL.Query().Get("key")
 	code := r.URL.Query().Get("code")
-	
+
 	// If key or code are empty, redirect to home
 	if key == "" || code == "" {
-		http.Redirect(rw, r, "https://ui.tribist.com/", http.StatusTemporaryRedirect)
+		http.Redirect(rw, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -81,7 +81,7 @@ func (epp *EmailPasswordProvider) HandleAuthorize(rw http.ResponseWriter, r *htt
 
 func (epp *EmailPasswordProvider) handleRegistrationForm(rw http.ResponseWriter, r *http.Request) {
 	redirectURL := r.URL.Query().Get("redirect_url")
-	
+
 	html := fmt.Sprintf(`
 	<!DOCTYPE html>
 	<html>
@@ -200,36 +200,36 @@ func (epp *EmailPasswordProvider) handleEmailLoginAuthorize(rw http.ResponseWrit
 	// Get the original redirect URL using the key
 	keyOneTime, err := epp.DB.GetOneTime(key, time.Hour, os.Getenv("WRITER"))
 	if err != nil {
-		http.Redirect(rw, r, "https://ui.tribist.com/", http.StatusTemporaryRedirect)
+		http.Redirect(rw, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
-	
+
 	redirectURL := keyOneTime.Data
 
 	// Get the user info using the code
 	codeOneTime, err := epp.DB.GetOneTime(code, time.Hour, os.Getenv("WRITER"))
 	if err != nil {
-		http.Redirect(rw, r, "https://ui.tribist.com/", http.StatusTemporaryRedirect)
+		http.Redirect(rw, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
 	// Parse the user JSON from the code
 	var userPayload map[string]string
 	if err := json.Unmarshal([]byte(codeOneTime.Data), &userPayload); err != nil {
-		http.Redirect(rw, r, "https://ui.tribist.com/", http.StatusTemporaryRedirect)
+		http.Redirect(rw, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
 	username, ok := userPayload["user"]
 	if !ok {
-		http.Redirect(rw, r, "https://ui.tribist.com/", http.StatusTemporaryRedirect)
+		http.Redirect(rw, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
 	// Find or create user with username as handle
 	user, err := common.FindOrCreateTPUser(epp.DB, username, "email", os.Getenv("WRITER"))
 	if err != nil {
-		http.Redirect(rw, r, "https://ui.tribist.com/", http.StatusTemporaryRedirect)
+		http.Redirect(rw, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
