@@ -206,30 +206,32 @@ func (epp *EmailPasswordProvider) handleEmailLoginAuthorize(rw http.ResponseWrit
 
 	redirectURL := keyOneTime.Data
 
+	defaultRedirect := os.Getenv("AUTH_REDIRECT_URL")
+
 	// Get the user info using the code
 	codeOneTime, err := epp.DB.GetOneTime(code, time.Hour, os.Getenv("WRITER"))
 	if err != nil {
-		http.Redirect(rw, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(rw, r, defaultRedirect, http.StatusTemporaryRedirect)
 		return
 	}
 
 	// Parse the user JSON from the code
 	var userPayload map[string]string
 	if err := json.Unmarshal([]byte(codeOneTime.Data), &userPayload); err != nil {
-		http.Redirect(rw, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(rw, r, defaultRedirect, http.StatusTemporaryRedirect)
 		return
 	}
 
 	username, ok := userPayload["user"]
 	if !ok {
-		http.Redirect(rw, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(rw, r, defaultRedirect, http.StatusTemporaryRedirect)
 		return
 	}
 
 	// Find or create user with username as handle
 	user, err := common.FindOrCreateTPUser(epp.DB, username, "email", os.Getenv("WRITER"))
 	if err != nil {
-		http.Redirect(rw, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(rw, r, defaultRedirect, http.StatusTemporaryRedirect)
 		return
 	}
 
