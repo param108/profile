@@ -202,7 +202,7 @@ func (epp *EmailPasswordProvider) handleEmailLoginAuthorize(rw http.ResponseWrit
 	// Get the original redirect URL using the key
 	keyOneTime, err := epp.DB.GetOneTime(key, time.Hour, os.Getenv("WRITER"))
 	if err != nil {
-		log.Println("couldnt get key %v", err)
+		log.Printf("couldnt get key %v", err)
 		rw.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(rw).Encode(models.Response{
 			Success: false,
@@ -216,7 +216,7 @@ func (epp *EmailPasswordProvider) handleEmailLoginAuthorize(rw http.ResponseWrit
 	// Get the user info using the code
 	codeOneTime, err := epp.DB.GetOneTime(code, time.Hour, os.Getenv("WRITER"))
 	if err != nil {
-		log.Println("couldnt get code %v", err)
+		log.Printf("couldnt get code %v", err)
 		rw.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(rw).Encode(models.Response{
 			Success: false,
@@ -228,7 +228,7 @@ func (epp *EmailPasswordProvider) handleEmailLoginAuthorize(rw http.ResponseWrit
 	// Parse the user JSON from the code
 	var userPayload map[string]string
 	if err := json.Unmarshal([]byte(codeOneTime.Data), &userPayload); err != nil {
-		log.Println("couldnt get payload %v", err)
+		log.Printf("couldnt get payload %v", err)
 		rw.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(rw).Encode(models.Response{
 			Success: false,
@@ -251,7 +251,7 @@ func (epp *EmailPasswordProvider) handleEmailLoginAuthorize(rw http.ResponseWrit
 	// Find or create user with username as handle
 	user, err := common.FindOrCreateTPUser(epp.DB, username, "email", os.Getenv("WRITER"))
 	if err != nil {
-		log.Println("couldnt create TP User %v", err)
+		log.Printf("couldnt create TP User %v", err)
 		rw.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(rw).Encode(models.Response{
 			Success: false,
