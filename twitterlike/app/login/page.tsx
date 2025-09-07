@@ -1,10 +1,9 @@
 "use client";
 import Header from "@/app/components/header";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FiCloudLightning } from "react-icons/fi";
 import ReactModal from "react-modal";
-import { emailLogin } from "../apis/login";
 
 const largeModalStyle = {
     content: {
@@ -31,14 +30,10 @@ const smallModalStyle = {
 };
 
 export default function Login() {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
     const [key, setKey] = useState("");
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [failureVisible, setFailureVisible] = useState(false);
     
-    const router = useRouter();
     const searchParams = useSearchParams();
 
     // Screen size management for modals
@@ -69,52 +64,6 @@ export default function Login() {
         setKey(keyParam);
     }, [searchParams]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        
-        if (!username || !password) {
-            setError("Username and password are required");
-            return;
-        }
-
-        setLoading(true);
-        setError("");
-
-        try {
-            const response = await emailLogin(username, password, key);
-            
-            if (response.status === 302 || response.status === 307) {
-                // Handle redirect response
-                const redirectUrl = response.headers.location || response.request.responseURL;
-                if (redirectUrl) {
-                    window.location.href = redirectUrl;
-                } else {
-                    setError("Redirect failed");
-                }
-            } else if (response.data.success) {
-                // Handle success case
-                setError("Login successful, but no redirect");
-            } else {
-                setError(response.data.errors?.[0] || "Login failed");
-            }
-        } catch (err: any) {
-            if (err.response && err.response.status === 302) {
-                // Axios treats redirects as errors, handle the redirect
-                const redirectUrl = err.response.headers.location;
-                if (redirectUrl) {
-                    window.location.href = redirectUrl;
-                } else {
-                    setError("Redirect failed");
-                }
-            } else if (err.response && err.response.data) {
-                setError(err.response.data.errors?.[0] || "Login failed");
-            } else {
-                setError("Network error occurred");
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
 
     return (
         <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
@@ -122,7 +71,11 @@ export default function Login() {
             <div className="mt-[100px] md:mt-[150px] flex flex-col items-center w-full max-w-md mx-auto px-4">
                 <h1 className="text-2xl font-bold text-gray-800 mb-8">Sign In</h1>
                 
-                <form onSubmit={handleSubmit} className="w-full space-y-4">
+                <form 
+                    action={`${process.env.NEXT_PUBLIC_BE_URL}/email/login?key=${key}`}
+                    method="POST"
+                    className="w-full space-y-4"
+                >
                     <div>
                         <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
                             Username
@@ -130,8 +83,7 @@ export default function Login() {
                         <input
                             type="text"
                             id="username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            name="username"
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="Enter your username"
                             pattern="[a-zA-Z0-9_]+"
@@ -147,8 +99,7 @@ export default function Login() {
                         <input
                             type="password"
                             id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            name="password"
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="Enter your password"
                             minLength={6}
@@ -164,10 +115,9 @@ export default function Login() {
                     
                     <button
                         type="submit"
-                        disabled={loading}
-                        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     >
-                        {loading ? "Signing in..." : "Sign In"}
+                        Sign In
                     </button>
                 </form>
             </div>

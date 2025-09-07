@@ -290,14 +290,18 @@ func (epp *EmailPasswordProvider) HandleEmailLogin(rw http.ResponseWriter, r *ht
 		return
 	}
 
-	var loginReq LoginRequest
-	if err := json.NewDecoder(r.Body).Decode(&loginReq); err != nil {
+	if err := r.ParseForm(); err != nil {
 		rw.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(rw).Encode(models.Response{
 			Success: false,
-			Errors:  []string{"Invalid request body"},
+			Errors:  []string{"Invalid form data"},
 		})
 		return
+	}
+
+	loginReq := LoginRequest{
+		UserName: r.FormValue("username"),
+		Password: r.FormValue("password"),
 	}
 
 	key := r.URL.Query().Get("key")
