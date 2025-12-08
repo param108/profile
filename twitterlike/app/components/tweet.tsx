@@ -1,5 +1,4 @@
 import { formatTweet, hasThread, ThreadInfo } from "../strings";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { GiBoltBomb, GiChemicalDrop, GiScrollUnfurled, GiSewingNeedle, GiTiedScroll } from "react-icons/gi"

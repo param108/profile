@@ -75,6 +75,11 @@ const smallDelModalStyle = {
 export default function ShowTweet() {
     const params = useParams();
     const searchParams = useSearchParams();
+
+    // Extract and ensure params are strings
+    const usernameParam = typeof params.username === 'string' ? params.username : (Array.isArray(params.username) ? params.username[0] : '');
+    const threadIdParam = typeof params.thread_id === 'string' ? params.thread_id : (Array.isArray(params.thread_id) ? params.thread_id[0] : '');
+
     var [ APIToken, setAPIToken ] = useState("")
     var [ loggedIn, setLoggedIn ] = useState(false)
     var [ editorLoading, setEditorLoading ] = useState(false)
@@ -197,9 +202,9 @@ Unknown Tweet`}
                 chosenTweet.flags = addThread(chosenTweet.flags, thread_id);
                 updateTweet(APIToken, chosenTweet.tweet, chosenTweet.id, chosenTweet.flags).
                     then((res)=>{
-                        getThread(params.username, params.thread_id).
+                        getThread(usernameParam, threadIdParam).
                             then((res:AxiosResponse)=>{
-                                setTweets(sortThreadTweets(res.data.data.tweets, params.thread_id))
+                                setTweets(sortThreadTweets(res.data.data.tweets, threadIdParam))
                                 setOpenModal("closed")
                             }).
                             catch(()=>{
@@ -297,11 +302,11 @@ Unknown Tweet`}
     useEffect(()=>{
         setPageLoading(true);
 
-        getThread(params.username, params.thread_id).
+        getThread(usernameParam, threadIdParam).
             then((res:AxiosResponse)=>{
-                setTweets(sortThreadTweets(res.data.data.tweets, params.thread_id))
+                setTweets(sortThreadTweets(res.data.data.tweets, threadIdParam))
                 setThreadName(res.data.data.name)
-                setUsername(params.username)
+                setUsername(usernameParam)
             }).
             catch(()=>{
                 setErrorMessage("Failed to get tweets.")
@@ -311,12 +316,12 @@ Unknown Tweet`}
                 setPageLoading(false)
             })
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [params.username, params.thread_id])
+    }, [usernameParam, threadIdParam])
 
     useEffect(()=>{
         var seen:{ [name:string]:boolean } = {}
         var newThreads: { [name:string]:(ThreadData|null) } = {}
-        setFlagsValue(`#thread:${params.thread_id}:${tweets.length}`)
+        setFlagsValue(`#thread:${threadIdParam}:${tweets.length}`)
         tweets.forEach((tweet: TweetType)=>{
             let ts = hasThread(tweet.flags);
             ts.forEach((t: ThreadInfo)=>{
@@ -407,7 +412,7 @@ Unknown Tweet`}
         setPageLoading(true);
         getProfile(APIToken).
             then((res: AxiosResponse)=>{
-                setLoggedIn(res.data.data.username === params.username)
+                setLoggedIn(res.data.data.username === usernameParam)
                 localStorage.setItem('username', res.data.data.username)
                 localStorage.setItem('user_id', res.data.data.user_id)
                 setPageLoading(false)
@@ -419,7 +424,7 @@ Unknown Tweet`}
                 setShowError(true)
                 setPageLoading(false)
             });
-                }, [APIToken, params.username])
+                }, [APIToken, usernameParam])
 
     const onSendClicked= (tweet: string, flags: string) => {
         if (loggedIn) {
@@ -430,9 +435,9 @@ Unknown Tweet`}
             setEditorValue(tweet)
             sendTweet(APIToken, tweet, flags).
                 then(()=>{
-                    getThread(params.username, params.thread_id).
+                    getThread(usernameParam, threadIdParam).
                         then((res:AxiosResponse)=>{
-                            setTweets(sortThreadTweets(res.data.data.tweets, params.thread_id))
+                            setTweets(sortThreadTweets(res.data.data.tweets, threadIdParam))
                             setEditorValue("")
                             setShowEditorTweet(false)
                         }).
@@ -485,9 +490,9 @@ Unknown Tweet`}
         console.log(editTweetValue, editFlagsValue);
         updateTweet(APIToken, editTweetValue, chosenTweet.id, editFlagsValue).
         then((res)=>{
-            getThread(params.username, params.thread_id).
+            getThread(usernameParam, threadIdParam).
                 then((res:AxiosResponse)=>{
-                    setTweets(sortThreadTweets(res.data.data.tweets, params.thread_id))
+                    setTweets(sortThreadTweets(res.data.data.tweets, threadIdParam))
                     setOpenModal("closed")
                 }).
                 catch(()=>{
@@ -515,9 +520,9 @@ Unknown Tweet`}
         setDelTweetLoading(true)
         deleteTweet(APIToken, chosenTweet.id).
             then((res)=>{
-                getThread(params.username, params.thread_id).
+                getThread(usernameParam, threadIdParam).
                     then((res:AxiosResponse)=>{
-                        setTweets(sortThreadTweets(res.data.data.tweets, params.thread_id))
+                        setTweets(sortThreadTweets(res.data.data.tweets, threadIdParam))
                         setOpenModal("closed")
                     }).
                     catch(()=>{
@@ -603,7 +608,7 @@ Unknown Tweet`}
                                                 location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/threads/${threadID}/`;
                                             }
                                         }}
-                                        shownThread={params.thread_id}
+                                        shownThread={threadIdParam}
                                         externalClicked={(tweet_id: string) => {
                                             location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/tweets?id=${tweet_id}`;
                                         }}
@@ -713,7 +718,7 @@ Used to be called **micro-blogging** until twitter
                                             location.href = `${process.env.NEXT_PUBLIC_HOST}/user/${username}/threads/${threadID}/`;
                                         }}
                                         threadList={threads}
-                                        shownThread={params.thread_id}
+                                        shownThread={threadIdParam}
                                     ></Tweet>
                                 )
                             })

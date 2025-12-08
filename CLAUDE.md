@@ -55,8 +55,8 @@ npm run citest    # Run all Jest tests (CI mode)
   - `utils/` - Shared utilities and authentication
 
 ### Frontend (Next.js)
-- **Framework**: Next.js 13+ with App Router
-- **Language**: TypeScript + React
+- **Framework**: Next.js 15+ with App Router
+- **Language**: TypeScript + React 19
 - **Styling**: Tailwind CSS
 - **Testing**: Jest with React Testing Library
 - **Key Directories**:
@@ -80,7 +80,7 @@ npm run citest    # Run all Jest tests (CI mode)
 
 ### Required Tools
 - Go 1.19+
-- Node.js/npm
+- Node.js 22.12.0+ / npm 10.9.0+
 - PostgreSQL
 - goimports (for Go formatting)
 

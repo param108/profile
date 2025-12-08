@@ -1,9 +1,10 @@
 "use client";
 import Header from "@/app/components/header";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { FiCloudLightning } from "react-icons/fi";
 import ReactModal from "react-modal";
+import Link from "next/link";
 
 const largeModalStyle = {
     content: {
@@ -29,11 +30,11 @@ const smallModalStyle = {
     }
 };
 
-export default function Login() {
+function LoginContent() {
     const [key, setKey] = useState("");
     const [error, setError] = useState("");
     const [failureVisible, setFailureVisible] = useState(false);
-    
+
     const searchParams = useSearchParams();
 
     // Screen size management for modals
@@ -131,10 +132,25 @@ export default function Login() {
                     <p>{"Failed to load login page."}</p>
                     <p>Missing required parameters.</p>
                     <p>
-                        Return <a className="text-blue-600" href="/">Home</a>!
+                        Return <Link className="text-blue-600" href="/">Home</Link>!
                     </p>
                 </div>
             </ReactModal>
         </main>
+    );
+}
+
+export default function Login() {
+    return (
+        <Suspense fallback={
+            <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
+                <Header changeDarkMode={null} showSpinner={false} />
+                <div className="mt-[100px] md:mt-[150px] flex flex-col items-center w-full max-w-md mx-auto px-4">
+                    <h1 className="text-2xl font-bold text-gray-800 mb-8">Loading...</h1>
+                </div>
+            </main>
+        }>
+            <LoginContent />
+        </Suspense>
     );
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
 import { usePathname, useRouter } from "next/navigation";
 import { MouseEventHandler, ReactElement, useEffect, useReducer, useState } from "react";
 import { FiCloudRain, FiZap } from "react-icons/fi";

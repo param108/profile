@@ -2,12 +2,13 @@
 import Header from "@/app/components/header";
 import { NextApiRequest, NextApiResponse } from "next";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { FiCloudLightning } from "react-icons/fi";
 import ReactModal from "react-modal";
 import { getOneTime, getProfile } from "../apis/login";
 import CircularProgressBar from "../components/circular_progress_bar";
 import dynamic from 'next/dynamic';
+import Link from "next/link";
 
 const ProgressBar = dynamic(() =>
     import("../components/circular_progress_bar"), {
@@ -38,10 +39,8 @@ const smallModalStyle = {
     }
 };
 
-// This page takes the onetime parameter and the redirecturl
-// from the url will extract the token and store in browser storage
-// and redirect to the redirecturl
-export default function LoginUser() {
+// Component that uses searchParams
+function LoginUserContent() {
     var [ oneTime, setOneTime ] = useState("")
     var [ token, setToken ] = useState("")
     var [ failureVisible, setFailureVisible ] = useState(false)
@@ -179,10 +178,28 @@ export default function LoginUser() {
                 <p>
                     but if its not you its us.</p>
                 <p>
-                    Return <a className="text-blue-600" href="/">Home</a>!
+                    Return <Link className="text-blue-600" href="/">Home</Link>!
                 </p>
             </div>
         </ReactModal>
         </main>
+    )
+}
+
+// This page takes the onetime parameter and the redirecturl
+// from the url will extract the token and store in browser storage
+// and redirect to the redirecturl
+export default function LoginUser() {
+    return (
+        <Suspense fallback={
+            <main className="flex bg-white min-h-screen flex-col items-center justify-stretch">
+                <Header changeDarkMode={null} showSpinner={false}></Header>
+                <div className="mt-[100px] md:mt-[150px] flex flex-col items-center">
+                    <span className="text-gray-500 md:text-xl">Loading...</span>
+                </div>
+            </main>
+        }>
+            <LoginUserContent />
+        </Suspense>
     )
 }

@@ -72,6 +72,10 @@ const smallDelModalStyle = {
 export default function ShowTweet() {
     const params = useParams();
     const searchParams = useSearchParams();
+
+    // Extract and ensure params are strings
+    const usernameParam = typeof params.username === 'string' ? params.username : (Array.isArray(params.username) ? params.username[0] : '');
+
     var [ APIToken, setAPIToken ] = useState("")
     var [ loggedIn, setLoggedIn ] = useState(false)
     var [ editorLoading, setEditorLoading ] = useState(false)
@@ -310,11 +314,11 @@ Unknown Tweet`}
         setPageLoading(true);
 
         if (idStr) {
-            getATweetForUser(params.username, idStr).
+            getATweetForUser(usernameParam, idStr).
                 then((res:AxiosResponse)=>{
                 console.log(res.data.data)
                 setTweets(mergeTweets(tweets, res.data.data, reverse))
-                setUsername(params.username)
+                setUsername(usernameParam)
                 setPageLoading(false)
             }).
             catch(()=>{
@@ -323,11 +327,11 @@ Unknown Tweet`}
                 setPageLoading(false)
             });
         } else {
-        getTweetsForUser([params.username], tags, 0, reverse).
+        getTweetsForUser([usernameParam], tags, 0, reverse).
             then((res:AxiosResponse)=>{
                 console.log(res.data.data)
                 setTweets(mergeTweets(tweets, res.data.data, reverse))
-                setUsername(params.username)
+                setUsername(usernameParam)
                 setPageLoading(false)
             }).
             catch(()=>{
@@ -337,7 +341,7 @@ Unknown Tweet`}
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [params.username])
+    }, [usernameParam])
 
     const getThreadCatalog = () => {
         return threadCatalog;
@@ -443,7 +447,7 @@ Unknown Tweet`}
         setPageLoading(true);
         getProfile(APIToken).
             then((res: AxiosResponse)=>{
-                setLoggedIn(res.data.data.username === params.username)
+                setLoggedIn(res.data.data.username === usernameParam)
                 localStorage.setItem('username', res.data.data.username)
                 localStorage.setItem('user_id', res.data.data.user_id)
                 setPageLoading(false)
@@ -455,7 +459,7 @@ Unknown Tweet`}
                 setShowError(true)
                 setPageLoading(false)
             });
-                }, [APIToken, params.username])
+                }, [APIToken, usernameParam])
 
     useEffect(()=>{
         let seenThreads: {[key: string]:Boolean} = {};
@@ -493,11 +497,11 @@ Unknown Tweet`}
 
         if (effectiveTweetLength < 20) {
             setPageLoading(true)
-            getTweetsForUser([params.username], queryTags, tweets.length, reverseFlag).
+            getTweetsForUser([usernameParam], queryTags, tweets.length, reverseFlag).
                 then((res:AxiosResponse)=>{
                     if (res.data.data.length > 0) {
                         setTweets(mergeTweets(tweets, res.data.data, reverseFlag))
-                        setUsername(params.username)
+                        setUsername(usernameParam)
                     }
                     setPageLoading(false)
                 }).
@@ -523,10 +527,10 @@ Unknown Tweet`}
                     setFlagsValue("")
                     setShowEditorTweet(false)
                     setEditorLoading(false)
-                    getTweetsForUser([params.username], [], 0, reverseFlag).
+                    getTweetsForUser([usernameParam], [], 0, reverseFlag).
                         then((res:AxiosResponse)=>{
                             setTweets(mergeTweets(tweets, res.data.data, reverseFlag))
-                            setUsername(params.username)
+                            setUsername(usernameParam)
                         }).
                         catch(()=>{
                             setErrorMessage("Failed to get tweets.")
@@ -613,10 +617,10 @@ Unknown Tweet`}
         if (scrollTop + clientHeight > (0.9*scrollHeight)) {
             if (!pageLoading) {
                 setPageLoading(true)
-                getTweetsForUser([params.username], queryTags, tweets.length, reverseFlag).
+                getTweetsForUser([usernameParam], queryTags, tweets.length, reverseFlag).
                     then((res:AxiosResponse)=>{
                         setTweets(mergeTweets(tweets, res.data.data, reverseFlag))
-                        setUsername(params.username)
+                        setUsername(usernameParam)
                         setPageLoading(false)
                     }).
                     catch(()=>{
