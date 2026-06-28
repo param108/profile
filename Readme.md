@@ -1,7 +1,7 @@
-# Profile 
+# Profile
 
 A completely open source platform to blog but using tweets.
-The code is deployed at [https://ui.tribist.com]
+The code is deployed at [https://profile.pritiatma.in](https://profile.pritiatma.in)
 
 # Build Status
 
@@ -9,9 +9,9 @@ Backend: ![api build status](https://github.com/param108/profile/actions/workflo
 
 Web Frontend: ![web build status](https://github.com/param108/profile/actions/workflows/twitterlike.yml/badge.svg)
 
-Deployed API Version: [api version](https://data.tribist.com/version)
+Deployed API Version: [api version](https://profile-api.pritiatma.in/version)
 
-Deployed web version: [web version](https://ui.tribist.com/version.txt)
+Deployed web version: [web version](https://profile.pritiatma.in/version.txt)
 
 # Contributing
 
