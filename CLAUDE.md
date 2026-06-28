@@ -4,7 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is "Profile" - an open source platform for blogging using tweets. It's a Twitter-like social media platform with both frontend and backend components. The live deployment is at https://ui.tribist.com.
+This is "Profile" - an open source platform for blogging using tweets. It's a Twitter-like social media platform with both frontend and backend components.
+
+### Live Deployment
+- **Frontend**: https://profile.pritiatma.in
+- **API**: https://profile-api.pritiatma.in
 
 ## Repository Structure
 
