@@ -67,7 +67,7 @@ func (epp *EmailPasswordProvider) HandleLogin(rw http.ResponseWriter, r *http.Re
 		return
 	}
 
-	loginURL := fmt.Sprintf("https://ui.tribist.com/login?key=%s", oneTime.ID)
+	loginURL := fmt.Sprintf("%s/login?key=%s", os.Getenv("FRONTEND_URL"), oneTime.ID)
 
 	// Add CORS headers for cross-origin redirects
 	rw.Header().Set("Access-Control-Allow-Origin", "*")
